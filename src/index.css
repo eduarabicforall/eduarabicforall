@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #070A14;
+  --bg-2: #0B1020;
+  --panel: rgba(255,255,255,.035);
+  --panel-2: rgba(255,255,255,.06);
+  --ink: #F3F5FA;
+  --ink-soft: #A2AABD;
+  --ink-faint: #6B7488;
+  --primary: #2FC49F;
+  --primary-soft: #1C6D5C;
+  --gold: #F0B429;
+  --violet: #B9A7F0;
+  --border: rgba(255,255,255,.09);
+  --border-soft: rgba(255,255,255,.055);
+  --radius: 20px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ea-gradient-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1100px 620px at 50% -8%, rgba(70,86,200,.28), transparent 70%),
+    radial-gradient(900px 500px at 88% 8%, rgba(47,196,159,.10), transparent 65%),
+    radial-gradient(800px 600px at 10% 30%, rgba(120,80,220,.08), transparent 60%);
+}
+
+.ea-gradient-bg-auth {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 600px at 12% 20%, rgba(70,86,200,.20), transparent 65%),
+    radial-gradient(800px 600px at 92% 85%, rgba(47,196,159,.12), transparent 60%);
+}
+
+.ea-gradient-bg-shop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1000px 560px at 50% -10%, rgba(70,86,200,.22), transparent 70%),
+    radial-gradient(800px 460px at 90% 4%, rgba(47,196,159,.09), transparent 65%);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--ink-faint);
+}
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Smooth scroll offset for sticky headers */
+section[id] { scroll-margin-top: 84px; }
+
+/* Page transition animation */
+.ea-page-enter {
+  animation: eaPageIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes eaPageIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Floating phone animation */
+.ea-float-phone {
+  animation: eaFloatPhone 3s ease-in-out infinite alternate;
+}
+@keyframes eaFloatPhone {
+  from { transform: translateY(0) translateX(-50%); }
+  to   { transform: translateY(-10px) translateX(-50%); }
+}
+
+/* Shimmer loading placeholder */
+.ea-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,.03) 25%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.03) 75%);
+  background-size: 200% 100%;
+  animation: eaShimmer 1.5s ease-in-out infinite;
+}
+@keyframes eaShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* Pulse glow for active elements */
+.ea-pulse-glow {
+  animation: eaPulseGlow 2s ease-in-out infinite;
+}
+@keyframes eaPulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(47,196,159,0); }
+  50%      { box-shadow: 0 0 20px 4px rgba(47,196,159,0.15); }
+}

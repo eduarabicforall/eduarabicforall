@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #070A14; }
+  .ea {
+    --bg: #070A14;
+    --bg-2: #0B1020;
+    --panel: rgba(255,255,255,.035);
+    --panel-2: rgba(255,255,255,.06);
+    --ink: #F3F5FA;
+    --ink-soft: #A2AABD;
+    --ink-faint: #6B7488;
+    --primary: #2FC49F;
+    --primary-soft: #1C6D5C;
+    --gold: #F0B429;
+    --border: rgba(255,255,255,.09);
+    --border-soft: rgba(255,255,255,.055);
+    --radius: 18px;
+  }
+  .ea a { color: inherit; }
+  .ea-mat { font-family: 'Material Symbols Rounded'; line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; }
+</style>
+</helmet>
+<div class="ea" style="display: flex; min-height: 100vh; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif;">
+
+  <aside style="width: 250px; flex-shrink: 0; border-inline-end: 1px solid var(--border-soft); padding: 22px 16px; display: flex; flex-direction: column; gap: 24px; position: sticky; top: 0; height: 100vh; background: rgba(11,16,32,.5);">
+    <div style="padding: 4px 8px;"><img src="assets/logo.png" alt="EduArabic for All" style="height: 34px; width: auto; display: block;"></div>
+    <nav style="display: flex; flex-direction: column; gap: 3px;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+        <a href="#" style="display: flex; align-items: center; gap: 13px; padding: 11px 14px; border-radius: 11px; text-decoration: none; font-size: 14.5px; font-weight: 600; color: {{ n.color }}; background: {{ n.bg }};" style-hover="background: var(--panel-2);">
+          <i class="hgi-stroke hgi-{{ n.icon }}" style="font-size: 21px;"></i> {{ n.label }}
+        </a>
+      </sc-for>
+    </nav>
+    <div style="margin-top: auto; padding: 14px; border-radius: 14px; background: linear-gradient(160deg, rgba(47,196,159,.16), rgba(47,196,159,.04)); border: 1px solid rgba(47,196,159,.22);">
+      <div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 4px;">Upgrade to Plus</div>
+      <p style="font-size: 12.5px; color: var(--ink-soft); margin: 0 0 12px; line-height: 1.45;">Unlock every module &amp; 10× AI Ustaz quota.</p>
+      <a href="#" style="display: block; text-align: center; padding: 9px; border-radius: 10px; background: var(--primary); color: #04140F; text-decoration: none; font-weight: 700; font-size: 13px;" style-hover="opacity:.9;">RM4.90 / mo</a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 11px; padding: 8px;">
+      <span style="width: 36px; height: 36px; border-radius: 10px; background: var(--panel-2); display: grid; place-items: center; color: var(--primary);"><i class="hgi-stroke hgi-user" style="font-size: 20px;"></i></span>
+      <div style="min-width: 0;"><div style="font-size: 13.5px; font-weight: 700;">Ahmad Faiz</div><div style="font-size: 12px; color: var(--ink-faint);">Free plan</div></div>
+      <i class="hgi-stroke hgi-settings-02" style="font-size: 18px; color: var(--ink-faint); margin-inline-start: auto;"></i>
+    </div>
+  </aside>
+
+  <main style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+    <div style="position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px); background: rgba(7,10,20,.72); border-bottom: 1px solid var(--border-soft); padding: 16px 34px; display: flex; align-items: center; gap: 20px;">
+      <div>
+        <div style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 21px; letter-spacing: -.01em;">Assalamualaikum, Ahmad</div>
+        <div style="font-size: 13.5px; color: var(--ink-soft);">You're on a 12-day streak — keep it going.</div>
+      </div>
+      <div style="margin-inline-start: auto; display: flex; align-items: center; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 11px; background: var(--panel); border: 1px solid var(--border);"><i class="hgi-stroke hgi-fire" style="font-size: 19px; color: var(--gold);"></i><span style="font-weight: 700; font-size: 14px;">12</span></div>
+        <div style="display: flex; align-items: center; gap: 7px; padding: 9px 15px; border-radius: 11px; background: var(--panel); border: 1px solid var(--border);"><i class="hgi-stroke hgi-flash" style="font-size: 19px; color: var(--primary);"></i><span style="font-weight: 700; font-size: 14px;">1,240 XP</span></div>
+        <span style="width: 42px; height: 42px; border-radius: 12px; background: var(--panel-2); display: grid; place-items: center; color: var(--ink-soft);"><i class="hgi-stroke hgi-notification-01" style="font-size: 21px;"></i></span>
+      </div>
+    </div>
+
+    <div style="padding: 28px 34px 48px; display: flex; flex-direction: column; gap: 26px;">
+
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+        <div style="position: relative; border-radius: 22px; padding: 30px; background: linear-gradient(140deg, #17756A, #0C3A33); overflow: hidden;">
+          <div style="position: absolute; top: -40px; right: -30px; width: 180px; height: 180px; border-radius: 50%; background: rgba(47,196,159,.25); filter: blur(20px);"></div>
+          <div style="position: relative;">
+            <span style="display: inline-block; padding: 5px 12px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px;">Continue learning</span>
+            <div style="display: flex; gap: 7px; margin-bottom: 12px;">
+              <span style="font-size: 11px; font-weight: 700; color: #fff; background: rgba(255,255,255,.16); padding: 4px 10px; border-radius: 7px;">NAHW · Unit 3</span>
+              <span style="font-size: 11px; font-weight: 700; background: var(--gold); padding: 4px 10px; border-radius: 7px; color: #1a1400;">Clip 2 of 5</span>
+            </div>
+            <h2 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 30px; letter-spacing: -.01em; margin: 0 0 4px; color: #fff;">The Nominal Sentence</h2>
+            <p dir="rtl" style="font-family: 'Amiri', serif; font-size: 22px; color: rgba(255,255,255,.82); margin: 0 0 22px;">الجُمْلَةُ الاِسْمِيَّة</p>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <a href="#" style="display: inline-flex; align-items: center; gap: 9px; padding: 13px 24px; border-radius: 12px; background: #fff; color: #0C3A33; text-decoration: none; font-weight: 700; font-size: 15px;" style-hover="opacity:.92;"><i class="hgi-stroke hgi-play" style="font-size: 20px;"></i> Resume lesson</a>
+              <div style="color: rgba(255,255,255,.85); font-size: 13px;"><span style="font-weight: 700;">40%</span> through this unit</div>
+            </div>
+            <div style="margin-top: 18px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.18); overflow: hidden;"><span style="display: block; height: 100%; width: 40%; background: var(--gold); border-radius: 999px;"></span></div>
+          </div>
+        </div>
+
+        <div style="border-radius: 22px; padding: 26px; background: var(--panel); border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+            <span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px;">Weekly goal</span>
+            <span style="font-size: 12px; color: var(--ink-faint); font-weight: 600;">5 / 7 days</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; gap: 6px; margin-bottom: 22px;">
+            <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
+                <span style="width: 100%; aspect-ratio: 1; border-radius: 11px; display: grid; place-items: center; background: {{ d.bg }}; color: {{ d.fg }}; border: 1px solid {{ d.bd }};"><i class="hgi-stroke hgi-{{ d.icon }}" style="font-size: 18px;"></i></span>
+                <span style="font-size: 11px; color: var(--ink-faint); font-weight: 600;">{{ d.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding: 14px; border-radius: 13px; background: var(--panel-2); display: flex; align-items: center; gap: 12px;">
+            <span style="width: 38px; height: 38px; border-radius: 10px; background: rgba(240,180,41,.16); display: grid; place-items: center; color: var(--gold);"><i class="hgi-stroke hgi-award-01" style="font-size: 21px;"></i></span>
+            <div><div style="font-size: 13.5px; font-weight: 700;">2 more days to a new badge</div><div style="font-size: 12.5px; color: var(--ink-faint);">Keep your streak alive</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; align-items: start;">
+
+        <div style="border-radius: 22px; padding: 26px; background: var(--panel); border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px;">Your learning path</span>
+            <a href="#" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600;">View full map</a>
+          </div>
+          <p style="font-size: 13.5px; color: var(--ink-soft); margin: 0 0 24px;">Nahw · Unit 3 — Nominal Sentences</p>
+
+          <div style="position: relative; padding: 4px 0;">
+            <sc-for list="{{ path }}" as="node" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; gap: 18px; padding: 10px 0; position: relative;">
+                <div style="position: relative; z-index: 1; flex-shrink: 0;">
+                  <span style="width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: {{ node.nodeBg }}; border: 2px solid {{ node.nodeBd }}; color: {{ node.nodeFg }}; box-shadow: {{ node.glow }};"><i class="hgi-stroke hgi-{{ node.icon }}" style="font-size: 25px;"></i></span>
+                  <sc-if value="{{ node.connector }}" hint-placeholder-val="{{ true }}"><span style="position: absolute; left: 50%; top: 52px; transform: translateX(-50%); width: 3px; height: 24px; background: {{ node.lineColor }};"></span></sc-if>
+                </div>
+                <div style="flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-radius: 13px; background: {{ node.rowBg }}; border: 1px solid {{ node.rowBd }};">
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 9px;"><span style="font-weight: 700; font-size: 14.5px; color: {{ node.titleColor }};">{{ node.title }}</span><span style="{{ node.kindStyle }}">{{ node.kind }}</span></div>
+                    <div style="font-size: 12.5px; color: var(--ink-faint); margin-top: 2px;">{{ node.meta }}</div>
+                  </div>
+                  <i class="hgi-stroke hgi-{{ node.stateIcon }}" style="font-size: 22px; color: {{ node.chevColor }};"></i>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <div style="border-radius: 22px; padding: 24px; background: var(--panel); border: 1px solid var(--border);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px;">Upcoming classes</span>
+              <a href="#" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600;">Schedule</a>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <sc-for list="{{ classes }}" as="c" hint-placeholder-count="2">
+                <div style="padding: 15px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--border-soft);">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <span style="width: 40px; height: 40px; border-radius: 11px; background: {{ c.tint }}; display: grid; place-items: center; color: {{ c.accent }};"><i class="hgi-stroke hgi-{{ c.icon }}" style="font-size: 21px;"></i></span>
+                    <div style="flex: 1; min-width: 0;"><div style="font-weight: 700; font-size: 14px;">{{ c.title }}</div><div style="font-size: 12.5px; color: var(--ink-faint);">{{ c.tutor }}</div></div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-soft); font-weight: 600;"><i class="hgi-stroke hgi-clock-01" style="font-size: 16px;"></i> {{ c.time }}</span>
+                    <a href="#" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 9px; background: {{ c.btnBg }}; color: {{ c.btnColor }}; text-decoration: none; font-weight: 700; font-size: 12.5px;" style-hover="opacity:.9;">{{ c.btnLabel }}</a>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <a href="#" style="text-decoration: none; border-radius: 22px; padding: 22px; background: linear-gradient(150deg, rgba(120,80,220,.16), rgba(47,196,159,.08)); border: 1px solid rgba(120,110,220,.25); display: flex; align-items: center; gap: 15px;" style-hover="border-color: rgba(120,110,220,.5);">
+            <span style="width: 48px; height: 48px; border-radius: 13px; background: rgba(255,255,255,.08); display: grid; place-items: center; color: #B9A7F0;"><i class="hgi-stroke hgi-ai-brain-01" style="font-size: 25px;"></i></span>
+            <div style="flex: 1;"><div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15.5px; color: var(--ink);">Ask AI Ustaz</div><div style="font-size: 13px; color: var(--ink-soft);">Practise & get your Arabic corrected</div></div>
+            <i class="hgi-stroke hgi-arrow-right-01" style="font-size: 22px; color: var(--ink-soft);"></i>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const activeNav = "Dashboard";
+    const nav = [
+      { icon: "dashboard-square-01", label: "Dashboard" },
+      { icon: "route-01", label: "Learning path" },
+      { icon: "headphones", label: "Audio Library" },
+      { icon: "calendar-01", label: "My classes" },
+      { icon: "ai-brain-01", label: "AI Ustaz" },
+      { icon: "award-01", label: "Achievements" },
+    ].map(n => ({
+      ...n,
+      color: n.label === activeNav ? "#F3F5FA" : "var(--ink-soft)",
+      bg: n.label === activeNav ? "var(--panel-2)" : "transparent",
+    }));
+
+    const days = [
+      { label: "M", done: true }, { label: "T", done: true }, { label: "W", done: true },
+      { label: "T", done: true }, { label: "F", done: true }, { label: "S", today: true },
+      { label: "S", done: false },
+    ];
+    const week = days.map(d => {
+      if (d.done) return { ...d, bg: "rgba(47,196,159,.16)", fg: "var(--primary)", bd: "rgba(47,196,159,.3)", icon: "tick-02" };
+      if (d.today) return { ...d, bg: "rgba(240,180,41,.16)", fg: "var(--gold)", bd: "var(--gold)", icon: "flash" };
+      return { ...d, bg: "var(--panel-2)", fg: "var(--ink-faint)", bd: "var(--border-soft)", icon: "lock" };
+    });
+
+    const kindStyle = (color, bg) => `padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:${color};background:${bg};`;
+    const nodeDone = { nodeBg: "rgba(47,196,159,.15)", nodeBd: "var(--primary)", nodeFg: "var(--primary)", glow: "none", rowBg: "var(--panel)", rowBd: "var(--border-soft)", titleColor: "var(--ink)", chevColor: "var(--primary)", stateIcon: "checkmark-circle-01", lineColor: "var(--primary)", connector: true };
+    const nodeActive = { nodeBg: "var(--gold)", nodeBd: "var(--gold)", nodeFg: "#1a1400", glow: "0 0 0 5px rgba(240,180,41,.16)", rowBg: "rgba(240,180,41,.08)", rowBd: "rgba(240,180,41,.35)", titleColor: "var(--ink)", chevColor: "var(--gold)", stateIcon: "arrow-right-01", lineColor: "var(--border-soft)", connector: true };
+    const nodeLocked = { nodeBg: "var(--panel-2)", nodeBd: "var(--border-soft)", nodeFg: "var(--ink-faint)", glow: "none", rowBg: "transparent", rowBd: "var(--border-soft)", titleColor: "var(--ink-soft)", chevColor: "var(--ink-faint)", stateIcon: "lock", lineColor: "var(--border-soft)", connector: true };
+
+    const path = [
+      { ...nodeDone, icon: "play-circle", title: "What is a nominal sentence?", kind: "Clip", kindStyle: kindStyle("var(--primary)", "rgba(47,196,159,.12)"), meta: "Watched · 3 min" },
+      { ...nodeActive, icon: "play", title: "Mubtada & Khabar", kind: "Clip", kindStyle: kindStyle("#1a1400", "var(--gold)"), meta: "In progress · 2 min left" },
+      { ...nodeLocked, icon: "quiz-01", title: "Practice: build the sentence", kind: "Exercise", kindStyle: kindStyle("var(--ink-faint)", "var(--panel-2)"), meta: "Locked · 8 questions" },
+      { ...nodeLocked, icon: "headphones", title: "Podcast: sentences in speech", kind: "Audio", kindStyle: kindStyle("var(--ink-faint)", "var(--panel-2)"), meta: "Locked · 6 min" },
+      { ...nodeLocked, icon: "medal-01", title: "Unit 3 checkpoint", kind: "Test", kindStyle: kindStyle("var(--ink-faint)", "var(--panel-2)"), meta: "Locked", connector: false },
+    ];
+
+    const classes = [
+      { title: "Muhadathah — Level 2", tutor: "with Ustaz Hakim", time: "Today · 8:30 PM", icon: "video-01", tint: "rgba(47,196,159,.14)", accent: "var(--primary)", btnLabel: "Join Zoom", btnBg: "var(--primary)", btnColor: "#04140F" },
+      { title: "Nahw Q&A session", tutor: "with Ustazah Aisyah", time: "Thu · 9:00 PM", icon: "user-group", tint: "rgba(240,180,41,.14)", accent: "var(--gold)", btnLabel: "Remind me", btnBg: "var(--panel-2)", btnColor: "var(--ink)" },
+    ];
+
+    return { nav, week, path, classes };
+  }
+}
+</script>
+</body>
+</html>

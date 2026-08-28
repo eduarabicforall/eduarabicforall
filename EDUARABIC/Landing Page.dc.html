@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: #070A14; }
+  .ea section[id] { scroll-margin-top: 84px; }
+  .ea {
+    --bg: #070A14;
+    --panel: rgba(255,255,255,.035);
+    --panel-2: rgba(255,255,255,.06);
+    --ink: #F3F5FA;
+    --ink-soft: #A2AABD;
+    --ink-faint: #6B7488;
+    --primary: #2FC49F;
+    --primary-soft: #1C6D5C;
+    --gold: #F0B429;
+    --border: rgba(255,255,255,.09);
+    --border-soft: rgba(255,255,255,.055);
+    --radius: 20px;
+  }
+  .ea a { color: inherit; }
+  .ea-mat { font-family: 'Material Symbols Rounded'; line-height: 1; display: inline-block; white-space: nowrap; direction: ltr; }
+  @keyframes eaFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  @keyframes eaFade { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+<div class="ea" style="position: relative; background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', sans-serif; min-height: 100vh; overflow-x: hidden;">
+
+  <div style="position: absolute; inset: 0; z-index: 0; pointer-events: none; background:
+    radial-gradient(1100px 620px at 50% -8%, rgba(70,86,200,.28), transparent 70%),
+    radial-gradient(900px 500px at 88% 8%, rgba(47,196,159,.10), transparent 65%),
+    radial-gradient(800px 600px at 10% 30%, rgba(120,80,220,.08), transparent 60%);"></div>
+
+  <div style="position: relative; z-index: 1;">
+
+  <header style="position: sticky; top: 0; z-index: 40; backdrop-filter: blur(14px); background: rgba(7,10,20,.72); border-bottom: 1px solid var(--border-soft);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 13px 26px; display: flex; align-items: center; gap: 26px;">
+      <a href="#" style="display: flex; align-items: center; text-decoration: none;">
+        <img src="assets/logo.png" alt="EduArabic for All" style="height: 42px; width: auto; display: block;">
+      </a>
+      <nav style="display: flex; gap: 2px; margin-inline-start: 18px;">
+        <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="5">
+          <a href="{{ link.href }}" onClick="{{ link.onClick }}" style="padding: 8px 14px; border-radius: 9px; text-decoration: none; color: var(--ink-soft); font-size: 14px; font-weight: 500;" style-hover="color: var(--ink); background: var(--panel-2);">{{ link.label }}</a>
+        </sc-for>
+      </nav>
+      <div style="margin-inline-start: auto; display: flex; align-items: center; gap: 10px;">
+        <a href="Auth.dc.html" style="padding: 10px 20px; border-radius: 11px; text-decoration: none; background: var(--ink); color: #0A0E1A; font-size: 14px; font-weight: 700;" style-hover="opacity: .9;">Sign in</a>
+      </div>
+    </div>
+  </header>
+
+  <section style="max-width: 1200px; margin: 0 auto; padding: 84px 26px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+    <div style="animation: eaFade .6s ease both;">
+      <h1 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 76px; line-height: .98; letter-spacing: -.03em; margin: 0 0 20px;">EduArabic<span style="color: var(--primary);">.</span></h1>
+      <p style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -.01em; margin: 0 0 8px;">Learn Arabic. Speak it with confidence.</p>
+      <p style="font-size: 17px; line-height: 1.62; color: var(--ink-soft); max-width: 470px; margin: 0 0 30px;">EduArabic brings interactive modules, free audio, live classes with an ustaz, and an AI Ustaz that corrects your Arabic — all in one connected place to learn, at any level.</p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+        <a href="Auth.dc.html" style="display: inline-flex; align-items: center; gap: 9px; padding: 14px 26px; border-radius: 12px; background: var(--ink); color: #0A0E1A; text-decoration: none; font-weight: 700; font-size: 16px;" style-hover="opacity: .9;">Start free <i class="hgi-stroke hgi-arrow-right-01" style="font-size: 20px;"></i></a>
+        <a href="#pricing" style="display: inline-flex; align-items: center; padding: 14px 26px; border-radius: 12px; background: var(--panel); color: var(--ink); text-decoration: none; font-weight: 700; font-size: 16px; border: 1px solid var(--border);" style-hover="border-color: var(--primary);">View pricing</a>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px;">
+        <sc-for list="{{ storeBtns }}" as="b" hint-placeholder-count="2">
+          <a href="#" style="display: inline-flex; align-items: center; gap: 11px; padding: 11px 20px; border-radius: 12px; background: #000; border: 1px solid var(--border); text-decoration: none;" style-hover="border-color: var(--ink-faint);">
+            <i class="hgi-stroke hgi-{{ b.icon }}" style="font-size: 26px; color: #fff;"></i>
+            <span style="display: flex; flex-direction: column; line-height: 1.1;"><span style="font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em;">{{ b.small }}</span><span style="font-size: 16px; font-weight: 700; color: #fff;">{{ b.big }}</span></span>
+          </a>
+        </sc-for>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; color: var(--ink-soft); font-size: 14px; font-weight: 500;">
+        <span style="color: var(--gold); letter-spacing: 2px; font-size: 15px;">★★★★★</span>
+        Loved by learners · Education · 12+ · Free to start
+      </div>
+    </div>
+
+    <div style="position: relative; height: 620px; animation: eaFade .7s .1s ease both;">
+      <div style="position: absolute; top: 62px; left: 3%; width: 232px; transform: rotate(-7deg); opacity: .5; filter: saturate(.7);">
+        <dc-import name="Phone Mockup" variant="sand" hint-size="232px,470px"></dc-import>
+      </div>
+      <div style="position: absolute; top: 62px; right: 3%; width: 232px; transform: rotate(7deg); opacity: .5; filter: saturate(.7);">
+        <dc-import name="Phone Mockup" variant="crimson" hint-size="232px,470px"></dc-import>
+      </div>
+      <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 268px; z-index: 2; animation: eaFloat 6s ease-in-out infinite;">
+        <dc-import name="Phone Mockup" variant="teal" hint-size="268px,540px"></dc-import>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" style="max-width: 1200px; margin: 0 auto; padding: 70px 26px;">
+    <div style="text-align: center; max-width: 680px; margin: 0 auto 56px;">
+      <h2 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 46px; letter-spacing: -.02em; margin: 0 0 14px;">See EduArabic in action</h2>
+      <p style="font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin: 0;">A connected learning flow: watch short clips, master grammar &amp; morphology, listen to podcasts, practise with AI Ustaz, and join live classes — everything in sync.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 32px; align-items: center;">
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <sc-for list="{{ stepsLeft }}" as="s" hint-placeholder-count="4">
+          <div style="display: flex; gap: 16px; padding: 20px; border-radius: 16px; background: {{ s.bg }}; border: 1px solid {{ s.bd }};">
+            <span style="width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; background: var(--panel-2); display: grid; place-items: center; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; color: var(--primary);">{{ s.n }}</span>
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;"><span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px;">{{ s.title }}</span><span style="{{ s.tagStyle }}">{{ s.tag }}</span></div>
+              <p style="font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin: 0;">{{ s.desc }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="width: 270px; animation: eaFloat 7s ease-in-out infinite;">
+        <dc-import name="Phone Mockup" variant="teal" screen="lesson" hint-size="270px,548px"></dc-import>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <sc-for list="{{ stepsRight }}" as="s" hint-placeholder-count="5">
+          <div style="display: flex; gap: 16px; padding: 20px; border-radius: 16px; background: var(--panel); border: 1px solid var(--border-soft);">
+            <span style="width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px; background: var(--panel-2); display: grid; place-items: center; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; color: var(--ink-faint);">{{ s.n }}</span>
+            <div>
+              <div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 5px;">{{ s.title }}</div>
+              <p style="font-size: 14px; line-height: 1.5; color: var(--ink-soft); margin: 0;">{{ s.desc }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" style="max-width: 1200px; margin: 0 auto; padding: 70px 26px;">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto 30px;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-faint);">Pricing</span>
+      <h2 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 46px; letter-spacing: -.02em; margin: 12px 0 14px;">Simple, learner-friendly pricing.</h2>
+      <p style="font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin: 0;">Start free. Upgrade to Plus or Pro to unlock every module and the full AI Ustaz. Cancel anytime. No hidden fees.</p>
+    </div>
+    <div style="max-width: 900px; margin: 0 auto 34px; padding: 18px 24px; border-radius: 14px; background: rgba(47,196,159,.08); border: 1px solid rgba(47,196,159,.22); text-align: center; font-size: 15px;">
+      <span style="color: var(--primary); font-weight: 700;">Website exclusive promo:</span> <span style="color: var(--ink-soft);">Subscribe directly through our website for discounted pricing.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start;">
+      <sc-for list="{{ plans }}" as="p" hint-placeholder-count="3">
+        <div style="position: relative; border-radius: var(--radius); padding: 30px 26px; background: {{ p.cardBg }}; border: 1px solid {{ p.cardBd }};">
+          <sc-if value="{{ p.badge }}" hint-placeholder-val="Most popular">
+            <span style="position: absolute; top: -13px; left: 50%; transform: translateX(-50%); padding: 6px 16px; border-radius: 999px; background: {{ p.badgeBg }}; color: {{ p.badgeColor }}; font-size: 12px; font-weight: 700; white-space: nowrap;">{{ p.badge }}</span>
+          </sc-if>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+            <span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px;">{{ p.name }}</span>
+            <span style="font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint);">{{ p.tag }}</span>
+            <sc-if value="{{ p.promo }}" hint-placeholder-val="{{ true }}"><span style="margin-inline-start: auto; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(47,196,159,.4); color: var(--primary); font-size: 10px; font-weight: 700; letter-spacing: .1em;">WEB PROMO</span></sc-if>
+          </div>
+          <div style="display: flex; align-items: baseline; gap: 8px; margin: 14px 0 6px;">
+            <span style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 44px; letter-spacing: -.02em;">{{ p.price }}</span>
+            <span style="font-size: 15px; color: var(--ink-soft);">{{ p.unit }}</span>
+          </div>
+          <p style="font-size: 14px; line-height: 1.55; color: var(--ink-soft); margin: 0 0 22px; min-height: 42px;">{{ p.note }}</p>
+          <a href="#" style="display: block; text-align: center; padding: 13px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 24px; background: {{ p.ctaBg }}; color: {{ p.ctaColor }}; border: 1px solid {{ p.ctaBd }};" style-hover="opacity: .9;">{{ p.cta }}</a>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ p.features }}" as="f" hint-placeholder-count="6">
+              <div style="display: flex; gap: 11px; font-size: 14px; line-height: 1.45; color: var(--ink-soft);">
+                <i class="hgi-stroke hgi-tick-02" style="font-size: 19px; color: var(--primary); flex-shrink: 0;"></i>
+                <span>{{ f }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width: 1120px; margin: 0 auto; padding: 40px 26px 70px;">
+    <div style="text-align: center; max-width: 640px; margin: 0 auto 44px;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-faint);">Compare plans</span>
+      <h2 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 40px; letter-spacing: -.02em; margin: 12px 0 0;">Pick the plan that fits how you learn.</h2>
+    </div>
+    <div style="border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); overflow: hidden;">
+      <div style="display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; padding: 26px 28px; border-bottom: 1px solid var(--border-soft); align-items: end;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint);">Feature</span>
+        <div style="text-align: center;"><div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px;">Free</div><div style="font-size: 12px; color: var(--ink-faint);">RM0 forever</div></div>
+        <div style="text-align: center; position: relative; padding: 14px 10px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--primary);"><span style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 4px 12px; border-radius: 999px; background: var(--gold); color: #1a1400; font-size: 10px; font-weight: 700; white-space: nowrap;">★ MOST POPULAR</span><div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px;">Plus</div><div style="font-size: 12px; color: var(--ink-faint);">RM4.90 / mo</div></div>
+        <div style="text-align: center;"><div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px;">Pro</div><div style="font-size: 12px; color: var(--ink-faint);">RM10.90 / mo</div></div>
+      </div>
+      <sc-for list="{{ compareGroups }}" as="g" hint-placeholder-count="3">
+        <div style="padding: 22px 28px 6px; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint);">{{ g.name }}</div>
+        <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+          <div style="display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; padding: 18px 28px; border-top: 1px solid var(--border-soft); align-items: center;">
+            <div style="padding-inline-end: 20px;"><div style="font-weight: 600; font-size: 15px; margin-bottom: 3px;">{{ r.feature }}</div><div style="font-size: 13px; color: var(--ink-faint); line-height: 1.4;">{{ r.desc }}</div></div>
+            <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="3">
+              <div style="text-align: center;">
+                <sc-if value="{{ c.isCheck }}" hint-placeholder-val="{{ true }}"><i class="hgi-stroke hgi-tick-02" style="font-size: 22px; color: var(--primary);"></i></sc-if>
+                <sc-if value="{{ c.isDash }}" hint-placeholder-val="{{ true }}"><i class="hgi-stroke hgi-cancel-01" style="font-size: 20px; color: var(--ink-faint);"></i></sc-if>
+                <sc-if value="{{ c.isPill }}" hint-placeholder-val="{{ true }}"><span style="display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--panel-2); font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.3;">{{ c.text }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="reviews" style="max-width: 1120px; margin: 0 auto; padding: 40px 26px 80px;">
+    <div style="text-align: center; margin-bottom: 44px;">
+      <h2 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 46px; letter-spacing: -.02em; margin: 0 0 12px;">Real learner reviews</h2>
+      <div style="display: inline-flex; align-items: center; gap: 10px; color: var(--ink-soft); font-size: 15px;"><span style="color: var(--gold); letter-spacing: 2px; font-size: 18px;">★★★★★</span> 4.9/5 from learners</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start;">
+      <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="3">
+        <div style="border-radius: var(--radius); padding: 28px; background: var(--panel); border: 1px solid var(--border-soft);">
+          <i class="hgi-stroke hgi-quote-down" style="font-size: 34px; color: var(--ink-faint); margin-bottom: 12px; display: block;"></i>
+          <p style="font-size: 15px; line-height: 1.6; color: var(--ink); margin: 0 0 18px;">{{ r.text }}</p>
+          <div style="font-size: 14px; color: var(--ink-faint); font-weight: 500;">— {{ r.name }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width: 900px; margin: 0 auto; padding: 60px 26px 90px; text-align: center;">
+    <h2 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 56px; letter-spacing: -.03em; margin: 0 0 8px; line-height: 1.02;">Learn Arabic. <span style="background: linear-gradient(90deg, var(--primary), #7FE3CC); -webkit-background-clip: text; background-clip: text; color: transparent;">The right way.</span></h2>
+    <p style="font-size: 17px; color: var(--ink-soft); margin: 0 0 30px;">Free to start — on the web, App Store and Google Play.</p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <sc-for list="{{ storeBtns }}" as="b" hint-placeholder-count="2">
+        <a href="#" style="display: inline-flex; align-items: center; gap: 11px; padding: 12px 22px; border-radius: 12px; background: #000; border: 1px solid var(--border); text-decoration: none;" style-hover="border-color: var(--ink-faint);">
+          <i class="hgi-stroke hgi-{{ b.icon }}" style="font-size: 26px; color: #fff;"></i>
+          <span style="display: flex; flex-direction: column; line-height: 1.1;"><span style="font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .08em;">{{ b.small }}</span><span style="font-size: 16px; font-weight: 700; color: #fff;">{{ b.big }}</span></span>
+        </a>
+      </sc-for>
+      <a href="#pricing" style="display: inline-flex; align-items: center; padding: 14px 26px; border-radius: 12px; background: var(--panel); border: 1px solid var(--border); text-decoration: none; font-weight: 700; font-size: 15px;" style-hover="border-color: var(--primary);">See plans</a>
+    </div>
+  </section>
+
+  <footer style="border-top: 1px solid var(--border-soft); background: rgba(7,10,20,.6);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 54px 26px; display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 32px;">
+      <div>
+        <img src="assets/logo.png" alt="EduArabic for All" style="height: 40px; width: auto; display: block; margin-bottom: 14px;">
+        <p style="font-size: 14px; color: var(--ink-faint); line-height: 1.5; margin: 0; max-width: 260px;">An Arabic learning platform for everyone — modules, audio, live classes &amp; AI Ustaz.</p>
+      </div>
+      <sc-for list="{{ footerCols }}" as="col" hint-placeholder-count="3">
+        <div>
+          <div style="font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 16px;">{{ col.title }}</div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ col.links }}" as="l" hint-placeholder-count="4">
+              <a href="#" style="font-size: 14px; color: var(--ink-soft); text-decoration: none;" style-hover="color: var(--ink);">{{ l }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="max-width: 1200px; margin: 0 auto; padding: 22px 26px; border-top: 1px solid var(--border-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--ink-faint);">
+      <span>© 2026 EduArabic for All</span>
+      <span>Made in Malaysia · Payments by Bayarcash (FPX / DuitNow)</span>
+    </div>
+  </footer>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  scrollToId(id) {
+    return (e) => {
+      e.preventDefault();
+      const el = document.getElementById(id);
+      if (!el) return;
+      let c = el.parentElement;
+      while (c) {
+        const s = getComputedStyle(c).overflowY;
+        if ((s === "auto" || s === "scroll" || s === "overlay") && c.scrollHeight > c.clientHeight + 4) break;
+        c = c.parentElement;
+      }
+      if (c) {
+        const top = c.scrollTop + (el.getBoundingClientRect().top - c.getBoundingClientRect().top) - 84;
+        c.scrollTo({ top, behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 84, behavior: "smooth" });
+      }
+    };
+  }
+  renderVals() {
+    const tagPill = "margin-inline-start:2px;padding:3px 9px;border-radius:999px;background:rgba(47,196,159,.15);color:var(--primary);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;";
+    const cell = (v) => ({ isCheck: v === true, isDash: v === false, isPill: typeof v === "string", text: typeof v === "string" ? v : "" });
+    return {
+      navLinks: [
+        { label: "Features", href: "#features", onClick: this.scrollToId("features") },
+        { label: "Pricing", href: "#pricing", onClick: this.scrollToId("pricing") },
+        { label: "Audio", href: "#features", onClick: this.scrollToId("features") },
+        { label: "AI Ustaz", href: "AI Ustaz.dc.html", onClick: null },
+        { label: "Reviews", href: "#reviews", onClick: this.scrollToId("reviews") },
+      ],
+      storeBtns: [
+        { icon: "smart-phone-01", small: "Download on the", big: "App Store" },
+        { icon: "play-store", small: "Get it on", big: "Google Play" },
+      ],
+      stepsLeft: [
+        { n: "1", title: "Short clips that click", tag: "MOST USED", tagStyle: tagPill, bg: "var(--panel-2)", bd: "var(--border)", desc: "2–3 minute videos per concept — watch, repeat and master without feeling overwhelmed." },
+        { n: "2", title: "Grammar & morphology, sorted", tag: "", tagStyle: "display:none;", bg: "var(--panel)", bd: "var(--border-soft)", desc: "Every rule broken into small steps with real Arabic example sentences and translations." },
+        { n: "3", title: "A game-like unit map", tag: "", tagStyle: "display:none;", bg: "var(--panel)", bd: "var(--border-soft)", desc: "A node path — clips, exercises, podcasts — unlocked one by one as you earn XP." },
+        { n: "4", title: "Practice that sticks", tag: "", tagStyle: "display:none;", bg: "var(--panel)", bd: "var(--border-soft)", desc: "Spaced-repetition questions keep new Arabic vocabulary locked into memory." },
+      ],
+      stepsRight: [
+        { n: "5", title: "Free audio, anywhere", desc: "Listen to podcasts & tajweed recitation — on the go, at home, at no cost." },
+        { n: "6", title: "AI Ustaz corrects you", desc: "Write an Arabic sentence and AI Ustaz fixes grammar & spelling with examples." },
+        { n: "7", title: "Live classes with an ustaz", desc: "Join Zoom/Meet sessions by plan — a clean schedule, one-tap to join." },
+        { n: "8", title: "Certificates & milestones", desc: "Daily streaks, badges and module certificates to keep your momentum up." },
+        { n: "9", title: "Progress made clear", desc: "See completed units, XP, and your suggested next step on one dashboard." },
+      ],
+      plans: [
+        {
+          name: "Free", tag: "Starter", price: "RM0", unit: "forever", promo: false,
+          note: "The core of learning Arabic — free for as long as you learn.",
+          cardBg: "var(--panel)", cardBd: "var(--border-soft)", badge: "",
+          cta: "Start free", ctaBg: "var(--panel-2)", ctaColor: "var(--ink)", ctaBd: "var(--border)",
+          features: ["Foundation modules + unit map", "Full free Audio Library", "AI Ustaz — basic daily quota", "1 exercise per unit", "Daily streak & XP", "100% ad-free"],
+        },
+        {
+          name: "Plus", tag: "Everyday", price: "RM4.90", unit: "/ month", promo: true,
+          note: "Full modules, smarter AI and weekly group classes.",
+          cardBg: "rgba(47,196,159,.06)", cardBd: "var(--primary)", badge: "Most popular", badgeBg: "var(--gold)", badgeColor: "#1a1400",
+          cta: "Choose Plus", ctaBg: "var(--primary)", ctaColor: "#04140F", ctaBd: "var(--primary)",
+          features: ["Everything in Free", "All modules unlocked (nahw, sarf, muhadathah)", "AI Ustaz 10× quota + deep corrections", "Unlimited exercises & quizzes", "Weekly group classes", "Offline audio downloads", "Module completion certificates"],
+        },
+        {
+          name: "Pro", tag: "All access", price: "RM10.90", unit: "/ month", promo: true,
+          note: "Full guidance with our fastest AI and 1-on-1 classes.",
+          cardBg: "var(--panel)", cardBd: "var(--border)", badge: "Best for exams", badgeBg: "var(--panel-2)", badgeColor: "var(--ink)",
+          cta: "Choose Pro", ctaBg: "var(--ink)", ctaColor: "#0A0E1A", ctaBd: "var(--ink)",
+          features: ["Everything in Plus", "AI Ustaz 50× quota — fastest model", "1-on-1 classes with an ustaz", "Personalised study plan", "Priority sessions & class slots", "Unlimited Arabic writing review", "Priority support"],
+        },
+      ],
+      compareGroups: [
+        { name: "Modules & learning", rows: [
+          { feature: "Unit map & video clips", desc: "Node path with a short clip per concept.", cells: [cell("Limited"), cell("All modules"), cell("All modules")] },
+          { feature: "Exercises & quizzes", desc: "Spaced-repetition questions for recall.", cells: [cell("1 / unit"), cell("Unlimited"), cell("Unlimited")] },
+        ]},
+        { name: "AI Ustaz", rows: [
+          { feature: "Arabic correction", desc: "Checks grammar, morphology & spelling.", cells: [cell("Basic"), cell("In-depth"), cell("In-depth+")] },
+          { feature: "Monthly AI quota", desc: "Number of AI Ustaz interactions.", cells: [cell("Small quota"), cell("10× more"), cell("50× · fastest")] },
+        ]},
+        { name: "Classes & audio", rows: [
+          { feature: "Live classes", desc: "Zoom/Meet sessions with an ustaz.", cells: [cell(false), cell("Group"), cell("1-on-1")] },
+          { feature: "Offline audio", desc: "Download podcasts & recitation.", cells: [cell(false), cell(true), cell(true)] },
+        ]},
+      ],
+      reviews: [
+        { text: "AI Ustaz genuinely helped me fix my Arabic sentences. It feels like having a teacher available 24/7.", name: "MojoMichie" },
+        { text: "The modules are so well organised — short clips, then practice. I actually look forward to studying now. Brilliant app.", name: "kuzo_" },
+        { text: "The free audio library alone is worth it. Great for students starting Arabic from zero.", name: "nuraaazz" },
+      ],
+      footerCols: [
+        { title: "Product", links: ["Features", "Pricing", "Audio Library", "AI Ustaz", "Classes"] },
+        { title: "Company", links: ["About us", "Contact", "Blog", "Careers"] },
+        { title: "Legal", links: ["Terms & Conditions", "Privacy Policy", "Refund Policy"] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
