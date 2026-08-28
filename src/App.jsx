@@ -7,37 +7,25 @@ import Navbar from './components/layout/Navbar'
 
 import Landing from './pages/Landing'
 import Auth from './pages/Auth'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import Dashboard from './pages/Dashboard'
 import AiChat from './pages/AiChat'
 import Dialogue from './pages/Dialogue'
 import Practice from './pages/Practice'
 import AdminDashboard from './pages/admin/AdminDashboard'
 
-/* Lightweight page entrance animation */
-function PageWrap({ children }) {
+/* Show navbar only on non-auth pages */
+function Layout({ children }) {
   const location = useLocation()
+  const isAuth = ['/', '/auth', '/login', '/signup'].includes(location.pathname)
   return (
-    <div key={location.pathname} className="ea-page-enter pt-16">
-      {children}
-    </div>
-  )
-}
-
-function AnimatedRoutes() {
-  const location = useLocation()
-  return (
-    <Routes location={location} key={location.pathname}>
-      {/* Public routes */}
-      <Route path="/" element={<PageWrap><Landing /></PageWrap>} />
-      <Route path="/auth" element={<PageWrap><Auth /></PageWrap>} />
-
-      {/* Protected user routes */}
-      <Route path="/chat" element={<ProtectedRoute><PageWrap><AiChat /></PageWrap></ProtectedRoute>} />
-      <Route path="/dialogue" element={<ProtectedRoute><PageWrap><Dialogue /></PageWrap></ProtectedRoute>} />
-      <Route path="/practice" element={<ProtectedRoute><PageWrap><Practice /></PageWrap></ProtectedRoute>} />
-
-      {/* Admin */}
-      <Route path="/admin" element={<AdminRoute><div className="pt-16"><AdminDashboard /></div></AdminRoute>} />
-    </Routes>
+    <>
+      {!isAuth && <Navbar />}
+      <div className={isAuth ? '' : 'pt-16'}>
+        {children}
+      </div>
+    </>
   )
 }
 
@@ -45,8 +33,24 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Navbar />
-        <AnimatedRoutes />
+        <Layout>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+
+            {/* Protected user routes */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/chat" element={<ProtectedRoute><AiChat /></ProtectedRoute>} />
+            <Route path="/dialogue" element={<ProtectedRoute><Dialogue /></ProtectedRoute>} />
+            <Route path="/practice" element={<ProtectedRoute><Practice /></ProtectedRoute>} />
+
+            {/* Admin */}
+            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          </Routes>
+        </Layout>
       </AuthProvider>
     </BrowserRouter>
   )
