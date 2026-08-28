@@ -13,6 +13,8 @@ import Dashboard from './pages/Dashboard'
 import AiChat from './pages/AiChat'
 import Dialogue from './pages/Dialogue'
 import Practice from './pages/Practice'
+import Profile from './pages/Profile'
+import Alerts from './pages/Alerts'
 import AdminDashboard from './pages/admin/AdminDashboard'
 
 /* Show navbar only on non-auth pages */
@@ -46,6 +48,8 @@ export default function App() {
             <Route path="/chat" element={<ProtectedRoute><AiChat /></ProtectedRoute>} />
             <Route path="/dialogue" element={<ProtectedRoute><Dialogue /></ProtectedRoute>} />
             <Route path="/practice" element={<ProtectedRoute><Practice /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
 
             {/* Admin */}
             <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />

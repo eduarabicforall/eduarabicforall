@@ -49,51 +49,21 @@ const LESSONS = [
 const TABS = [
   { id: 'learn', label: 'Learn', icon: 'book-open-01', route: '/dashboard' },
   { id: 'practice', label: 'Practice', icon: 'target-01', route: '/practice' },
-  { id: 'notifications', label: 'Alerts', icon: 'notification-01', route: '/dashboard' },
-  { id: 'profile', label: 'Profile', icon: 'user', route: '/dashboard' },
+  { id: 'notifications', label: 'Alerts', icon: 'notification-01', route: '/alerts' },
+  { id: 'profile', label: 'Profile', icon: 'user', route: '/profile' },
 ]
 
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [lang, setLang] = useState('Arabic')
-  const [langOpen, setLangOpen] = useState(false)
-
   const userName = profile?.full_name || user?.email?.split('@')[0] || 'Learner'
-  const langs = ['Arabic', 'English', 'Malay']
 
   return (
     <div className="min-h-screen bg-bg pb-24">
       <div className="max-w-lg mx-auto px-5 pt-6">
         {/* Header: Language selector + Avatar */}
         <div className="flex items-center justify-between mb-8">
-          <div className="relative">
-            <button
-              onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-panel border border-ea-border rounded-xl text-sm text-ink hover:bg-panel-2 transition-all"
-            >
-              <Icon name="translate-01" size={16} className="text-ink-faint" />
-              {lang}
-              <Icon name="arrow-down-01" size={14} className={`text-ink-faint transition-transform ${langOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {langOpen && (
-              <div className="absolute top-full mt-2 left-0 bg-bg-2 border border-ea-border rounded-xl overflow-hidden shadow-xl z-10 min-w-[120px]">
-                {langs.map(l => (
-                  <button
-                    key={l}
-                    onClick={() => { setLang(l); setLangOpen(false) }}
-                    className={`block w-full text-left px-4 py-2.5 text-sm hover:bg-panel transition-all ${
-                      l === lang ? 'text-primary' : 'text-ink-soft'
-                    }`}
-                  >
-                    {l}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
           {/* Avatar */}
           <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
             {userName[0]?.toUpperCase()}
@@ -104,7 +74,7 @@ export default function Dashboard() {
         <div className="mb-8">
           <p className="text-sm text-ink-faint mb-1">Hello {userName.split(' ')[0]},</p>
           <h1 className="text-2xl font-sora font-bold text-ink">
-            Continue your <span className="text-primary">{lang}</span> journey!
+            Continue your <span className="text-primary">Arabic</span> journey!
           </h1>
         </div>
 
@@ -151,7 +121,7 @@ export default function Dashboard() {
       <div className="fixed bottom-0 left-0 right-0 bg-bg-2/90 backdrop-blur-xl border-t border-ea-border z-50">
         <div className="max-w-lg mx-auto flex">
           {TABS.map(tab => {
-            const isActive = location.pathname === tab.route && tab.id === 'learn'
+            const isActive = location.pathname === tab.route
             return (
               <Link
                 key={tab.id}
