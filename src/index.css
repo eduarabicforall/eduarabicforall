@@ -69,6 +69,12 @@ input:focus, textarea:focus {
   border-color: var(--primary);
 }
 
+/* Hugeicons font icon ::before fix */
+.hgi-stroke::before {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

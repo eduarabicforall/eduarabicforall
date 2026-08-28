@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { MODULES } from '../data/modules'
+import Icon from '../components/Icon'
 
 export default function Practice() {
   const [selectedModule, setSelectedModule] = useState(MODULES[0])
@@ -41,7 +42,10 @@ export default function Practice() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Page title */}
       <div className="mb-8">
-        <h1 className="text-2xl font-sora font-bold text-ink mb-1">📝 Pronunciation Practice</h1>
+        <h1 className="text-2xl font-sora font-bold text-ink mb-1 flex items-center gap-2">
+          <span className="text-amber-400"><Icon name="mic-01" size={28} /></span>
+          Pronunciation Practice
+        </h1>
         <p className="text-sm text-ink-faint">Tap each word to reveal transliteration and meaning</p>
       </div>
 
@@ -83,7 +87,10 @@ export default function Practice() {
       {totalWords > 0 && (
         <div className="mb-6">
           <div className="flex items-center justify-between text-xs text-ink-faint mb-2">
-            <span>{masteredCount} / {totalWords} mastered</span>
+            <span className="flex items-center gap-1.5">
+              <Icon name="check-circle-01" size={14} className={masteredCount === totalWords ? 'text-primary' : ''} />
+              {masteredCount} / {totalWords} mastered
+            </span>
             <span>{Math.round((masteredCount / totalWords) * 100)}%</span>
           </div>
           <div className="w-full h-1.5 bg-panel rounded-full overflow-hidden">
@@ -115,7 +122,9 @@ export default function Practice() {
             >
               {/* Mastered badge */}
               {isMastered && (
-                <div className="absolute top-3 right-3 text-xs text-primary">✅</div>
+                <div className="absolute top-3 right-3 text-primary">
+                  <Icon name="check-double-01" size={18} />
+                </div>
               )}
 
               {/* Arabic word */}
@@ -126,27 +135,32 @@ export default function Practice() {
               {/* Revealed info */}
               {isRevealed ? (
                 <div className="space-y-2">
-                  <div className="text-sm text-primary font-medium">{word.transliteration}</div>
+                  <div className="text-sm text-primary font-medium flex items-center gap-1.5">
+                    <Icon name="volume-01" size={14} /> {word.transliteration}
+                  </div>
                   <div className="text-sm text-ink-soft">{word.meaning}</div>
-                  <div className="text-xs text-ink-faint bg-panel rounded-lg px-3 py-1.5 font-mono">
-                    🔊 {word.audioHint}
+                  <div className="text-xs text-ink-faint bg-panel rounded-lg px-3 py-1.5 font-mono flex items-center gap-1.5">
+                    <Icon name="headphones" size={12} /> {word.audioHint}
                   </div>
                 </div>
               ) : (
-                <div className="text-xs text-ink-faint">Tap to reveal</div>
+                <div className="text-xs text-ink-faint flex items-center gap-1">
+                  <Icon name="eye-01" size={12} /> Tap to reveal
+                </div>
               )}
 
               {/* Mark mastered */}
               {isRevealed && (
                 <button
                   onClick={(e) => toggleMastered(word.id, e)}
-                  className={`mt-3 px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                  className={`mt-3 flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all ${
                     isMastered
                       ? 'bg-primary/20 text-primary'
                       : 'bg-white/5 text-ink-faint hover:text-primary hover:bg-primary/10'
                   }`}
                 >
-                  {isMastered ? '✓ Mastered' : 'Mark as mastered'}
+                  <Icon name={isMastered ? 'check-circle-01' : 'circle-01'} size={14} />
+                  {isMastered ? 'Mastered' : 'Mark as mastered'}
                 </button>
               )}
             </button>
@@ -155,7 +169,8 @@ export default function Practice() {
       </div>
 
       {exercises.length === 0 && (
-        <div className="text-center py-12 text-ink-faint text-sm">
+        <div className="text-center py-12 text-ink-faint text-sm flex flex-col items-center gap-2">
+          <Icon name="microphone-off-01" size={32} />
           No pronunciation exercises yet for this unit.
         </div>
       )}

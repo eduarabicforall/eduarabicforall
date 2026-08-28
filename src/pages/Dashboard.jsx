@@ -1,51 +1,56 @@
 import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
+import Icon from '../components/Icon'
 
 const LESSONS = [
   {
     id: 'chat',
     title: 'AI Chat',
-    emoji: '💬',
+    icon: 'ai-brain-01',
     color: 'from-teal-500/20 to-teal-500/5',
     border: 'border-teal-500/20',
+    iconColor: 'text-teal-400',
     progress: 65,
     route: '/chat',
   },
   {
     id: 'dialogue',
     title: 'Dialogue',
-    emoji: '🎙️',
+    icon: 'headphones',
     color: 'from-violet-500/20 to-violet-500/5',
     border: 'border-violet-500/20',
+    iconColor: 'text-violet-400',
     progress: 42,
     route: '/dialogue',
   },
   {
     id: 'practice',
     title: 'Pronunciation',
-    emoji: '📝',
+    icon: 'mic-01',
     color: 'from-amber-500/20 to-amber-500/5',
     border: 'border-amber-500/20',
+    iconColor: 'text-amber-400',
     progress: 28,
     route: '/practice',
   },
   {
     id: 'grammar',
     title: 'Grammar',
-    emoji: '📐',
+    icon: 'book-02',
     color: 'from-rose-500/20 to-rose-500/5',
     border: 'border-rose-500/20',
+    iconColor: 'text-rose-400',
     progress: 53,
     route: '/chat',
   },
 ]
 
 const TABS = [
-  { id: 'learn', label: 'Learn', icon: '📖', route: '/dashboard' },
-  { id: 'practice', label: 'Practice', icon: '🎯', route: '/practice' },
-  { id: 'notifications', label: 'Notifications', icon: '🔔', route: '/dashboard' },
-  { id: 'profile', label: 'Profile', icon: '👤', route: '/dashboard' },
+  { id: 'learn', label: 'Learn', icon: 'book-open-01', route: '/dashboard' },
+  { id: 'practice', label: 'Practice', icon: 'target-01', route: '/practice' },
+  { id: 'notifications', label: 'Alerts', icon: 'notification-01', route: '/dashboard' },
+  { id: 'profile', label: 'Profile', icon: 'user', route: '/dashboard' },
 ]
 
 export default function Dashboard() {
@@ -68,10 +73,9 @@ export default function Dashboard() {
               onClick={() => setLangOpen(!langOpen)}
               className="flex items-center gap-2 px-3 py-1.5 bg-panel border border-ea-border rounded-xl text-sm text-ink hover:bg-panel-2 transition-all"
             >
+              <Icon name="translate-01" size={16} className="text-ink-faint" />
               {lang}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
+              <Icon name="arrow-down-01" size={14} className={`text-ink-faint transition-transform ${langOpen ? 'rotate-180' : ''}`} />
             </button>
             {langOpen && (
               <div className="absolute top-full mt-2 left-0 bg-bg-2 border border-ea-border rounded-xl overflow-hidden shadow-xl z-10 min-w-[120px]">
@@ -110,10 +114,10 @@ export default function Dashboard() {
             <h2 className="text-base font-semibold text-ink">Your Lessons</h2>
             <div className="flex gap-1.5">
               <button className="w-7 h-7 rounded-lg bg-panel flex items-center justify-center text-ink-faint">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>
+                <Icon name="grid-01" size={14} />
               </button>
               <button className="w-7 h-7 rounded-lg bg-panel flex items-center justify-center text-ink-faint">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
+                <Icon name="list-03" size={14} />
               </button>
             </div>
           </div>
@@ -125,7 +129,9 @@ export default function Dashboard() {
                 to={lesson.route}
                 className={`p-4 bg-gradient-to-br ${lesson.color} border ${lesson.border} rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all`}
               >
-                <div className="text-2xl mb-3">{lesson.emoji}</div>
+                <div className={`${lesson.iconColor} mb-3`}>
+                  <Icon name={lesson.icon} size={28} />
+                </div>
                 <h3 className="text-sm font-semibold text-ink mb-0.5">{lesson.title}</h3>
                 <p className="text-xs text-ink-faint mb-3">You completed {lesson.progress}%</p>
                 {/* Progress bar */}
@@ -150,11 +156,11 @@ export default function Dashboard() {
               <Link
                 key={tab.id}
                 to={tab.route}
-                className={`flex-1 flex flex-col items-center py-3 transition-all ${
+                className={`flex-1 flex flex-col items-center py-3 gap-0.5 transition-all ${
                   isActive ? 'text-primary' : 'text-ink-faint hover:text-ink-soft'
                 }`}
               >
-                <span className="text-lg mb-0.5">{tab.icon}</span>
+                <Icon name={tab.icon} size={22} />
                 <span className="text-[10px] font-medium">{tab.label}</span>
               </Link>
             )

@@ -1,16 +1,17 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import Icon from '../Icon'
 
 export default function Navbar() {
   const { user, profile, signOut } = useAuth()
   const loc = useLocation()
 
   const navLinks = [
-    { to: '/dashboard', label: 'Home', icon: '🏠' },
-    { to: '/chat', label: 'AI Chat', icon: '💬' },
-    { to: '/dialogue', label: 'Dialogue', icon: '🎙️' },
-    { to: '/practice', label: 'Practice', icon: '📝' },
+    { to: '/dashboard', label: 'Home', icon: 'home-09' },
+    { to: '/chat', label: 'AI Chat', icon: 'ai-brain-01' },
+    { to: '/dialogue', label: 'Dialogue', icon: 'headphones' },
+    { to: '/practice', label: 'Practice', icon: 'mic-01' },
   ]
 
   const isActive = (path) => loc.pathname === path
@@ -27,21 +28,23 @@ export default function Navbar() {
             <Link
               key={l.to}
               to={l.to}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
                 isActive(l.to)
                   ? 'bg-primary/15 text-primary'
                   : 'text-ink-faint hover:text-ink'
               }`}
             >
-              {l.icon} {l.label}
+              <Icon name={l.icon} size={16} />
+              {l.label}
             </Link>
           ))}
           {profile?.role === 'admin' && (
-            <Link to="/admin" className="px-3 py-1.5 rounded-xl text-xs font-medium text-gold hover:bg-gold/10 transition-all">
-              ⚙️
+            <Link to="/admin" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gold hover:bg-gold/10 transition-all">
+              <Icon name="settings-02" size={16} />
             </Link>
           )}
-          <button onClick={signOut} className="px-3 py-1.5 text-xs text-ink-faint hover:text-ink transition-all">
+          <button onClick={signOut} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-ink-faint hover:text-ink transition-all">
+            <Icon name="logout-01" size={16} />
             Sign out
           </button>
         </div>

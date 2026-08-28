@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { sendToGemini, getApiKey, setApiKey } from '../lib/gemini'
+import Icon from '../components/Icon'
 
 export default function AiChat() {
   const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Assalamualaikum! I\'m your AI Ustaz. Ask me anything about Arabic grammar, vocabulary, or send me an Arabic sentence to check. 🌙' }
+    { role: 'ai', text: 'Assalamualaikum! I\'m your AI Ustaz. Ask me anything about Arabic grammar, vocabulary, or send me an Arabic sentence to check.' }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -53,8 +54,8 @@ export default function AiChat() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-ea-border bg-bg/50 backdrop-blur">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-lg">
-            🧠
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/30 to-teal-500/30 flex items-center justify-center text-violet-400">
+            <Icon name="ai-brain-01" size={22} />
           </div>
           <div>
             <h1 className="text-sm font-semibold text-ink">AI Ustaz</h1>
@@ -63,10 +64,10 @@ export default function AiChat() {
         </div>
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="p-2 rounded-xl hover:bg-white/5 text-ink-faint hover:text-ink transition-all"
+          className="w-9 h-9 rounded-xl border border-ea-border bg-panel flex items-center justify-center text-ink-faint hover:text-ink hover:border-primary/30 transition-all"
           title="Settings"
         >
-          ⚙️
+          <Icon name="settings-02" size={18} />
         </button>
       </div>
 
@@ -74,7 +75,9 @@ export default function AiChat() {
       {showSettings && (
         <div className="px-4 py-3 bg-bg-2 border-b border-ea-border space-y-3">
           <div>
-            <label className="text-xs text-ink-faint mb-1 block">Gemini API Key</label>
+            <label className="text-xs text-ink-faint mb-1 block flex items-center gap-1.5">
+              <Icon name="square-lock-01" size={12} /> Gemini API Key
+            </label>
             <div className="flex gap-2">
               <input
                 type="password"
@@ -91,7 +94,8 @@ export default function AiChat() {
               </button>
             </div>
           </div>
-          <p className="text-xs text-ink-faint">
+          <p className="text-xs text-ink-faint flex items-center gap-1">
+            <Icon name="link-01" size={12} />
             Get your key at{' '}
             <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="text-primary underline">
               Google AI Studio
@@ -107,6 +111,11 @@ export default function AiChat() {
             key={i}
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
+            {msg.role === 'ai' && (
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500/30 to-teal-500/30 flex items-center justify-center text-violet-400 mr-2 flex-shrink-0 mt-1">
+                <Icon name="ai-brain-01" size={16} />
+              </div>
+            )}
             <div
               className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${
                 msg.role === 'user'
@@ -120,6 +129,9 @@ export default function AiChat() {
         ))}
         {loading && (
           <div className="flex justify-start">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500/30 to-teal-500/30 flex items-center justify-center text-violet-400 mr-2 flex-shrink-0">
+              <Icon name="ai-brain-01" size={16} />
+            </div>
             <div className="px-4 py-3 bg-panel border border-ea-border rounded-2xl rounded-bl-md">
               <div className="flex gap-1.5">
                 <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -148,9 +160,9 @@ export default function AiChat() {
           <button
             onClick={handleSend}
             disabled={!input.trim() || loading}
-            className="px-5 py-3 bg-primary text-bg rounded-2xl text-sm font-medium hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            className="w-12 h-12 flex items-center justify-center bg-primary text-bg rounded-2xl hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
           >
-            {loading ? '...' : 'Send'}
+            <Icon name="navigation-01" size={20} />
           </button>
         </div>
       </div>
