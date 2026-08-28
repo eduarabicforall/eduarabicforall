@@ -1,66 +1,133 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import LanguageToggle from '../LanguageToggle'
-import { useCart } from '../../context/CartContext'
-import { scrollToId } from '../../lib/utils'
+import React, { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Navbar() {
-  const { t } = useTranslation()
-  const { count } = useCart()
+  const { user, profile, signOut } = useAuth()
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const loc = useLocation()
 
   const navLinks = [
-    { label: t('nav.features'), href: '#features' },
-    { label: t('nav.pricing'), href: '#pricing' },
-    { to: '/shop', label: t('nav.shop') },
-    { label: t('nav.reviews'), href: '#reviews' },
+    { to: '/chat', label: 'AI Chat', icon: '💬' },
+    { to: '/dialogue', label: 'Dialogue', icon: '🎙️' },
+    { to: '/practice', label: 'Practice', icon: '📝' },
   ]
 
+  const isActive = (path) => loc.pathname.startsWith(path)
+
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-[14px] bg-[rgba(7,10,20,.72)] border-b border-ea-border-soft">
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-7 py-3 flex items-center gap-6 md:gap-[26px]">
-        <Link to="/" className="flex items-center shrink-0">
-          <div className="h-[38px] sm:h-[42px] flex items-center">
-            <span className="font-sora font-extrabold text-xl sm:text-2xl text-ink tracking-tight">
-              Edu<span className="text-primary">Arabic</span>
-            </span>
-          </div>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-xl border-b border-ea-border">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <span className="text-xl font-sora font-bold">
+            Edu<span className="text-primary">Arabic</span>
+          </span>
         </Link>
 
-        <nav className="hidden md:flex gap-0.5 ms-[18px]">
-          {navLinks.map((link) => (
-            link.to ? (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="px-3.5 py-2 rounded-[9px] text-sm font-medium text-ink-soft hover:text-ink hover:bg-panel-2 transition-colors no-underline"
-              >
-                {link.label}
-              </Link>
-            ) : (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={scrollToId(link.href.replace('#', ''))}
-                className="px-3.5 py-2 rounded-[9px] text-sm font-medium text-ink-soft hover:text-ink hover:bg-panel-2 transition-colors"
-              >
-                {link.label}
-              </a>
-            )
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-1">
+          {navLinks.map(l => (
+            <Link
+              key={l.to}
+              to={l.to}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                isActive(l.to)
+                  ? 'bg-primary/15 text-primary'
+                  : 'text-ink-soft hover:text-ink hover:bg-white/5'
+              }`}
+            >
+              <span className="mr-1">{l.icon}</span>
+              {l.label}
+            </Link>
           ))}
-        </nav>
+          {profile?.role === 'admin' && (
+            <Link
+              to="/admin"
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                isActive('/admin')
+                  ? 'bg-gold/15 text-gold'
+                  : 'text-ink-soft hover:text-ink hover:bg-white/5'
+              }`}
+            >
+              ⚙️ Admin
+            </Link>
+          )}
+        </div>
 
-        <div className="flex items-center gap-2.5 ms-auto">
-          <LanguageToggle />
-          <Link to="/shop" className="relative w-[40px] h-[40px] rounded-[11px] border border-ea-border bg-panel grid place-items-center text-ink-soft hover:text-primary hover:border-primary/40 transition-colors no-underline">
-            <i className="hgi-stroke hgi-shopping-cart-01" style={{ fontSize: '20px' }} />
-            {count > 0 && <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-gold text-[#1a1400] text-[10px] font-extrabold grid place-items-center">{count}</span>}
-          </Link>
-          <Link to="/auth" className="hidden sm:inline-flex px-5 py-2.5 rounded-[11px] bg-ink text-[#0A0E1A] text-sm font-bold hover:opacity-90 transition-opacity">
-            {t('nav.signin')}
-          </Link>
+        {/* Right side */}
+        <div className="flex items-center gap-3">
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-ink-soft hidden sm:block">
+                {profile?.full_name || user.email?.split('@')[0]}
+              </span>
+              {profile?.role === 'admin' && (
+                <span className="px-2 py-0.5 bg-gold/15 text-gold text-xs rounded-full font-medium">
+                  Admin
+                </span>
+              )}
+              <button
+                onClick={signOut}
+                className="px-3 py-1.5 text-sm text-ink-soft hover:text-ink bg-white/5 hover:bg-white/10 rounded-full transition-all"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/auth"
+              className="px-4 py-2 text-sm font-medium bg-primary text-bg rounded-full hover:bg-primary/90 transition-all"
+            >
+              Sign in
+            </Link>
+          )}
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="md:hidden p-2 text-ink-soft hover:text-ink"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              {mobileOpen ? (
+                <path d="M18 6L6 18M6 6l12 12" />
+              ) : (
+                <path d="M3 12h18M3 6h18M3 18h18" />
+              )}
+            </svg>
+          </button>
         </div>
       </div>
-    </header>
+
+      {/* Mobile menu */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-ea-border bg-bg/95 backdrop-blur-xl px-4 py-3 space-y-1">
+          {navLinks.map(l => (
+            <Link
+              key={l.to}
+              to={l.to}
+              onClick={() => setMobileOpen(false)}
+              className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isActive(l.to)
+                  ? 'bg-primary/15 text-primary'
+                  : 'text-ink-soft hover:text-ink hover:bg-white/5'
+              }`}
+            >
+              <span className="mr-2">{l.icon}</span>
+              {l.label}
+            </Link>
+          ))}
+          {profile?.role === 'admin' && (
+            <Link
+              to="/admin"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-2.5 rounded-xl text-sm font-medium text-ink-soft hover:text-ink hover:bg-white/5"
+            >
+              ⚙️ Admin
+            </Link>
+          )}
+        </div>
+      )}
+    </nav>
   )
 }
