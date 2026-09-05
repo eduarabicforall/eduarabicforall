@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+  <style>
+    body{margin:0;background:#05070d;color:#F3F5FA;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+    * { box-sizing: border-box; }
+    input::placeholder,textarea::placeholder{color:#6B7488}
+    @media (max-width: 480px) {
+      .__shopOuter { padding: 0 !important; }
+      .__shopFrame { width: 100% !important; border-radius: 0 !important; border: none !important; box-shadow: none !important; min-height: 100vh !important; }
+    }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:36px 12px;background:#05070d;" class="__shopOuter">
+  <div style="width:402px;max-width:100%;background:#070A14;border:1px solid rgba(255,255,255,.09);border-radius:36px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.5);min-height:820px;" class="__shopFrame">
+
+    <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="padding:26px 20px 18px;background:linear-gradient(180deg, rgba(47,196,159,.10), transparent);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <div style="width:36px;height:36px;border-radius:11px;background:rgba(47,196,159,.15);display:flex;align-items:center;justify-content:center;"><i class="hgi-stroke hgi-shopping-bag-02" style="color:#2FC49F;font-size:18px;"></i></div>
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;">Shop</div>
+          </div>
+          <div style="color:#A2AABD;font-size:12.5px;">Physical modules, delivered to your door.</div>
+        </div>
+        <div style="padding:16px 20px 0;display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ products }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:18px;padding:14px;">
+              <button onClick="{{ p.open }}" style="display:flex;gap:14px;text-align:left;flex:1;min-width:0;background:transparent;border:none;padding:0;cursor:pointer;color:inherit;font-family:inherit;">
+                <div style="width:64px;height:64px;border-radius:13px;flex-shrink:0;background:repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 6px, rgba(255,255,255,.02) 6px 12px);"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-weight:700;font-size:14px;margin-bottom:3px;">{{ p.name }}</div>
+                  <div style="color:#6B7488;font-size:11.5px;margin-bottom:8px;">{{ p.units }} units</div>
+                  <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;color:#2FC49F;">RM{{ p.price }}</div>
+                </div>
+              </button>
+              <button onClick="{{ p.buyNow }}" style="flex-shrink:0;background:#2FC49F;color:#04241C;font-weight:700;font-size:12.5px;padding:10px 16px;border-radius:10px;border:none;cursor:pointer;">Buy</button>
+            </div>
+          </sc-for>
+        </div>
+        <div style="height:76px;"></div>
+        <div style="position:sticky;bottom:0;display:flex;justify-content:space-around;align-items:center;padding:14px 10px 20px;background:rgba(7,10,20,.9);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.09);">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B7488;"><i class="hgi-stroke hgi-home-01" style="font-size:20px;"></i><span style="font-size:10.5px;font-weight:600;">Home</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B7488;"><i class="hgi-stroke hgi-mortarboard-01" style="font-size:20px;"></i><span style="font-size:10.5px;font-weight:600;">Grammar</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#2FC49F;"><i class="hgi-stroke hgi-shopping-bag-02" style="font-size:20px;"></i><span style="font-size:10.5px;font-weight:600;">Shop</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#6B7488;"><i class="hgi-stroke hgi-message-01" style="font-size:20px;"></i><span style="font-size:10.5px;font-weight:600;">AI Ustaz</span></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;padding:22px 20px 6px;">
+          <button onClick="{{ backToCatalog }}" style="width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;cursor:pointer;"><i class="hgi-stroke hgi-arrow-left-01" style="font-size:16px;color:#A2AABD;"></i></button>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;">Product</div>
+        </div>
+        <div style="padding:14px 20px 20px;">
+          <div style="aspect-ratio:1;border-radius:18px;background:repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 8px, rgba(255,255,255,.02) 8px 16px);display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><span style="font-family:monospace;color:#6B7488;font-size:11px;">product photo</span></div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:19px;margin-bottom:4px;">{{ selected.name }}</div>
+          <div style="color:#6B7488;font-size:12.5px;margin-bottom:12px;">{{ selected.units }} units · physical card &amp; book set</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:22px;color:#2FC49F;margin-bottom:16px;">RM{{ selected.price }}</div>
+          <p style="color:#A2AABD;font-size:13.5px;line-height:1.6;margin:0 0 16px;">Includes the printed module and a unique activation code that unlocks the matching Audio Library and AI Ustaz once scanned or entered in the app.</p>
+          <div style="display:flex;gap:10px;background:rgba(47,196,159,.06);border:1px solid rgba(47,196,159,.18);border-radius:14px;padding:12px 14px;margin-bottom:20px;">
+            <i class="hgi-stroke hgi-truck" style="color:#2FC49F;font-size:18px;"></i>
+            <div style="font-size:12px;color:#A2AABD;">Ships within 3–5 business days across Malaysia.</div>
+          </div>
+          <button onClick="{{ goCheckout }}" style="width:100%;background:#2FC49F;color:#04241C;font-weight:700;font-size:15px;padding:15px;border-radius:13px;border:none;cursor:pointer;">Buy now</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;padding:22px 20px 6px;">
+          <button onClick="{{ backToProduct }}" style="width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;cursor:pointer;"><i class="hgi-stroke hgi-arrow-left-01" style="font-size:16px;color:#A2AABD;"></i></button>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;">Checkout</div>
+        </div>
+        <div style="padding:14px 20px 24px;">
+          <div style="display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:12px;margin-bottom:20px;">
+            <div style="width:44px;height:44px;border-radius:11px;flex-shrink:0;background:repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 6px, rgba(255,255,255,.02) 6px 12px);"></div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:13px;">{{ selected.name }}</div>
+              <div style="color:#6B7488;font-size:11px;">Qty 1</div>
+            </div>
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:#2FC49F;">RM{{ selected.price }}</div>
+          </div>
+
+          <div style="font-size:12.5px;font-weight:700;color:#A2AABD;margin-bottom:10px;">SHIPPING ADDRESS</div>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+            <input placeholder="Full name" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:12px 14px;color:#F3F5FA;font-size:13.5px;font-family:inherit;"/>
+            <input placeholder="Phone number" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:12px 14px;color:#F3F5FA;font-size:13.5px;font-family:inherit;"/>
+            <textarea placeholder="Address line, city, postcode, state" rows="3" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:12px 14px;color:#F3F5FA;font-size:13.5px;font-family:inherit;resize:none;"></textarea>
+          </div>
+
+          <div style="font-size:12.5px;font-weight:700;color:#A2AABD;margin-bottom:10px;">PAYMENT METHOD</div>
+          <div style="display:flex;gap:10px;margin-bottom:20px;">
+            <div style="flex:1;border:1.5px solid #2FC49F;background:rgba(47,196,159,.08);border-radius:12px;padding:12px;text-align:center;font-size:12.5px;font-weight:700;">FPX / Online Banking</div>
+            <div style="flex:1;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:12px;text-align:center;font-size:12.5px;color:#A2AABD;">DuitNow QR</div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:#A2AABD;margin-bottom:6px;"><span>Subtotal</span><span>RM{{ selected.price }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:#A2AABD;margin-bottom:14px;"><span>Shipping</span><span>RM6.00</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800;font-family:'Sora',sans-serif;margin-bottom:20px;padding-top:12px;border-top:1px solid rgba(255,255,255,.09);"><span>Total</span><span style="color:#2FC49F;">RM{{ total }}</span></div>
+
+          <button onClick="{{ placeOrder }}" style="width:100%;background:#2FC49F;color:#04241C;font-weight:700;font-size:15px;padding:15px;border-radius:13px;border:none;cursor:pointer;">Place order</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:60px 30px;display:flex;flex-direction:column;align-items:center;text-align:center;">
+        <div style="width:56px;height:56px;border-radius:16px;background:rgba(47,196,159,.18);display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><i class="hgi-stroke hgi-checkmark-circle-02" style="color:#2FC49F;font-size:26px;"></i></div>
+        <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:19px;margin-bottom:8px;">Order placed!</div>
+        <div style="color:#A2AABD;font-size:13px;line-height:1.5;margin-bottom:24px;">We'll email you once it ships. Your activation code arrives with the module.</div>
+        <button onClick="{{ backToCatalog }}" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:#F3F5FA;font-weight:700;font-size:14px;padding:14px;border-radius:12px;cursor:pointer;">Back to shop</button>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  productDefs = [
+    { id: 'pemula', name: 'Bahasa Arab Pemula', units: 324, price: '39.90' },
+    { id: 'kerjaya', name: 'Bahasa Arab untuk Tujuan Kerjaya', units: 198, price: '59.90' },
+    { id: 'quran', name: 'Bahasa Arab Al Quran', units: 198, price: '97.90' },
+    { id: 'anak', name: 'Anakku Berbahasa Arab', units: 198, price: '27.90' },
+  ];
+  state = { view: 'catalog', selectedId: null };
+  renderVals() {
+    const selected = this.productDefs.find((p) => p.id === this.state.selectedId);
+    const total = selected ? (parseFloat(selected.price) + 6).toFixed(2) : '0.00';
+    return {
+      isCatalog: this.state.view === 'catalog',
+      isProduct: this.state.view === 'product',
+      isCheckout: this.state.view === 'checkout',
+      isDone: this.state.view === 'done',
+      products: this.productDefs.map((p) => ({ ...p, open: () => this.setState({ selectedId: p.id, view: 'product' }), buyNow: () => this.setState({ selectedId: p.id, view: 'checkout' }) })),
+      selected,
+      total,
+      backToCatalog: () => this.setState({ view: 'catalog' }),
+      backToProduct: () => this.setState({ view: 'product' }),
+      goCheckout: () => this.setState({ view: 'checkout' }),
+      placeOrder: () => this.setState({ view: 'done' }),
+    };
+  }
+}
+</script>
+</body>
+</html>

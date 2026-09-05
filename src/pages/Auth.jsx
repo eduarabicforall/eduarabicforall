@@ -1,68 +1,131 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import Button from '../components/ui/Button'
+import Input from '../components/ui/Input'
 import Icon from '../components/Icon'
 
 export default function Auth() {
+  const [params] = useSearchParams()
+  const [view, setView] = useState(params.get('view') === 'signup' ? 'signup' : 'signin')
+  const [forgotSent, setForgotSent] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { signIn, signUp, resetPassword } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      if (view === 'signin') {
+        const { error } = await signIn(email, password)
+        if (error) throw error
+        navigate('/dashboard')
+      } else if (view === 'signup') {
+        const { error } = await signUp(email, password, fullName)
+        if (error) throw error
+        navigate('/dashboard')
+      } else if (view === 'forgot') {
+        const { error } = await resetPassword(email)
+        if (error) throw error
+        setForgotSent(true)
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-app-bg px-5 py-10">
+      <div className="w-full max-w-[400px]">
+        <Link to="/" className="text-sm text-app-inkFaint hover:text-app-ink mb-6 inline-flex items-center gap-1">
+          <Icon name="arrow-left-01" size={16} /> Back to site
+        </Link>
 
-      <div className="relative z-10 flex flex-col items-center max-w-sm w-full">
-        {/* Illustration area */}
-        <div className="w-56 h-56 mb-8 relative">
-          <div className="absolute inset-0 bg-primary/10 rounded-full blur-[60px]" />
-          <div className="relative w-full h-full flex items-center justify-center">
-            <div className="relative">
-              {/* Central icon */}
-              <div className="w-20 h-20 bg-panel-2 border border-ea-border rounded-2xl flex items-center justify-center text-primary">
-                <Icon name="book-open-01" size={40} />
+        <div className="bg-app-panel border border-app-border rounded-card p-6">
+          {view !== 'forgot' && (
+            <>
+              <h1 className="font-title font-extrabold text-2xl mb-1">
+                {view === 'signin' ? 'Sign in' : 'Create account'}
+              </h1>
+              <p className="text-app-inkSoft text-sm mb-6">
+                {view === 'signin' ? 'Welcome back to EduArabic for All.' : 'Start your Arabic learning journey.'}
+              </p>
+
+              <button
+                type="button"
+                disabled
+                title="Coming soon"
+                className="w-full mb-4 flex items-center justify-center gap-2 rounded-pill border border-app-border py-3 text-sm font-semibold text-app-inkFaint cursor-not-allowed"
+              >
+                <Icon name="google" size={18} /> Continue with Google
+                <span className="text-[10px] bg-app-panel2 px-2 py-0.5 rounded-pill">Coming soon</span>
+              </button>
+
+              <div className="flex items-center gap-3 mb-4 text-app-inkFaint text-xs">
+                <div className="flex-1 h-px bg-app-border" /> or <div className="flex-1 h-px bg-app-border" />
               </div>
-              {/* Floating elements */}
-              <div className="absolute -top-3 -left-8 w-10 h-10 bg-teal-500/15 border border-teal-500/20 rounded-xl flex items-center justify-center text-teal-400 animate-bounce" style={{ animationDelay: '0s' }}>
-                <Icon name="ai-brain-01" size={20} />
-              </div>
-              <div className="absolute -top-3 -right-8 w-10 h-10 bg-violet-500/15 border border-violet-500/20 rounded-xl flex items-center justify-center text-violet-400 animate-bounce" style={{ animationDelay: '0.5s' }}>
-                <Icon name="headphones" size={20} />
-              </div>
-              <div className="absolute -bottom-3 -left-6 w-9 h-9 bg-amber-500/15 border border-amber-500/20 rounded-xl flex items-center justify-center text-amber-400 animate-bounce" style={{ animationDelay: '1s' }}>
-                <Icon name="mic-01" size={18} />
-              </div>
-              <div className="absolute -bottom-2 -right-7 w-9 h-9 bg-rose-500/15 border border-rose-500/20 rounded-xl flex items-center justify-center text-rose-400 animate-bounce" style={{ animationDelay: '1.5s' }}>
-                <Icon name="notebook-01" size={18} />
-              </div>
+
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                {view === 'signup' && (
+                  <Input label="Full name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                )}
+                <Input label="Email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input label="Password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+
+                {view === 'signin' && (
+                  <button type="button" onClick={() => setView('forgot')} className="text-xs text-app-primary text-right">
+                    Forgot password?
+                  </button>
+                )}
+
+                {error && <p className="text-app-danger text-xs">{error}</p>}
+
+                <Button type="submit" disabled={loading} className="w-full mt-2">
+                  {loading ? 'Please wait…' : view === 'signin' ? 'Sign in' : 'Create account'}
+                </Button>
+              </form>
+
+              <p className="text-center text-sm text-app-inkSoft mt-5">
+                {view === 'signin' ? (
+                  <>Don't have an account? <button onClick={() => setView('signup')} className="text-app-primary font-semibold">Sign up</button></>
+                ) : (
+                  <>Already have an account? <button onClick={() => setView('signin')} className="text-app-primary font-semibold">Sign in</button></>
+                )}
+              </p>
+            </>
+          )}
+
+          {view === 'forgot' && !forgotSent && (
+            <>
+              <h1 className="font-title font-extrabold text-2xl mb-1">Forgot password</h1>
+              <p className="text-app-inkSoft text-sm mb-6">We'll send you a reset link.</p>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                <Input label="Email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                {error && <p className="text-app-danger text-xs">{error}</p>}
+                <Button type="submit" disabled={loading} className="w-full mt-2">Send reset link</Button>
+              </form>
+              <button onClick={() => setView('signin')} className="text-center text-sm text-app-primary mt-5 w-full">
+                Back to sign in
+              </button>
+            </>
+          )}
+
+          {view === 'forgot' && forgotSent && (
+            <div className="text-center py-6">
+              <Icon name="mail-01" size={40} className="text-app-primary mb-3" />
+              <h2 className="font-title font-bold text-lg mb-1">Check your email</h2>
+              <p className="text-app-inkSoft text-sm">The reset link expires in 30 minutes.</p>
             </div>
-          </div>
+          )}
         </div>
-
-        {/* Brand */}
-        <h1 className="text-3xl font-sora font-bold text-ink mb-2">EduArabic</h1>
-        <p className="text-sm text-ink-faint text-center mb-10 leading-relaxed max-w-[260px]">
-          Are you ready to learn Arabic easily in the funniest way?
-        </p>
-
-        {/* Buttons */}
-        <div className="w-full space-y-3">
-          <Link
-            to="/login"
-            className="block w-full py-3.5 bg-primary text-bg text-center rounded-2xl font-semibold text-[15px] hover:bg-primary/90 active:scale-[0.98] transition-all"
-          >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className="block w-full py-3.5 bg-panel border border-ea-border text-ink text-center rounded-2xl font-semibold text-[15px] hover:bg-panel-2 active:scale-[0.98] transition-all"
-          >
-            Sign up
-          </Link>
-        </div>
-
-        {/* Browse comments */}
-        <button className="mt-8 text-xs text-ink-faint hover:text-ink-soft transition-colors">
-          Browse user comments
-        </button>
       </div>
     </div>
   )

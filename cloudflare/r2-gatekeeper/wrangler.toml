@@ -1,0 +1,15 @@
+name = "eduarabic-r2-gatekeeper"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "eduarabic-grammar-videos"
+
+[[kv_namespaces]]
+binding = "TOKENS"
+id = "742f254f5f9c49fbb2b27862bc67da1f"
+
+[vars]
+SUPABASE_URL = "https://unqbijfmsniedwgtyulp.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable_P4PxzC89VdTyQOPLeM3AUg_D18NMne0"

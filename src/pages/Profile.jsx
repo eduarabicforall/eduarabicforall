@@ -1,91 +1,61 @@
-import React from 'react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useToast } from '../components/ui/Toast'
+import Button from '../components/ui/Button'
+import Input from '../components/ui/Input'
 import Icon from '../components/Icon'
 
 export default function Profile() {
-  const { user, profile, signOut } = useAuth()
-  const navigate = useNavigate()
-  const userName = profile?.full_name || user?.email?.split('@')[0] || 'Learner'
-  const userEmail = user?.email || ''
-  const userRole = profile?.role || 'user'
+  const { user, profile, signOut, refreshProfile } = useAuth()
+  const toast = useToast()
+  const [fullName, setFullName] = useState(profile?.full_name || '')
+  const [showPassword, setShowPassword] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [saving, setSaving] = useState(false)
 
-  const handleSignOut = async () => {
-    await signOut()
-    navigate('/')
+  async function saveProfile(e) {
+    e.preventDefault()
+    setSaving(true)
+    const { error } = await supabase.from('profiles').update({ full_name: fullName }).eq('id', user.id)
+    if (!error) {
+      await refreshProfile()
+      toast('Profile updated')
+    }
+    setSaving(false)
   }
 
-  const settings = [
-    { icon: 'user-02', label: 'Edit Profile', desc: 'Update your name and avatar' },
-    { icon: 'bell-01', label: 'Notifications', desc: 'Manage alert preferences', route: '/alerts' },
-    { icon: 'translate-01', label: 'Language', desc: 'Arabic' },
-    { icon: 'moon-01', label: 'Appearance', desc: 'Dark mode' },
-    { icon: 'lock-01', label: 'Privacy', desc: 'Password and security' },
-    { icon: 'help-circle-01', label: 'Help & Support', desc: 'FAQ and contact us' },
-  ]
-
-  if (userRole === 'admin') {
-    settings.push({ icon: 'settings-02', label: 'Admin Panel', desc: 'Manage modules and users', route: '/admin' })
+  async function changePassword(e) {
+    e.preventDefault()
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (!error) { toast('Password updated'); setNewPassword(''); setShowPassword(false) }
   }
 
   return (
-    <div className="max-w-lg mx-auto px-5 py-8">
-      {/* Profile Header */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-2xl font-bold text-primary mb-4">
-          {userName[0]?.toUpperCase()}
-        </div>
-        <h1 className="text-xl font-sora font-bold text-ink mb-1">{userName}</h1>
-        <p className="text-sm text-ink-faint mb-1">{userEmail}</p>
-        {userRole === 'admin' && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-primary/15 text-primary text-xs font-medium rounded-full mt-2">
-            <Icon name="shield-01" size={12} /> Admin
-          </span>
-        )}
-      </div>
+    <div className="min-h-screen bg-app-bg px-5 py-6 max-w-lg mx-auto">
+      <Link to="/dashboard" className="text-app-inkFaint text-sm mb-4 inline-flex items-center gap-1">
+        <Icon name="arrow-left-01" size={16} /> Dashboard
+      </Link>
+      <h1 className="font-title font-extrabold text-2xl mb-6">Profile settings</h1>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-8">
-        {[
-          { label: 'Words', value: '124' },
-          { label: 'Streak', value: '7d' },
-          { label: 'XP', value: '1,240' },
-        ].map(stat => (
-          <div key={stat.label} className="bg-panel border border-ea-border rounded-xl p-3 text-center">
-            <div className="text-lg font-bold text-ink">{stat.value}</div>
-            <div className="text-xs text-ink-faint">{stat.label}</div>
-          </div>
-        ))}
-      </div>
+      <form onSubmit={saveProfile} className="flex flex-col gap-3 mb-6">
+        <Input label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+        <Input label="Email" value={user?.email} disabled />
+        <Button type="submit" disabled={saving} className="mt-1">Save changes</Button>
+      </form>
 
-      {/* Settings List */}
-      <div className="space-y-1">
-        {settings.map((item, i) => (
-          <button
-            key={i}
-            onClick={() => item.route && navigate(item.route)}
-            className="w-full flex items-center gap-3 p-3.5 rounded-xl hover:bg-panel transition-all text-left"
-          >
-            <div className="w-9 h-9 rounded-xl bg-panel-2 flex items-center justify-center text-ink-faint">
-              <Icon name={item.icon} size={18} />
-            </div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-ink">{item.label}</div>
-              <div className="text-xs text-ink-faint">{item.desc}</div>
-            </div>
-            <Icon name="arrow-right-01" size={16} className="text-ink-faint" />
-          </button>
-        ))}
-      </div>
-
-      {/* Sign Out */}
-      <button
-        onClick={handleSignOut}
-        className="w-full mt-8 flex items-center justify-center gap-2 py-3 rounded-xl border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-all text-sm font-medium"
-      >
-        <Icon name="logout-01" size={18} />
-        Sign out
+      <button onClick={() => setShowPassword((s) => !s)} className="text-sm font-semibold text-app-primary mb-3">
+        Change password
       </button>
+      {showPassword && (
+        <form onSubmit={changePassword} className="flex flex-col gap-3 mb-6">
+          <Input label="New password" type="password" minLength={6} required value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+          <Button type="submit">Update password</Button>
+        </form>
+      )}
+
+      <Button variant="danger" onClick={signOut} className="w-full">Log out</Button>
     </div>
   )
 }

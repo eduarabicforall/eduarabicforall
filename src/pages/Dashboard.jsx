@@ -1,142 +1,125 @@
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
+import BottomTabBar from '../components/layout/BottomTabBar'
+import Card from '../components/ui/Card'
 import Icon from '../components/Icon'
-
-const LESSONS = [
-  {
-    id: 'chat',
-    title: 'AI Chat',
-    icon: 'ai-brain-01',
-    color: 'from-teal-500/20 to-teal-500/5',
-    border: 'border-teal-500/20',
-    iconColor: 'text-teal-400',
-    progress: 65,
-    route: '/chat',
-  },
-  {
-    id: 'dialogue',
-    title: 'Dialogue',
-    icon: 'headphones',
-    color: 'from-violet-500/20 to-violet-500/5',
-    border: 'border-violet-500/20',
-    iconColor: 'text-violet-400',
-    progress: 42,
-    route: '/dialogue',
-  },
-  {
-    id: 'practice',
-    title: 'Pronunciation',
-    icon: 'mic-01',
-    color: 'from-amber-500/20 to-amber-500/5',
-    border: 'border-amber-500/20',
-    iconColor: 'text-amber-400',
-    progress: 28,
-    route: '/practice',
-  },
-  {
-    id: 'grammar',
-    title: 'Grammar',
-    icon: 'book-02',
-    color: 'from-rose-500/20 to-rose-500/5',
-    border: 'border-rose-500/20',
-    iconColor: 'text-rose-400',
-    progress: 53,
-    route: '/chat',
-  },
-]
-
-const TABS = [
-  { id: 'learn', label: 'Learn', icon: 'book-open-01', route: '/dashboard' },
-  { id: 'practice', label: 'Practice', icon: 'target-01', route: '/practice' },
-  { id: 'notifications', label: 'Alerts', icon: 'notification-01', route: '/alerts' },
-  { id: 'profile', label: 'Profile', icon: 'user', route: '/profile' },
-]
 
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const userName = profile?.full_name || user?.email?.split('@')[0] || 'Learner'
+  const [modules, setModules] = useState([])
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+
+    async function load() {
+      const { data: userModules } = await supabase
+        .from('user_modules')
+        .select('module_id, modules(id, name, slug, cover_url)')
+        .eq('user_id', user.id)
+
+      const results = []
+      for (const um of userModules ?? []) {
+        const [{ count: totalTracks }, { data: units }] = await Promise.all([
+          supabase.from('audio_tracks').select('id, unit_id, units!inner(module_id)', { count: 'exact', head: true })
+            .eq('units.module_id', um.module_id),
+          supabase.from('units').select('id').eq('module_id', um.module_id),
+        ])
+        results.push({
+          ...um.modules,
+          totalTracks: totalTracks ?? 0,
+          totalUnits: units?.length ?? 0,
+          // Fasa 1: real audio-completion tracking (per-track "listened" state)
+          // isn't modelled yet — show unit count as progress denominator with
+          // 0 completed rather than a hardcoded percentage (PRD §6 issue #10).
+          doneUnits: 0,
+        })
+      }
+      if (!cancelled) {
+        setModules(results)
+        setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [user])
+
+  const initials = (profile?.full_name || user?.email || '?').slice(0, 2).toUpperCase()
 
   return (
-    <div className="min-h-screen bg-bg pb-24">
-      <div className="max-w-lg mx-auto px-5 pt-6">
-        {/* Header: Language selector + Avatar */}
-        <div className="flex items-center justify-between mb-8">
-          {/* Avatar */}
-          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
-            {userName[0]?.toUpperCase()}
-          </div>
-        </div>
-
-        {/* Greeting */}
-        <div className="mb-8">
-          <p className="text-sm text-ink-faint mb-1">Hello {userName.split(' ')[0]},</p>
-          <h1 className="text-2xl font-sora font-bold text-ink">
-            Continue your <span className="text-primary">Arabic</span> journey!
-          </h1>
-        </div>
-
-        {/* Your Lessons */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-ink">Your Lessons</h2>
-            <div className="flex gap-1.5">
-              <button className="w-7 h-7 rounded-lg bg-panel flex items-center justify-center text-ink-faint">
-                <Icon name="grid-01" size={14} />
-              </button>
-              <button className="w-7 h-7 rounded-lg bg-panel flex items-center justify-center text-ink-faint">
-                <Icon name="list-03" size={14} />
-              </button>
+    <div className="app-frame">
+      <header className="flex items-center justify-between px-5 pt-6 pb-4">
+        <div className="relative">
+          <button onClick={() => setMenuOpen((o) => !o)} className="w-11 h-11 rounded-full bg-app-primary/20 text-app-primary font-bold flex items-center justify-center">
+            {initials}
+          </button>
+          {menuOpen && (
+            <div className="absolute top-14 left-0 bg-app-panel2 border border-app-border rounded-xl overflow-hidden w-48 z-10">
+              <Link to="/profile" className="block px-4 py-3 text-sm hover:bg-app-panel">Profile settings</Link>
+              <button onClick={signOut} className="w-full text-left px-4 py-3 text-sm text-app-danger hover:bg-app-panel">Log out</button>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {LESSONS.map(lesson => (
-              <Link
-                key={lesson.id}
-                to={lesson.route}
-                className={`p-4 bg-gradient-to-br ${lesson.color} border ${lesson.border} rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all`}
-              >
-                <div className={`${lesson.iconColor} mb-3`}>
-                  <Icon name={lesson.icon} size={28} />
-                </div>
-                <h3 className="text-sm font-semibold text-ink mb-0.5">{lesson.title}</h3>
-                <p className="text-xs text-ink-faint mb-3">You completed {lesson.progress}%</p>
-                {/* Progress bar */}
-                <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all duration-700"
-                    style={{ width: `${lesson.progress}%` }}
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
+          )}
         </div>
-      </div>
-
-      {/* Bottom Tab Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-bg-2/90 backdrop-blur-xl border-t border-ea-border z-50">
-        <div className="max-w-lg mx-auto flex">
-          {TABS.map(tab => {
-            const isActive = location.pathname === tab.route
-            return (
-              <Link
-                key={tab.id}
-                to={tab.route}
-                className={`flex-1 flex flex-col items-center py-3 gap-0.5 transition-all ${
-                  isActive ? 'text-primary' : 'text-ink-faint hover:text-ink-soft'
-                }`}
-              >
-                <Icon name={tab.icon} size={22} />
-                <span className="text-[10px] font-medium">{tab.label}</span>
-              </Link>
-            )
-          })}
+        <div className="text-center">
+          <p className="text-app-inkSoft text-xs">Assalamualaikum,</p>
+          <p className="font-semibold">{profile?.full_name || 'Student'}</p>
         </div>
-      </div>
+        <Link to="/alerts" className="w-11 h-11 rounded-full bg-app-panel flex items-center justify-center">
+          <Icon name="notification-01" />
+        </Link>
+      </header>
+
+      <main className="flex-1 px-5 pb-6 flex flex-col gap-3 overflow-y-auto">
+        <h2 className="text-xs font-bold text-app-inkFaint tracking-wider mt-2">MY MODULES</h2>
+
+        {loading && <p className="text-app-inkFaint text-sm">Loading…</p>}
+        {!loading && modules.length === 0 && (
+          <p className="text-app-inkFaint text-sm">No modules activated yet — activate one below.</p>
+        )}
+
+        {modules.map((m) => {
+          const pct = m.totalUnits ? Math.round((m.doneUnits / m.totalUnits) * 100) : 0
+          return (
+            <Link key={m.id} to={`/audio/${m.slug}`}>
+              <Card className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-xl bg-app-primary/15 flex items-center justify-center shrink-0">
+                  <Icon name="book-02" size={26} className="text-app-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold truncate">{m.name}</p>
+                  <div className="h-1.5 bg-app-panel2 rounded-pill mt-2 mb-1">
+                    <div className="h-1.5 bg-app-primary rounded-pill" style={{ width: `${pct}%` }} />
+                  </div>
+                  <p className="text-xs text-app-inkFaint">{pct}% · {m.doneUnits}/{m.totalUnits} units</p>
+                </div>
+              </Card>
+            </Link>
+          )
+        })}
+
+        <Link to="/activate">
+          <Card className="border-dashed flex items-center justify-between">
+            <span className="text-sm font-semibold">Activate a new module</span>
+            <span className="text-xs bg-app-panel2 rounded-pill px-3 py-1.5">Enter code</span>
+          </Card>
+        </Link>
+
+        <Link to="/grammar">
+          <Card className="border-app-gold/40 bg-app-gold/10 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-app-gold">Grammar module</p>
+              <p className="text-xs text-app-inkSoft">Free for your account</p>
+            </div>
+            <Icon name="arrow-right-01" className="text-app-gold" />
+          </Card>
+        </Link>
+      </main>
+
+      <BottomTabBar />
     </div>
   )
 }

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&amp;family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&amp;family=Amiri:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+  <style>
+    body{margin:0;background:#05070d;color:#F3F5FA;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+    * { box-sizing: border-box; }
+    input::placeholder{color:#6B7488}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:36px 12px;background:#05070d;">
+  <div style="width:402px;max-width:100%;background:#070A14;border:1px solid rgba(255,255,255,.09);border-radius:36px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.5);min-height:820px;display:flex;flex-direction:column;">
+
+    <div style="padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div style="width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;"><i class="hgi-stroke hgi-arrow-left-01" style="font-size:16px;color:#A2AABD;"></i></div>
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(185,167,240,.15);display:flex;align-items:center;justify-content:center;"><i class="hgi-stroke hgi-sparkles" style="color:#B9A7F0;font-size:17px;"></i></div>
+        <div style="flex:1;">
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:15px;">{{ currentModule.ustaz }}</div>
+          
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="flex:1;height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;">
+          <div style="height:100%;border-radius:4px;background:#B9A7F0;width:{{ quotaPct }}%;"></div>
+        </div>
+        <div style="color:#B9A7F0;font-size:11px;font-weight:700;flex-shrink:0;">{{ quotaLabel }}</div>
+      </div>
+
+      <select onChange="{{ selectModule }}" value="{{ currentModule.id }}" style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:10px 12px;color:#F3F5FA;font-size:13px;font-family:inherit;font-weight:600;">
+        <sc-for list="{{ modules }}" as="m" hint-placeholder-count="2">
+          <option value="{{ m.id }}">{{ m.name }} · {{ m.ustaz }}</option>
+        </sc-for>
+      </select>
+    </div>
+
+    <div style="flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;">
+      <sc-for list="{{ messages }}" as="msg" hint-placeholder-count="3">
+        <div style="align-self:{{ msg.align }};max-width:82%;">
+          <div style="background:{{ msg.bg }};border-radius:{{ msg.radius }};padding:11px 15px;font-size:13.5px;line-height:1.5;color:{{ msg.color }};">{{ msg.text }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="padding:14px 16px 20px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:10px;align-items:center;">
+      <input value="{{ draft }}" onChange="{{ setDraft }}" placeholder="Ask your Ustaz…" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:100px;padding:12px 16px;color:#F3F5FA;font-size:13.5px;font-family:inherit;">
+      <button onClick="{{ send }}" style="width:42px;height:42px;border-radius:50%;background:#B9A7F0;border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;">
+        <i class="hgi-stroke hgi-sent" style="color:#1a1230;font-size:17px;"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  moduleDefs = [
+    { id: 'quran', name: 'Bahasa Arab Al Quran', ustaz: 'Ai Ustaz', used: 12, limit: 60 },
+    { id: 'pemula', name: 'Bahasa Arab Pemula', ustaz: 'Ustaz Zaid', used: 41, limit: 60 },
+  ];
+  state = {
+    moduleId: 'quran',
+    draft: '',
+    chats: {
+      quran: [
+        { from: 'them', text: 'Assalamualaikum! I\'m Ustaz Hakim, here to help you with Bahasa Arab Al Quran. What are you working on today?' },
+        { from: 'me', text: 'why is وَ sometimes an oath particle?' },
+        { from: 'them', text: 'Great question — before اللَّيْل in Surah al-Fajr, وَ is qasam (an oath), not a conjunction. Let\'s look at unit 6 together.' },
+      ],
+      pemula: [
+        { from: 'them', text: 'Hi! I\'m Ustaz Zaid — ask me anything about Bahasa Arab Pemula.' },
+      ],
+    },
+  };
+  renderVals() {
+    const cur = this.moduleDefs.find((m) => m.id === this.state.moduleId);
+    const msgs = this.state.chats[this.state.moduleId] || [];
+    return {
+      modules: this.moduleDefs,
+      currentModule: cur,
+      quotaLabel: `${cur.used}/${cur.limit}`,
+      quotaPct: Math.round((cur.used / cur.limit) * 100),
+      messages: msgs.map((m) => ({
+        text: m.text,
+        align: m.from === 'me' ? 'flex-end' : 'flex-start',
+        bg: m.from === 'me' ? 'rgba(47,196,159,.16)' : 'rgba(255,255,255,.06)',
+        color: '#F3F5FA',
+        radius: m.from === 'me' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+      })),
+      draft: this.state.draft,
+      setDraft: (e) => this.setState({ draft: e.target.value }),
+      selectModule: (e) => this.setState({ moduleId: e.target.value }),
+      send: () => {
+        if (!this.state.draft.trim()) return;
+        const key = this.state.moduleId;
+        const chats = { ...this.state.chats, [key]: [...(this.state.chats[key] || []), { from: 'me', text: this.state.draft }] };
+        this.setState({ chats, draft: '' });
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

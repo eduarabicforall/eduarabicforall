@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+  <style>
+    body{margin:0;background:#070A14;color:#F3F5FA;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+    * { box-sizing: border-box; }
+    input::placeholder,textarea::placeholder{color:#6B7488}
+    table{width:100%;border-collapse:collapse;}
+    th{text-align:left;font-size:11.5px;color:#6B7488;font-weight:700;letter-spacing:.04em;padding:14px 14px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.08);}
+    td{font-size:13px;padding:13px 14px;border-top:1px solid rgba(255,255,255,.06);}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:grid;grid-template-columns:250px 1fr;background:#070A14;">
+
+  <div style="border-right:1px solid rgba(255,255,255,.09);padding:20px 14px;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 8px 22px;">
+      <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#2FC49F,#1C6D5C);display:flex;align-items:center;justify-content:center;"><i class="hgi-stroke hgi-book-02" style="color:#F3F5FA;font-size:16px;"></i></div>
+      <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:14.5px;">EduArabic <span style="color:#6B7488;font-weight:600;">Admin</span></span>
+    </div>
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="7">
+      <button onClick="{{ n.select }}" style="width:100%;display:flex;align-items:center;gap:11px;text-align:left;padding:11px 12px;border-radius:11px;border:none;background:{{ n.bg }};color:{{ n.color }};font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:2px;">
+        <i class="hgi-stroke {{ n.icon }}" style="font-size:17px;"></i>{{ n.label }}
+      </button>
+      <sc-if value="{{ n.hasSubItems }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:1px;margin:0 0 6px 20px;padding-left:12px;border-left:1px solid rgba(255,255,255,.09);">
+          <sc-for list="{{ n.subItems }}" as="sm" hint-placeholder-count="4">
+            <button onClick="{{ sm.select }}" style="display:flex;align-items:center;gap:8px;text-align:left;padding:8px 10px;border-radius:9px;border:none;background:{{ sm.bg }};color:{{ sm.color }};font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">
+              <i class="hgi-stroke hgi-folder-01" style="font-size:13px;flex-shrink:0;"></i>{{ sm.label }}
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-for>
+    <div style="flex:1;"></div>
+    <button onClick="{{ goProfile }}" style="display:flex;align-items:center;gap:10px;padding:12px;border-top:1px solid rgba(255,255,255,.06);margin-top:10px;background:{{ profileBg }};border-radius:11px;border:none;cursor:pointer;font-family:inherit;text-align:left;">
+      <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">A</div>
+      <div style="font-size:12.5px;font-weight:600;color:{{ profileColor }};">Afiq (admin)</div>
+    </button>
+  </div>
+
+  <div style="padding:30px 40px;overflow-x:auto;">
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0 0 24px;">Dashboard</h1>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;">
+          <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:20px;">
+            <div style="color:#6B7488;font-size:12px;font-weight:600;margin-bottom:8px;">Total users</div>
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;">4,812</div>
+          </div>
+          <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:20px;">
+            <div style="color:#6B7488;font-size:12px;font-weight:600;margin-bottom:8px;">Most active module</div>
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:17px;">Al Quran</div>
+          </div>
+          <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:20px;">
+            <div style="color:#6B7488;font-size:12px;font-weight:600;margin-bottom:8px;">AI Ustaz messages (30d)</div>
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;">18,204</div>
+          </div>
+          <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:20px;">
+            <div style="color:#6B7488;font-size:12px;font-weight:600;margin-bottom:8px;">Sales (in-app)</div>
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:#2FC49F;">RM12,430</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:22px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:14px;">Module activations</div>
+          <sc-for list="{{ moduleStats }}" as="m" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              <div style="width:130px;font-size:12.5px;color:#A2AABD;flex-shrink:0;">{{ m.name }}</div>
+              <div style="flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;"><div style="height:100%;background:#2FC49F;width:{{ m.pct }}%;"></div></div>
+              <div style="width:50px;text-align:right;font-size:12px;color:#6B7488;">{{ m.count }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isAdmins }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0 0 24px;">Manage admins</h1>
+        <div style="display:flex;gap:10px;margin-bottom:24px;">
+          <input value="{{ newAdminEmail }}" onChange="{{ setNewAdminEmail }}" placeholder="email@example.com" style="flex:1;max-width:340px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:11px;padding:11px 14px;color:#F3F5FA;font-size:13.5px;font-family:inherit;"/>
+          <button onClick="{{ addAdmin }}" style="background:#2FC49F;color:#04241C;font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:11px;border:none;cursor:pointer;">Add admin</button>
+        </div>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;overflow:hidden;">
+          <table>
+            <tr><th>Email</th><th>Added</th><th></th></tr>
+            <sc-for list="{{ admins }}" as="a" hint-placeholder-count="3">
+              <tr><td>{{ a.email }}</td><td style="color:#6B7488;">{{ a.added }}</td><td style="text-align:right;"><button onClick="{{ a.remove }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;">Remove</button></td></tr>
+            </sc-for>
+          </table>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMaterials }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div>
+            <div style="color:#6B7488;font-size:12px;font-weight:700;letter-spacing:.03em;margin-bottom:4px;">MANAGE MATERIALS</div>
+            <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0;display:flex;align-items:center;gap:10px;">{{ activeMaterial.name }}
+              <sc-if value="{{ activeMaterial.free }}" hint-placeholder-val="{{ false }}"><span style="background:rgba(240,180,41,.16);color:#F0B429;font-size:11px;font-weight:800;padding:4px 10px;border-radius:100px;">FREE</span></sc-if>
+            </h1>
+            <div style="color:#6B7488;font-size:12.5px;margin-top:4px;">{{ activeMaterial.unitCount }} units</div>
+          </div>
+          <button onClick="{{ addUnit }}" style="background:#2FC49F;color:#04241C;font-weight:700;font-size:13.5px;padding:11px 18px;border-radius:11px;border:none;cursor:pointer;">+ Add unit</button>
+        </div>
+        <div style="margin-top:22px;display:flex;flex-direction:column;gap:8px;">
+          <sc-for list="{{ activeMaterial.units }}" as="u" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:13px;padding:14px 16px;">
+              <i class="hgi-stroke hgi-folder-01" style="font-size:16px;color:#A2AABD;"></i>
+              <div style="flex:1;font-size:13.5px;font-weight:600;">{{ u.title }}</div>
+              <div style="color:#6B7488;font-size:12px;">{{ u.audioCount }} audio files</div>
+              <button onClick="{{ u.addAudio }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;">+ Audio</button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProducts }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div>
+            <div style="color:#6B7488;font-size:12px;font-weight:700;letter-spacing:.03em;margin-bottom:4px;">MANAGE PRODUCTS</div>
+            <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0;">{{ productsTitle }}</h1>
+          </div>
+          <button onClick="{{ addProduct }}" style="background:#2FC49F;color:#04241C;font-weight:700;font-size:13.5px;padding:11px 18px;border-radius:11px;border:none;cursor:pointer;">+ New product</button>
+        </div>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;overflow:hidden;margin-top:18px;">
+          <table>
+            <tr><th>Product</th><th>Module</th><th>Price</th><th>Stock</th><th>Status</th><th>Sell in app</th><th></th></tr>
+            <sc-for list="{{ products }}" as="p" hint-placeholder-count="4">
+              <tr>
+                <td style="font-weight:600;">{{ p.name }}</td>
+                <td style="color:#A2AABD;">{{ p.module }}</td>
+                <td>RM{{ p.price }}</td>
+                <td style="color:#A2AABD;">{{ p.stock }}</td>
+                <td><button onClick="{{ p.toggleActive }}" style="background:{{ p.statusBg }};color:{{ p.statusColor }};font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;border:none;cursor:pointer;">{{ p.statusLabel }}</button></td>
+                <td>
+                  <button onClick="{{ p.toggleSale }}" style="width:38px;height:22px;border-radius:100px;background:{{ p.saleBg }};border:none;cursor:pointer;position:relative;">
+                    <div style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;left:{{ p.saleLeft }};transition:.15s;"></div>
+                  </button>
+                </td>
+                <td style="text-align:right;"><button onClick="{{ p.startEdit }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;">Edit</button></td>
+              </tr>
+            </sc-for>
+          </table>
+        </div>
+        <sc-if value="{{ editingProduct }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px;background:rgba(255,255,255,.035);border:1px solid rgba(47,196,159,.25);border-radius:14px;padding:18px;max-width:420px;">
+            <div style="font-weight:700;font-size:13.5px;margin-bottom:12px;">Edit product</div>
+            <label style="font-size:12px;color:#A2AABD;font-weight:600;display:block;margin-bottom:10px;">Name
+              <input value="{{ editDraft.name }}" onChange="{{ setEditName }}" style="display:block;width:100%;margin-top:4px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:9px 11px;color:#F3F5FA;font-size:13px;font-family:inherit;"/>
+            </label>
+            <div style="display:flex;gap:10px;margin-bottom:14px;">
+              <label style="font-size:12px;color:#A2AABD;font-weight:600;flex:1;">Price (RM)
+                <input value="{{ editDraft.price }}" onChange="{{ setEditPrice }}" style="display:block;width:100%;margin-top:4px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:9px 11px;color:#F3F5FA;font-size:13px;font-family:inherit;"/>
+              </label>
+              <label style="font-size:12px;color:#A2AABD;font-weight:600;flex:1;">Stock
+                <input value="{{ editDraft.stock }}" onChange="{{ setEditStock }}" style="display:block;width:100%;margin-top:4px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:9px 11px;color:#F3F5FA;font-size:13px;font-family:inherit;"/>
+              </label>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button onClick="{{ saveEditProduct }}" style="background:#2FC49F;color:#04241C;font-weight:700;font-size:12.5px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;">Save</button>
+              <button onClick="{{ cancelEditProduct }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12.5px;padding:9px 18px;border-radius:9px;cursor:pointer;">Cancel</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isCodes }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0 0 24px;">Activation codes</h1>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:20px;margin-bottom:24px;display:flex;gap:14px;align-items:flex-end;">
+          <div>
+            <div style="font-size:12px;color:#A2AABD;font-weight:600;margin-bottom:6px;">Module</div>
+            <select value="{{ batchModule }}" onChange="{{ setBatchModule }}" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:10px 12px;color:#F3F5FA;font-size:13px;font-family:inherit;min-width:200px;">
+              <sc-for list="{{ moduleOptions }}" as="mo" hint-placeholder-count="4"><option value="{{ mo }}">{{ mo }}</option></sc-for>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#A2AABD;font-weight:600;margin-bottom:6px;">Quantity</div>
+            <input type="number" value="{{ batchQty }}" onChange="{{ setBatchQty }}" style="width:100px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:10px 12px;color:#F3F5FA;font-size:13px;font-family:inherit;"/>
+          </div>
+          <button onClick="{{ generateBatch }}" style="background:#2FC49F;color:#04241C;font-weight:700;font-size:13.5px;padding:11px 20px;border-radius:11px;border:none;cursor:pointer;">Generate batch</button>
+          <div style="flex:1;"></div>
+          <button onClick="{{ exportCsv }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12.5px;padding:10px 16px;border-radius:10px;cursor:pointer;display:flex;align-items:center;gap:7px;"><i class="hgi-stroke hgi-download-01" style="font-size:14px;"></i>Export CSV</button>
+        </div>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;overflow:hidden;">
+          <table>
+            <tr><th>Code</th><th>Module</th><th>Batch</th><th>Activated count</th><th>Status</th><th></th></tr>
+            <sc-for list="{{ codes }}" as="c" hint-placeholder-count="6">
+              <tr>
+                <td style="font-family:'Sora',sans-serif;font-weight:700;letter-spacing:.05em;">{{ c.code }}</td>
+                <td style="color:#A2AABD;">{{ c.module }}</td>
+                <td style="color:#6B7488;">{{ c.batch }}</td>
+                <td style="color:#A2AABD;">{{ c.activatedCount }}</td>
+                <td><span style="background:{{ c.statusBg }};color:{{ c.statusColor }};font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;">{{ c.statusLabel }}</span></td>
+                <td style="text-align:right;"><button onClick="{{ c.toggle }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;">{{ c.actionLabel }}</button></td>
+              </tr>
+            </sc-for>
+          </table>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isOrders }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="color:#6B7488;font-size:12px;font-weight:700;letter-spacing:.03em;margin-bottom:4px;">ORDERS</div>
+        <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0 0 24px;">{{ ordersTitle }}</h1>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;overflow:hidden;">
+          <table>
+            <tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Shipping</th><th></th></tr>
+            <sc-for list="{{ orders }}" as="o" hint-placeholder-count="5">
+              <tr>
+                <td style="font-family:'Sora',sans-serif;font-weight:700;">{{ o.id }}</td>
+                <td style="color:#A2AABD;">{{ o.customer }}</td>
+                <td>RM{{ o.total }}</td>
+                <td><span style="background:{{ o.payBg }};color:{{ o.payColor }};font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;">{{ o.payLabel }}</span></td>
+                <td>
+                  <select value="{{ o.shipStatus }}" onChange="{{ o.setShip }}" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:6px 10px;color:#F3F5FA;font-size:12px;font-family:inherit;">
+                    <option value="pending">Pending</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                  </select>
+                </td>
+                <td style="text-align:right;"><button onClick="{{ o.toggleView }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;">{{ o.viewLabel }}</button></td>
+              </tr>
+              <sc-if value="{{ o.expanded }}" hint-placeholder-val="{{ false }}">
+                <tr><td colSpan="6" style="background:rgba(255,255,255,.02);">
+                  <div style="font-size:12.5px;color:#A2AABD;line-height:1.7;">
+                    <strong style="color:#F3F5FA;">Shipping address:</strong> {{ o.address }}<br/>
+                    <strong style="color:#F3F5FA;">Items:</strong> {{ o.itemsLabel }}
+                  </div>
+                </td></tr>
+              </sc-if>
+            </sc-for>
+          </table>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0 0 24px;">Profile settings</h1>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:24px;max-width:480px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;">A</div>
+            <div><div style="font-weight:700;font-size:14.5px;">Afiq</div><div style="color:#6B7488;font-size:12px;">Admin</div></div>
+          </div>
+          <label style="font-size:12.5px;color:#A2AABD;font-weight:600;">Full name
+            <input value="Afiq" style="display:block;width:100%;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:11px 13px;color:#F3F5FA;font-size:13.5px;font-family:inherit;"/>
+          </label>
+          <label style="font-size:12.5px;color:#A2AABD;font-weight:600;">Email
+            <input value="afiq@eduarabic.my" style="display:block;width:100%;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:11px 13px;color:#F3F5FA;font-size:13.5px;font-family:inherit;"/>
+          </label>
+          <button onClick="{{ saveProfile }}" style="align-self:flex-start;background:#2FC49F;color:#04241C;font-weight:700;font-size:13.5px;padding:11px 22px;border-radius:11px;border:none;cursor:pointer;margin-top:2px;">Save changes</button>
+          <div style="height:1px;background:rgba(255,255,255,.07);margin:6px 0;"></div>
+          <button onClick="{{ toggleChangePassword }}" style="align-self:flex-start;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:#F3F5FA;font-weight:600;font-size:13px;padding:11px 20px;border-radius:11px;cursor:pointer;">Change password</button>
+          <sc-if value="{{ showChangePassword }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px;">
+              <input type="password" placeholder="New password" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:10px 12px;color:#F3F5FA;font-size:13px;font-family:inherit;"/>
+              <input type="password" placeholder="Confirm new password" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:10px 12px;color:#F3F5FA;font-size:13px;font-family:inherit;"/>
+              <button onClick="{{ updatePassword }}" style="align-self:flex-start;background:#2FC49F;color:#04241C;font-weight:700;font-size:12.5px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;">Update password</button>
+            </div>
+          </sc-if>
+          <button onClick="{{ logout }}" style="align-self:flex-start;background:transparent;border:1px solid rgba(240,90,90,.3);color:#f06868;font-weight:600;font-size:13px;padding:11px 20px;border-radius:11px;cursor:pointer;">Log out</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isAI }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <h1 style="font-family:'Sora',sans-serif;font-weight:800;font-size:24px;margin:0 0 24px;">AI console</h1>
+
+        <div style="background:rgba(185,167,240,.06);border:1px solid rgba(185,167,240,.2);border-radius:16px;padding:22px;max-width:640px;margin-bottom:28px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><i class="hgi-stroke hgi-key-01" style="color:#B9A7F0;font-size:16px;"></i><span style="font-weight:700;font-size:13.5px;">Gemini API key</span></div>
+          <div style="display:flex;gap:10px;">
+            <input type="{{ apiKeyInputType }}" value="{{ apiKey }}" onChange="{{ setApiKey }}" placeholder="AIza…" style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:11px 13px;color:#F3F5FA;font-size:13px;font-family:monospace;"/>
+            <button onClick="{{ toggleApiKeyVisible }}" style="background:transparent;border:1px solid rgba(255,255,255,.1);color:#A2AABD;font-size:12px;padding:0 14px;border-radius:10px;cursor:pointer;">{{ apiKeyToggleLabel }}</button>
+            <button onClick="{{ saveApiKey }}" style="background:#B9A7F0;color:#1a1230;font-weight:700;font-size:13px;padding:0 18px;border-radius:10px;border:none;cursor:pointer;">Save key</button>
+          </div>
+          <div style="color:#6B7488;font-size:11.5px;margin-top:10px;">One key powers every module below — stored encrypted server-side, never sent to the client. Set here once; each module below only configures persona, prompt and quota.</div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:20px;">
+          <sc-for list="{{ aiModuleTabs }}" as="t" hint-placeholder-count="5">
+            <button onClick="{{ t.select }}" style="padding:9px 16px;border-radius:100px;font-size:12.5px;font-weight:700;border:1px solid {{ t.border }};background:{{ t.bg }};color:{{ t.color }};cursor:pointer;">{{ t.label }}</button>
+          </sc-for>
+        </div>
+        <div style="background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:24px;max-width:640px;display:flex;flex-direction:column;gap:16px;">
+          <label style="font-size:12.5px;color:#A2AABD;font-weight:600;">Persona name
+            <input value="{{ aiConfig.persona }}" onChange="{{ setPersona }}" style="display:block;width:100%;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:11px 13px;color:#F3F5FA;font-size:13.5px;font-family:inherit;"/>
+          </label>
+          <label style="font-size:12.5px;color:#A2AABD;font-weight:600;">System prompt
+            <textarea value="{{ aiConfig.prompt }}" onChange="{{ setPrompt }}" rows="5" style="display:block;width:100%;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:11px 13px;color:#F3F5FA;font-size:13px;font-family:inherit;resize:vertical;"></textarea>
+          </label>
+          <div style="display:flex;gap:14px;">
+            <label style="font-size:12.5px;color:#A2AABD;font-weight:600;flex:1;">Model
+              <select value="{{ aiConfig.model }}" onChange="{{ setModel }}" style="display:block;width:100%;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:11px 13px;color:#F3F5FA;font-size:13px;font-family:inherit;">
+                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+              </select>
+            </label>
+            <label style="font-size:12.5px;color:#A2AABD;font-weight:600;flex:1;">Daily quota / user
+              <input type="number" value="{{ aiConfig.quota }}" onChange="{{ setQuota }}" style="display:block;width:100%;margin-top:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:11px 13px;color:#F3F5FA;font-size:13px;font-family:inherit;"/>
+            </label>
+          </div>
+          <button onClick="{{ saveAiConfig }}" style="align-self:flex-start;background:#2FC49F;color:#04241C;font-weight:700;font-size:13.5px;padding:11px 22px;border-radius:11px;border:none;cursor:pointer;margin-top:4px;">Save configuration</button>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:24px;right:24px;background:#0B1020;border:1px solid rgba(47,196,159,.35);color:#F3F5FA;font-size:13px;font-weight:600;padding:14px 20px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.45);z-index:50;display:flex;align-items:center;gap:10px;">
+      <i class="hgi-stroke hgi-checkmark-circle-02" style="color:#2FC49F;font-size:16px;"></i>{{ toastMessage }}
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  navDefs = [
+    { id: 'dashboard', label: 'Dashboard', icon: 'hgi-dashboard-square-01' },
+    { id: 'admins', label: 'Manage admins', icon: 'hgi-shield-user' },
+    { id: 'materials', label: 'Manage materials', icon: 'hgi-book-02' },
+    { id: 'products', label: 'Manage products', icon: 'hgi-shopping-bag-02' },
+    { id: 'codes', label: 'Activation codes', icon: 'hgi-key-01' },
+    { id: 'orders', label: 'Orders', icon: 'hgi-package' },
+    { id: 'ai', label: 'AI console', icon: 'hgi-sparkles' },
+  ];
+  state = {
+    section: 'dashboard',
+    newAdminEmail: '',
+    admins: [
+      { email: 'afiq@eduarabic.my', added: '5 Jan 2026' },
+      { email: 'siti.admin@eduarabic.my', added: '18 Mar 2026' },
+    ],
+    expandedModule: 'pemula',
+    selectedMaterialModule: 'pemula',
+    orderFilter: 'all',
+    productFilter: 'all',
+    batchModule: 'Bahasa Arab Al Quran',
+    batchQty: 100,
+    codes: [
+      { code: 'PMLA-1042', module: 'Bahasa Arab Pemula', batch: 'B-001', activatedCount: 1, status: 'active' },
+      { code: 'PMLA-1043', module: 'Bahasa Arab Pemula', batch: 'B-001', activatedCount: 0, status: 'active' },
+      { code: 'QURN-8841', module: 'Bahasa Arab Al Quran', batch: 'B-004', activatedCount: 3, status: 'active' },
+      { code: 'QURN-8842', module: 'Bahasa Arab Al Quran', batch: 'B-004', activatedCount: 0, status: 'active' },
+      { code: 'KRYA-2201', module: 'Arab Tujuan Kerjaya', batch: 'B-002', activatedCount: 0, status: 'disabled' },
+      { code: 'ANAK-0090', module: 'Anakku Berbahasa Arab', batch: 'B-003', activatedCount: 2, status: 'active' },
+    ],
+    products: [
+      { name: 'Bahasa Arab Pemula', module: 'Bahasa Arab Pemula', price: '39.90', stock: 240, onSale: true, active: true },
+      { name: 'Arab Tujuan Kerjaya', module: 'Arab Tujuan Kerjaya', price: '59.90', stock: 88, onSale: true, active: true },
+      { name: 'Bahasa Arab Al Quran', module: 'Bahasa Arab Al Quran', price: '97.90', stock: 51, onSale: false, active: true },
+      { name: 'Anakku Berbahasa Arab', module: 'Anakku Berbahasa Arab', price: '27.90', stock: 132, onSale: true, active: false },
+    ],
+    orders: [
+      { id: '#EA-3021', customer: 'Nur Aisyah', total: '65.90', payment: 'paid', ship: 'shipped', address: '12 Jalan Damai, 43000 Kajang, Selangor', itemsLabel: 'Bahasa Arab Pemula ×1' },
+      { id: '#EA-3022', customer: 'Danial Hakim', total: '45.90', payment: 'paid', ship: 'pending', address: '88 Taman Sri Indah, 81100 Johor Bahru, Johor', itemsLabel: 'Anakku Berbahasa Arab ×1' },
+      { id: '#EA-3023', customer: 'Farah Iman', total: '103.90', payment: 'pending', ship: 'pending', address: '5 Lorong Pantai, 11700 Gelugor, Penang', itemsLabel: 'Bahasa Arab Al Quran ×1' },
+      { id: '#EA-3024', customer: 'Zul Ariffin', total: '33.90', payment: 'paid', ship: 'delivered', address: '21 Jalan Meranti, 93450 Kuching, Sarawak', itemsLabel: 'Anakku Berbahasa Arab ×1' },
+      { id: '#EA-3025', customer: 'Aina Sofea', total: '59.90', payment: 'paid', ship: 'shipped', address: '3 Persiaran Impian, 40170 Shah Alam, Selangor', itemsLabel: 'Arab Tujuan Kerjaya ×1' },
+    ],
+    apiKey: 'AIzaSyD8f92kLp3xQmZ7RtY0nHc1J6vWa4bXeKq',
+    apiKeyVisible: false,
+    aiModule: 'quran',
+    toast: null,
+    editingProductIdx: null,
+    editDraft: {},
+    showChangePassword: false,
+    viewingOrderIdx: null,
+    aiConfigs: {
+      quran: { persona: 'Ustaz Hakim', prompt: 'You are Ustaz Hakim, a warm and precise Arabic teacher focused on Quranic Arabic grammar and vocabulary. Only answer questions related to the Bahasa Arab Al Quran module.', model: 'gemini-2.5-flash', quota: 20 },
+      pemula: { persona: 'Ustaz Zaid', prompt: 'You are Ustaz Zaid, an encouraging beginner-level Arabic tutor for the Bahasa Arab Pemula module.', model: 'gemini-2.5-flash', quota: 20 },
+      kerjaya: { persona: 'Ustaz Imran', prompt: 'You are Ustaz Imran, focused on professional and workplace Arabic vocabulary.', model: 'gemini-2.5-flash', quota: 15 },
+      anak: { persona: 'Kak Alia', prompt: 'You are Kak Alia, a gentle, playful tutor helping parents teach children basic Arabic.', model: 'gemini-2.5-flash', quota: 15 },
+      grammar: { persona: 'Ustaz Fikri', prompt: 'You are Ustaz Fikri, giving light grammar guidance on the free Grammar module.', model: 'gemini-2.5-flash', quota: 5 },
+    },
+  };
+  orderFilters = [
+    { id: 'all', label: 'All orders' },
+    { id: 'pending', label: 'Pending' },
+    { id: 'shipped', label: 'Shipped' },
+    { id: 'delivered', label: 'Delivered' },
+  ];
+  productFilters = [
+    { id: 'all', label: 'All products' },
+    { id: 'active', label: 'Active' },
+    { id: 'inactive', label: 'Tidak Aktif' },
+  ];
+  moduleTree = [
+    { id: 'pemula', name: 'Bahasa Arab Pemula', unitCount: 324, units: [{ title: 'Unit 1 — Greetings', audioCount: 6 }, { title: 'Unit 2 — Numbers', audioCount: 4 }, { title: 'Unit 3 — Family', audioCount: 5 }] },
+    { id: 'kerjaya', name: 'Arab Tujuan Kerjaya', unitCount: 198, units: [{ title: 'Unit 1 — Office vocabulary', audioCount: 5 }, { title: 'Unit 2 — Meetings', audioCount: 3 }] },
+    { id: 'quran', name: 'Bahasa Arab Al Quran', unitCount: 198, units: [{ title: 'Unit 1 — Surah al-Fatihah', audioCount: 4 }, { title: 'Unit 2 — Oath particles', audioCount: 6 }] },
+    { id: 'grammar', name: 'Grammar module', unitCount: 12, free: true, units: [{ title: 'Nouns & articles', audioCount: 2 }] },
+  ];
+  renderVals() {
+    const s = this.state;
+    const cfg = s.aiConfigs[s.aiModule];
+    const showToast = (msg) => {
+      clearTimeout(this._toastTimer);
+      this.setState({ toast: msg });
+      this._toastTimer = setTimeout(() => this.setState({ toast: null }), 2200);
+    };
+    return {
+      toastVisible: !!s.toast,
+      toastMessage: s.toast,
+      navItems: this.navDefs.map((n) => ({
+        label: n.label, icon: n.icon,
+        bg: s.section === n.id ? 'rgba(47,196,159,.14)' : 'transparent',
+        color: s.section === n.id ? '#2FC49F' : '#A2AABD',
+        select: () => this.setState({ section: n.id }),
+        subItems: n.id === 'materials' ? this.moduleTree.map((m) => ({
+          label: m.name,
+          bg: s.section === 'materials' && s.selectedMaterialModule === m.id ? 'rgba(255,255,255,.08)' : 'transparent',
+          color: s.section === 'materials' && s.selectedMaterialModule === m.id ? '#F3F5FA' : '#6B7488',
+          select: () => this.setState({ section: 'materials', selectedMaterialModule: m.id }),
+        })) : n.id === 'orders' ? this.orderFilters.map((f) => ({
+          label: f.label,
+          bg: s.section === 'orders' && s.orderFilter === f.id ? 'rgba(255,255,255,.08)' : 'transparent',
+          color: s.section === 'orders' && s.orderFilter === f.id ? '#F3F5FA' : '#6B7488',
+          select: () => this.setState({ section: 'orders', orderFilter: f.id }),
+        })) : n.id === 'products' ? this.productFilters.map((f) => ({
+          label: f.label,
+          bg: s.section === 'products' && s.productFilter === f.id ? 'rgba(255,255,255,.08)' : 'transparent',
+          color: s.section === 'products' && s.productFilter === f.id ? '#F3F5FA' : '#6B7488',
+          select: () => this.setState({ section: 'products', productFilter: f.id }),
+        })) : [],
+        hasSubItems: n.id === 'materials' || n.id === 'orders' || n.id === 'products',
+      })),
+      isDashboard: s.section === 'dashboard',
+      isAdmins: s.section === 'admins',
+      isMaterials: s.section === 'materials',
+      isProducts: s.section === 'products',
+      isCodes: s.section === 'codes',
+      isOrders: s.section === 'orders',
+      isAI: s.section === 'ai',
+      isProfile: s.section === 'profile',
+      showChangePassword: s.showChangePassword,
+      profileBg: s.section === 'profile' ? 'rgba(47,196,159,.14)' : 'transparent',
+      profileColor: s.section === 'profile' ? '#2FC49F' : '#F3F5FA',
+      goProfile: () => this.setState({ section: 'profile' }),
+
+      moduleStats: [
+        { name: 'Al Quran', pct: 78, count: 1204 },
+        { name: 'Pemula', pct: 62, count: 960 },
+        { name: 'Kerjaya', pct: 34, count: 528 },
+        { name: 'Anakku', pct: 21, count: 326 },
+      ],
+
+      newAdminEmail: s.newAdminEmail,
+      setNewAdminEmail: (e) => this.setState({ newAdminEmail: e.target.value }),
+      addAdmin: () => {
+        if (!s.newAdminEmail.trim()) return;
+        this.setState({ admins: [...s.admins, { email: s.newAdminEmail, added: 'Just now' }], newAdminEmail: '' });
+      },
+      admins: s.admins.map((a, i) => ({ ...a, remove: () => this.setState({ admins: s.admins.filter((_, j) => j !== i) }) })),
+
+      activeMaterial: (() => {
+        const m = this.moduleTree.find((m) => m.id === s.selectedMaterialModule) || this.moduleTree[0];
+        return { ...m, units: m.units.map((u) => ({ ...u, addAudio: () => { u.audioCount++; this.forceUpdate(); showToast(`Audio file added to ${u.title}.`); } })) };
+      })(),
+      addUnit: () => {
+        const m = this.moduleTree.find((m) => m.id === s.selectedMaterialModule);
+        if (!m) return;
+        m.units.push({ title: `Unit ${m.units.length + 1}`, audioCount: 0 });
+        this.forceUpdate();
+        showToast('New unit added.');
+      },
+
+      productsTitle: (this.productFilters.find((f) => f.id === s.productFilter) || this.productFilters[0]).label,
+      addProduct: () => {
+        const products = [...s.products, { name: 'New product', module: 'Bahasa Arab Pemula', price: '0.00', stock: 0, onSale: false, active: false }];
+        this.setState({ products, editingProductIdx: products.length - 1, editDraft: { name: 'New product', price: '0.00', stock: 0 } });
+      },
+      editingProduct: s.editingProductIdx !== null,
+      editDraft: s.editDraft,
+      setEditName: (e) => this.setState({ editDraft: { ...s.editDraft, name: e.target.value } }),
+      setEditPrice: (e) => this.setState({ editDraft: { ...s.editDraft, price: e.target.value } }),
+      setEditStock: (e) => this.setState({ editDraft: { ...s.editDraft, stock: e.target.value } }),
+      saveEditProduct: () => {
+        const products = s.products.map((x, j) => (j === s.editingProductIdx ? { ...x, ...s.editDraft } : x));
+        this.setState({ products, editingProductIdx: null, editDraft: {} });
+        showToast('Product saved.');
+      },
+      cancelEditProduct: () => this.setState({ editingProductIdx: null, editDraft: {} }),
+      products: s.products
+        .map((p, i) => ({ ...p, _i: i }))
+        .filter((p) => s.productFilter === 'all' || (s.productFilter === 'active' ? p.active : !p.active))
+        .map((p) => ({
+          ...p,
+          statusLabel: p.active ? 'Active' : 'Tidak Aktif',
+          statusBg: p.active ? 'rgba(47,196,159,.15)' : 'rgba(255,255,255,.08)',
+          statusColor: p.active ? '#2FC49F' : '#6B7488',
+          saleBg: p.onSale ? '#2FC49F' : 'rgba(255,255,255,.15)',
+          saleLeft: p.onSale ? '19px' : '3px',
+          toggleSale: () => {
+            const products = s.products.map((x, j) => (j === p._i ? { ...x, onSale: !x.onSale } : x));
+            this.setState({ products });
+          },
+          toggleActive: () => {
+            const products = s.products.map((x, j) => (j === p._i ? { ...x, active: !x.active } : x));
+            this.setState({ products });
+          },
+          startEdit: () => this.setState({ editingProductIdx: p._i, editDraft: { name: p.name, price: p.price, stock: p.stock } }),
+        })),
+
+      moduleOptions: ['Bahasa Arab Pemula', 'Arab Tujuan Kerjaya', 'Bahasa Arab Al Quran', 'Anakku Berbahasa Arab'],
+      batchModule: s.batchModule,
+      setBatchModule: (e) => this.setState({ batchModule: e.target.value }),
+      batchQty: s.batchQty,
+      setBatchQty: (e) => this.setState({ batchQty: parseInt(e.target.value) || 0 }),
+      generateBatch: () => {
+        const batchId = 'B-0' + (10 + Math.floor(Math.random() * 90));
+        const newCodes = Array.from({ length: Math.min(s.batchQty, 20) }, (_, i) => ({
+          code: s.batchModule.slice(0, 4).toUpperCase() + '-' + (9000 + i),
+          module: s.batchModule, batch: batchId, activatedCount: 0, status: 'active',
+        }));
+        this.setState({ codes: [...newCodes, ...s.codes] });
+        showToast(`${newCodes.length} codes generated.`);
+      },
+      exportCsv: () => {
+        const header = 'code,module,batch,activated_count,status';
+        const rows = s.codes.map((c) => `${c.code},"${c.module}",${c.batch},${c.activatedCount},${c.status}`);
+        const csv = [header, ...rows].join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'activation-codes.csv';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Codes exported as CSV.');
+      },
+      codes: s.codes.map((c, i) => ({
+        ...c,
+        statusBg: c.status === 'active' ? 'rgba(47,196,159,.15)' : 'rgba(255,255,255,.08)',
+        statusColor: c.status === 'active' ? '#2FC49F' : '#6B7488',
+        statusLabel: c.status === 'active' ? 'Active' : 'Disabled',
+        actionLabel: c.status === 'active' ? 'Disable' : 'Enable',
+        toggle: () => {
+          const codes = s.codes.map((x, j) => (j === i ? { ...x, status: x.status === 'active' ? 'disabled' : 'active' } : x));
+          this.setState({ codes });
+        },
+      })),
+
+      ordersTitle: (this.orderFilters.find((f) => f.id === s.orderFilter) || this.orderFilters[0]).label,
+      orders: s.orders
+        .map((o, i) => ({ ...o, _i: i }))
+        .filter((o) => s.orderFilter === 'all' || o.ship === s.orderFilter)
+        .map((o) => ({
+          id: o.id, customer: o.customer, total: o.total, address: o.address, itemsLabel: o.itemsLabel,
+          payLabel: o.payment === 'paid' ? 'Paid' : 'Pending',
+          payBg: o.payment === 'paid' ? 'rgba(47,196,159,.15)' : 'rgba(240,180,41,.15)',
+          payColor: o.payment === 'paid' ? '#2FC49F' : '#F0B429',
+          shipStatus: o.ship,
+          expanded: s.viewingOrderIdx === o._i,
+          viewLabel: s.viewingOrderIdx === o._i ? 'Hide' : 'View',
+          toggleView: () => this.setState({ viewingOrderIdx: s.viewingOrderIdx === o._i ? null : o._i }),
+          setShip: (e) => {
+            const orders = s.orders.map((x, j) => (j === o._i ? { ...x, ship: e.target.value } : x));
+            this.setState({ orders });
+          },
+        })),
+
+      apiKey: s.apiKeyVisible ? s.apiKey : s.apiKey.replace(/./g, '•').slice(0, 28),
+      apiKeyInputType: 'text',
+      apiKeyToggleLabel: s.apiKeyVisible ? 'Hide' : 'Show',
+      toggleApiKeyVisible: () => this.setState({ apiKeyVisible: !s.apiKeyVisible }),
+      setApiKey: (e) => this.setState({ apiKey: e.target.value }),
+      saveApiKey: () => showToast('Gemini API key saved.'),
+      aiModuleTabs: [
+        { id: 'quran', label: 'Al Quran' }, { id: 'pemula', label: 'Pemula' },
+        { id: 'kerjaya', label: 'Kerjaya' }, { id: 'anak', label: 'Anakku' },
+      ].map((t) => ({
+        label: t.label,
+        border: s.aiModule === t.id ? '#B9A7F0' : 'rgba(255,255,255,.09)',
+        bg: s.aiModule === t.id ? 'rgba(185,167,240,.15)' : 'rgba(255,255,255,.05)',
+        color: s.aiModule === t.id ? '#B9A7F0' : '#A2AABD',
+        select: () => this.setState({ aiModule: t.id }),
+      })),
+      aiConfig: cfg,
+      setPersona: (e) => this.setState({ aiConfigs: { ...s.aiConfigs, [s.aiModule]: { ...cfg, persona: e.target.value } } }),
+      setPrompt: (e) => this.setState({ aiConfigs: { ...s.aiConfigs, [s.aiModule]: { ...cfg, prompt: e.target.value } } }),
+      setModel: (e) => this.setState({ aiConfigs: { ...s.aiConfigs, [s.aiModule]: { ...cfg, model: e.target.value } } }),
+      setQuota: (e) => this.setState({ aiConfigs: { ...s.aiConfigs, [s.aiModule]: { ...cfg, quota: parseInt(e.target.value) || 0 } } }),
+      saveAiConfig: () => showToast(`Configuration saved for ${cfg.persona}.`),
+      saveProfile: () => showToast('Profile updated.'),
+      toggleChangePassword: () => this.setState({ showChangePassword: !s.showChangePassword }),
+      updatePassword: () => { this.setState({ showChangePassword: false }); showToast('Password updated.'); },
+      logout: () => { showToast('Logged out.'); this.setState({ section: 'dashboard' }); },
+    };
+  }
+}
+</script>
+</body>
+</html>

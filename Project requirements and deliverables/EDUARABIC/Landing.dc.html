@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&amp;family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&amp;family=Amiri:wght@400;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13/dist/ScrollToPlugin.min.js"></script>
+  <style>
+    body{margin:0;background:#FFFFFF;color:#14161C;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+    a{color:#2FC49F;text-decoration:none}
+    a:hover{color:#58d6b6}
+    * { box-sizing: border-box; }
+    @media (max-width: 640px) {
+      .__navlinks, .__authbtns { display: none !important; }
+    }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:radial-gradient(ellipse 900px 500px at 50% -10%, rgba(47,196,159,.14), transparent 60%),#FFFFFF;">
+
+  <header style="position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:18px 6vw;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);border-bottom:1px solid rgba(20,22,28,.10);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2FC49F,#1C6D5C);display:flex;align-items:center;justify-content:center;">
+        <i class="hgi-stroke hgi-book-02" style="color:#14161C;font-size:18px;"></i>
+      </div>
+      <span style="font-family:'Sora',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em;">EduArabic <span style="color:#2FC49F;">for All</span></span>
+    </div>
+    <nav style="display:flex;align-items:center;gap:28px;" class="__navlinks">
+      <a href="#how" style="color:#5B6472;font-weight:500;font-size:14px;">How it works</a>
+      <a href="#modules" style="color:#5B6472;font-weight:500;font-size:14px;">Modules</a>
+      <a href="#ai" style="color:#5B6472;font-weight:500;font-size:14px;">AI Ustaz</a>
+      <a href="#reviews" style="color:#5B6472;font-weight:500;font-size:14px;">Reviews</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:10px;" class="__authbtns">
+      <a href="#" style="color:#14161C;font-weight:600;font-size:14px;padding:9px 16px;">Sign in</a>
+      <a href="#" style="background:#2FC49F;color:#04241C;font-weight:700;font-size:14px;padding:10px 18px;border-radius:12px;">Get started</a>
+    </div>
+  </header>
+
+  <section style="max-width:1160px;margin:0 auto;padding:90px 6vw 60px;display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;">
+    <div class="gs-hero">
+      <div class="gs-hero-item" style="display:inline-flex;align-items:center;gap:8px;background:rgba(20,22,28,.045);border:1px solid rgba(20,22,28,.10);border-radius:100px;padding:7px 14px;font-size:13px;color:#5B6472;font-weight:600;margin-bottom:22px;">
+        <i class="hgi-stroke hgi-qr-code" style="color:#2FC49F;font-size:15px;"></i> Physical modules, digital learning
+      </div>
+      <h1 class="gs-hero-item" style="font-family:'Sora',sans-serif;font-weight:800;font-size:52px;line-height:1.06;letter-spacing:-.02em;margin:0 0 20px;">Listen, Speak &amp; <span style="background:linear-gradient(90deg,#2FC49F,#B9A7F0);-webkit-background-clip:text;background-clip:text;color:transparent;">Repeat!</span></h1>
+      <p class="gs-hero-item" style="color:#5B6472;font-size:17px;line-height:1.6;max-width:480px;margin:0 0 32px;">A new-age way to learn Arabic. With interactive modules powered by AI.</p>
+      <div class="gs-hero-item" style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="#" class="gs-float" style="position:relative;overflow:hidden;background:#2FC49F;color:#04241C;font-weight:700;font-size:15px;padding:15px 26px;border-radius:13px;display:inline-block;box-shadow:0 8px 24px rgba(47,196,159,.35);">
+          <span class="gs-shine" style="position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(115deg, transparent, rgba(255,255,255,.55), transparent);"></span>
+          <span style="position:relative;">Start Now!</span>
+        </a>
+        <a href="#modules" style="background:rgba(20,22,28,.045);border:1px solid rgba(20,22,28,.10);color:#14161C;font-weight:600;font-size:15px;padding:15px 26px;border-radius:13px;display:inline-flex;align-items:center;gap:8px;">
+          <i class="hgi-stroke hgi-shopping-bag-02" style="font-size:16px;"></i> Browse modules
+        </a>
+      </div>
+      <div class="gs-hero-item" style="display:flex;gap:28px;margin-top:40px;">
+        <div><i class="hgi-stroke hgi-mortarboard-01" style="color:#F0B429;font-size:20px;"></i><div style="color:#8B93A3;font-size:13px;margin-top:8px;">Endorsed by Arabic Specialists</div></div>
+        <div><i class="hgi-stroke hgi-sparkles" style="color:#B9A7F0;font-size:20px;"></i><div style="color:#8B93A3;font-size:13px;margin-top:8px;">AI Integrated</div></div>
+        <div><i class="hgi-stroke hgi-headphones" style="color:#2FC49F;font-size:20px;"></i><div style="color:#8B93A3;font-size:13px;margin-top:8px;">Audio Support</div></div>
+      </div>
+    </div>
+    <div class="gs-hero-img" style="position:relative;">
+      <div style="border-radius:24px;border:1px solid rgba(20,22,28,.10);background:repeating-linear-gradient(45deg, rgba(20,22,28,.045) 0 10px, rgba(20,22,28,.02) 10px 20px);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;">
+        <span style="font-family:monospace;color:#8B93A3;font-size:12px;text-align:center;padding:0 20px;">product photo — hand holding physical module &amp; phone showing app</span>
+      </div>
+      <div style="position:absolute;bottom:-18px;left:-18px;background:#F3F1EC;border:1px solid rgba(20,22,28,.10);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 20px 40px rgba(0,0,0,.4);">
+        <div style="width:34px;height:34px;border-radius:10px;background:rgba(185,167,240,.15);display:flex;align-items:center;justify-content:center;">
+          <i class="hgi-stroke hgi-message-01" style="color:#B9A7F0;font-size:17px;"></i>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:13px;">Ai Ustaz Module</div>
+          <div style="color:#8B93A3;font-size:11px;">Your Arabic studies companion</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" style="max-width:1160px;margin:0 auto;padding:70px 6vw;">
+    <h2 style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;text-align:center;margin:0 0 10px;">Four steps to <span style="background:linear-gradient(90deg,#2FC49F,#B9A7F0);-webkit-background-clip:text;background-clip:text;color:transparent;">fluent!</span><br></h2>
+    <p style="text-align:center;color:#5B6472;font-size:15px;margin:0 0 48px;">No app-only courses. Your module is a real book — the app is what makes it come alive.</p>
+    <div class="gs-stagger" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;padding:26px 22px;">
+        <div style="width:40px;height:40px;border-radius:11px;background:rgba(47,196,159,.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;"><i class="hgi-stroke hgi-shopping-cart-01" style="color:#2FC49F;font-size:19px;"></i></div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;">1. Get a module</div>
+        <div style="color:#5B6472;font-size:13px;line-height:1.55;">Buy in-app or from any reseller/bookstore.</div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;padding:26px 22px;">
+        <div style="width:40px;height:40px;border-radius:11px;background:rgba(47,196,159,.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;"><i class="hgi-stroke hgi-qr-code" style="color:#2FC49F;font-size:19px;"></i></div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;">2. Scan the QR</div>
+        <div style="color:#5B6472;font-size:13px;line-height:1.55;">Printed inside every module — opens the app.</div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;padding:26px 22px;">
+        <div style="width:40px;height:40px;border-radius:11px;background:rgba(47,196,159,.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;"><i class="hgi-stroke hgi-key-01" style="color:#2FC49F;font-size:19px;"></i></div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;">3. Enter your code</div>
+        <div style="color:#5B6472;font-size:13px;line-height:1.55;">A unique activation code unlocks the module.</div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;padding:26px 22px;">
+        <div style="width:40px;height:40px;border-radius:11px;background:rgba(47,196,159,.15);display:flex;align-items:center;justify-content:center;margin-bottom:16px;"><i class="hgi-stroke hgi-graduation-scroll" style="color:#2FC49F;font-size:19px;"></i></div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;">4. Learn</div>
+        <div style="color:#5B6472;font-size:13px;line-height:1.55;">Audio lessons + a dedicated AI Ustaz, ready.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ai" style="max-width:1160px;margin:0 auto;padding:20px 6vw 70px;display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center;">
+    <div class="gs-reveal" style="border-radius:24px;border:1px solid rgba(185,167,240,.2);background:linear-gradient(180deg, rgba(185,167,240,.08), transparent);padding:28px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+        <div style="width:32px;height:32px;border-radius:9px;background:rgba(185,167,240,.18);display:flex;align-items:center;justify-content:center;"><i class="hgi-stroke hgi-sparkles" style="color:#B9A7F0;font-size:16px;"></i></div>
+        <div style="font-weight:700;font-size:14px;">Ustaz Hakim · Al Quran module</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="align-self:flex-end;background:rgba(47,196,159,.16);border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:13px;max-width:80%;">why is وَ sometimes an oath particle?</div>
+        <div style="align-self:flex-start;background:rgba(20,22,28,.045);border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:13px;max-width:85%;color:#14161C;">Great catch — in Surah al-Fajr, وَ before اللَّيْل is a particle of oath (qasam), not a conjunction. Let's look at unit 6...</div>
+      </div>
+    </div>
+    <div class="gs-reveal">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(185,167,240,.12);border:1px solid rgba(185,167,240,.25);border-radius:100px;padding:6px 14px;font-size:12px;color:#B9A7F0;font-weight:700;margin-bottom:18px;">AI USTAZ</div>
+      <h2 style="font-family:'Sora',sans-serif;font-weight:800;font-size:30px;margin:0 0 14px;line-height:1.15;">A different Ustaz for every module</h2>
+      <p style="color:#5B6472;font-size:15px;line-height:1.65;margin:0;">Ask anything about a topic in your language, then&nbsp; Ai Ustaz will teach you how to use the words and sentences in real situations.</p>
+    </div>
+  </section>
+
+  <section id="modules" style="max-width:1160px;margin:0 auto;padding:20px 6vw 70px;">
+    <h2 style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;text-align:center;margin:0 0 10px;">Our physical modules</h2>
+    <p style="text-align:center;color:#5B6472;font-size:15px;margin:0 0 44px;">Each one ships with its own audio library and AI Ustaz.</p>
+    <div class="gs-stagger" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;overflow:hidden;">
+        <div style="aspect-ratio:1;background:repeating-linear-gradient(45deg, rgba(20,22,28,.045) 0 10px, rgba(20,22,28,.02) 10px 20px);display:flex;align-items:center;justify-content:center;"><span style="font-family:monospace;color:#8B93A3;font-size:11px;">module cover</span></div>
+        <div style="padding:16px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px;">Bahasa Arab Pemula</div>
+          <div style="color:#8B93A3;font-size:12px;margin-bottom:10px;">324 units</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:#2FC49F;">RM39.90</div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button style="flex:1;background:rgba(20,22,28,.045);border:1px solid rgba(20,22,28,.1);color:#14161C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Add to Cart</button>
+            <button style="flex:1;background:#2FC49F;border:none;color:#04241C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Buy Now</button>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;overflow:hidden;">
+        <div style="aspect-ratio:1;background:repeating-linear-gradient(45deg, rgba(20,22,28,.045) 0 10px, rgba(20,22,28,.02) 10px 20px);display:flex;align-items:center;justify-content:center;"><span style="font-family:monospace;color:#8B93A3;font-size:11px;">module cover</span></div>
+        <div style="padding:16px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px;">Arab Tujuan Kerjaya</div>
+          <div style="color:#8B93A3;font-size:12px;margin-bottom:10px;">198 units</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:#2FC49F;">RM59.90</div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button style="flex:1;background:rgba(20,22,28,.045);border:1px solid rgba(20,22,28,.1);color:#14161C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Add to Cart</button>
+            <button style="flex:1;background:#2FC49F;border:none;color:#04241C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Buy Now</button>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;overflow:hidden;">
+        <div style="aspect-ratio:1;background:repeating-linear-gradient(45deg, rgba(20,22,28,.045) 0 10px, rgba(20,22,28,.02) 10px 20px);display:flex;align-items:center;justify-content:center;"><span style="font-family:monospace;color:#8B93A3;font-size:11px;">module cover</span></div>
+        <div style="padding:16px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px;">Bahasa Arab Al Quran</div>
+          <div style="color:#8B93A3;font-size:12px;margin-bottom:10px;">198 units</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:#2FC49F;">RM97.90</div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button style="flex:1;background:rgba(20,22,28,.045);border:1px solid rgba(20,22,28,.1);color:#14161C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Add to Cart</button>
+            <button style="flex:1;background:#2FC49F;border:none;color:#04241C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Buy Now</button>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;overflow:hidden;">
+        <div style="aspect-ratio:1;background:repeating-linear-gradient(45deg, rgba(20,22,28,.045) 0 10px, rgba(20,22,28,.02) 10px 20px);display:flex;align-items:center;justify-content:center;"><span style="font-family:monospace;color:#8B93A3;font-size:11px;">module cover</span></div>
+        <div style="padding:16px;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px;">Anakku Berbahasa Arab</div>
+          <div style="color:#8B93A3;font-size:12px;margin-bottom:10px;">198 units</div>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;color:#2FC49F;">RM27.90</div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <button style="flex:1;background:rgba(20,22,28,.045);border:1px solid rgba(20,22,28,.1);color:#14161C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Add to Cart</button>
+            <button style="flex:1;background:#2FC49F;border:none;color:#04241C;font-weight:700;font-size:12.5px;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;">Buy Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:40px;">
+      <h3 style="font-family:'Sora',sans-serif;font-weight:800;font-size:20px;text-align:center;margin:0 0 24px;">App features</h3>
+      <div class="gs-stagger" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+        <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:16px;padding:20px;">
+          <i class="hgi-stroke hgi-mortarboard-01" style="color:#F0B429;font-size:22px;"></i>
+          <div style="font-weight:700;font-size:13.5px;margin:12px 0 4px;">Free Grammar module</div>
+          <div style="color:#5B6472;font-size:12.5px;line-height:1.5;">Included for every registered account — no code needed.</div>
+        </div>
+        <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:16px;padding:20px;">
+          <i class="hgi-stroke hgi-headphones" style="color:#2FC49F;font-size:22px;"></i>
+          <div style="font-weight:700;font-size:13.5px;margin:12px 0 4px;">Audio Library</div>
+          <div style="color:#5B6472;font-size:12.5px;line-height:1.5;">Unit-by-unit lessons with a simple play/pause player.</div>
+        </div>
+        <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:16px;padding:20px;">
+          <i class="hgi-stroke hgi-sparkles" style="color:#B9A7F0;font-size:22px;"></i>
+          <div style="font-weight:700;font-size:13.5px;margin:12px 0 4px;">AI Ustaz per module</div>
+          <div style="color:#5B6472;font-size:12.5px;line-height:1.5;">Ask questions and get answers grounded in your module.</div>
+        </div>
+        <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:16px;padding:20px;">
+          <i class="hgi-stroke hgi-qr-code" style="color:#2FC49F;font-size:22px;"></i>
+          <div style="font-weight:700;font-size:13.5px;margin:12px 0 4px;">Instant activation</div>
+          <div style="color:#5B6472;font-size:12.5px;line-height:1.5;">Scan the code in your physical module to unlock it.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reviews" style="max-width:1160px;margin:0 auto;padding:20px 6vw 80px;">
+    <h2 style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;text-align:center;margin:0 0 40px;">Students say</h2>
+    <div class="gs-stagger" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;padding:24px;">
+        <p style="color:#14161C;font-size:14px;line-height:1.6;margin:0 0 14px;">"Scanning the QR straight into my activated module felt instant. The AI Ustaz answers grammar questions my tutor doesn't have time for."</p>
+        <div style="color:#8B93A3;font-size:12px;font-weight:600;">— Nur Aisyah, Al Quran module</div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;padding:24px;">
+        <p style="color:#14161C;font-size:14px;line-height:1.6;margin:0 0 14px;">"I bought the card set from a reseller and just typed the code in. No waiting for anything digital to unlock."</p>
+        <div style="color:#8B93A3;font-size:12px;font-weight:600;">— Danial, Bahasa Arab Pemula</div>
+      </div>
+      <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:18px;padding:24px;">
+        <p style="color:#14161C;font-size:14px;line-height:1.6;margin:0 0 14px;">"Started with the free Grammar module before committing to a physical set. Exactly the trial I needed."</p>
+        <div style="color:#8B93A3;font-size:12px;font-weight:600;">— Farah, Grammar module</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="max-width:800px;margin:0 auto;padding:20px 6vw 80px;">
+    <h2 style="font-family:'Sora',sans-serif;font-weight:800;font-size:32px;text-align:center;margin:0 0 40px;">Frequently asked questions</h2>
+    <div class="gs-stagger" style="display:flex;flex-direction:column;gap:10px;">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="7">
+        <div style="background:rgba(20,22,28,.03);border:1px solid rgba(20,22,28,.07);border-radius:14px;overflow:hidden;">
+          <button onClick="{{ f.toggle }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:18px 20px;background:transparent;border:none;cursor:pointer;font-family:inherit;color:#14161C;">
+            <span style="font-weight:700;font-size:14.5px;">{{ f.q }}</span>
+            <i class="hgi-stroke hgi-arrow-down-01" style="font-size:15px;color:#8B93A3;flex-shrink:0;transform:{{ f.chev }};"></i>
+          </button>
+          <div style="max-height:{{ f.maxH }};opacity:{{ f.ansOpacity }};overflow:hidden;transition:max-height .35s ease, opacity .3s ease;">
+            <div style="padding:0 20px 18px;color:#5B6472;font-size:13.5px;line-height:1.6;">{{ f.a }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <footer style="border-top:1px solid rgba(20,22,28,.10);padding:40px 6vw;display:flex;flex-direction:column;gap:20px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#2FC49F,#1C6D5C);"></div>
+        <span style="font-family:'Sora',sans-serif;font-weight:700;font-size:14px;">EduArabic for All</span>
+      </div>
+      <nav style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+        <a href="#how" style="color:#5B6472;font-weight:500;font-size:13.5px;">How it works</a>
+        <a href="#modules" style="color:#5B6472;font-weight:500;font-size:13.5px;">Modules</a>
+        <a href="#ai" style="color:#5B6472;font-weight:500;font-size:13.5px;">AI Ustaz</a>
+        <a href="#faq" style="color:#5B6472;font-weight:500;font-size:13.5px;">FAQ</a>
+        <a href="#reviews" style="color:#5B6472;font-weight:500;font-size:13.5px;">Reviews</a>
+      </nav>
+    </div>
+    <div style="color:#8B93A3;font-size:13px;">© 2026 EduArabic for All. All rights reserved.</div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { openFaq: 0 };
+  componentDidMount() {
+    if (!window.gsap) return;
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute('href').slice(1);
+      const target = id && document.getElementById(id);
+      if (!target) return;
+      e.preventDefault();
+      gsap.to(window, { duration: 0.9, ease: 'power2.inOut', scrollTo: { y: target, offsetY: 70 } });
+    });
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.set('.gs-hero-item, .gs-hero-img', { opacity: 0, y: 24 });
+      gsap.to('.gs-hero-item', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', stagger: 0.12, delay: 0.1 });
+      gsap.to('.gs-hero-img', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.2 });
+
+      gsap.utils.toArray('.gs-stagger').forEach((el) => {
+        gsap.from(el.children, {
+          opacity: 0, y: 28, duration: 0.6, ease: 'power2.out', stagger: 0.08,
+          scrollTrigger: { trigger: el, start: 'top 85%' },
+        });
+      });
+      gsap.utils.toArray('.gs-reveal').forEach((el) => {
+        gsap.from(el, {
+          opacity: 0, y: 28, duration: 0.7, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 85%' },
+        });
+      });
+
+      gsap.to('.gs-float', { y: -6, duration: 1.4, ease: 'sine.inOut', repeat: -1, yoyo: true });
+      gsap.to('.gs-shine', { left: '140%', duration: 1.8, ease: 'power1.inOut', repeat: -1, repeatDelay: 1.4 });
+    });
+  }
+  faqDefs = [
+    { q: 'How does module activation work?', a: 'Every physical module has a unique code inside it. Scan the QR code or type the code into the app to instantly unlock its Audio Library and AI Ustaz.' },
+    { q: 'Can I buy modules outside the app?', a: 'Yes — modules are sold in-app or through resellers and bookstores. Either way, you activate the same way once you have the code.' },
+    { q: 'Is the Grammar module really free?', a: 'Yes, permanently free for every registered account. No activation code is needed.' },
+    { q: 'What is AI Ustaz and how is it different per module?', a: 'AI Ustaz is a chat assistant trained on the content of the module you activated, with its own persona and knowledge — so answers stay relevant to what you\u2019re studying.' },
+    { q: 'Can I use one code on multiple devices?', a: 'Yes, an activation code can be used on more than one account or device.' },
+    { q: 'Do I need internet access to listen to audio lessons?', a: 'Yes, audio streams from the Audio Library, so an internet connection is required to play lessons.' },
+    { q: 'What happens if my activation code doesn\u2019t work?', a: 'Double-check for typos first. If it still fails, contact support with your module and code so we can help.' },
+  ];
+  renderVals() {
+    const s = this.state;
+    return {
+      faqs: this.faqDefs.map((f, i) => ({
+        q: f.q, a: f.a,
+        open: s.openFaq === i,
+        chev: s.openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)',
+        maxH: s.openFaq === i ? '240px' : '0px',
+        ansOpacity: s.openFaq === i ? 1 : 0,
+        toggle: () => this.setState({ openFaq: s.openFaq === i ? null : i }),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

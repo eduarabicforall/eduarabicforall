@@ -1,64 +1,67 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import Icon from '../Icon'
 
+const LINKS = [
+  { href: '#how-it-works', label: 'How it works' },
+  { href: '#modules', label: 'Modules' },
+  { href: '#ai-ustaz', label: 'AI Ustaz' },
+  { href: '#reviews', label: 'Reviews' },
+]
+
 export default function Navbar() {
-  const { user, profile, signOut } = useAuth()
-  const loc = useLocation()
-
-  const navLinks = [
-    { to: '/dashboard', label: 'Home', icon: 'home-09' },
-    { to: '/chat', label: 'AI Chat', icon: 'ai-brain-01' },
-    { to: '/dialogue', label: 'Dialogue', icon: 'headphones' },
-    { to: '/practice', label: 'Practice', icon: 'mic-01' },
-  ]
-
-  const isActive = (path) => loc.pathname === path
+  const [open, setOpen] = useState(false)
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-bg/80 backdrop-blur-xl border-b border-ea-border">
-      <div className="max-w-lg mx-auto px-5 h-16 flex items-center justify-between">
-        <Link to="/" className="text-lg font-sora font-bold">
-          Edu<span className="text-primary">Arabic</span>
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-light-inkFaint/10">
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-4">
+        <Link to="/" className="font-title font-extrabold text-lg text-light-ink">
+          EduArabic
         </Link>
 
-        <div className="hidden md:flex items-center gap-1">
-          {navLinks.map(l => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
-                isActive(l.to)
-                  ? 'bg-primary/15 text-primary'
-                  : 'text-ink-faint hover:text-ink'
-              }`}
-            >
-              <Icon name={l.icon} size={16} />
+        <nav className="hidden sm:flex items-center gap-8">
+          {LINKS.map((l) => (
+            <a key={l.href} href={l.href} className="text-sm font-medium text-light-inkSoft hover:text-light-ink">
               {l.label}
-            </Link>
+            </a>
           ))}
-          {profile?.role === 'admin' && (
-            <Link to="/admin" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-gold hover:bg-gold/10 transition-all">
-              <Icon name="settings-02" size={16} />
-            </Link>
-          )}
-          <button onClick={signOut} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-ink-faint hover:text-ink transition-all">
-            <Icon name="logout-01" size={16} />
-            Sign out
-          </button>
+        </nav>
+
+        <div className="hidden sm:flex items-center gap-3">
+          <Link to="/auth" className="text-sm font-semibold text-light-ink px-4 py-2">Sign in</Link>
+          <Link to="/auth?view=signup" className="text-sm font-semibold bg-app-primary text-white rounded-pill px-5 py-2.5">
+            Get started
+          </Link>
         </div>
 
-        {/* Mobile: just avatar */}
-        {user && (
-          <div className="flex items-center gap-2 md:hidden">
-            <span className="text-xs text-ink-faint">{profile?.full_name || user.email?.split('@')[0]}</span>
-            <button onClick={signOut} className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-              {(profile?.full_name || user.email || 'U')[0].toUpperCase()}
-            </button>
-          </div>
-        )}
+        <button
+          className="sm:hidden text-light-ink"
+          aria-label="Toggle menu"
+          onClick={() => setOpen((o) => !o)}
+        >
+          <Icon name={open ? 'cancel-01' : 'menu-01'} size={26} />
+        </button>
       </div>
-    </nav>
+
+      {open && (
+        <div className="sm:hidden border-t border-light-inkFaint/10 bg-white px-5 py-4 flex flex-col gap-4">
+          {LINKS.map((l) => (
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="text-sm font-medium text-light-inkSoft">
+              {l.label}
+            </a>
+          ))}
+          <div className="flex flex-col gap-2 pt-2 border-t border-light-inkFaint/10">
+            <Link to="/auth" onClick={() => setOpen(false)} className="text-sm font-semibold text-light-ink">Sign in</Link>
+            <Link
+              to="/auth?view=signup"
+              onClick={() => setOpen(false)}
+              className="text-sm font-semibold bg-app-primary text-white rounded-pill px-5 py-2.5 text-center"
+            >
+              Get started
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
   )
 }

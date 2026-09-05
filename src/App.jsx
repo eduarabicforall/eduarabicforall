@@ -1,61 +1,61 @@
-import React from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
-import Navbar from './components/layout/Navbar'
 
 import Landing from './pages/Landing'
 import Auth from './pages/Auth'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
-import AiChat from './pages/AiChat'
-import Dialogue from './pages/Dialogue'
-import Practice from './pages/Practice'
+import Activate from './pages/Activate'
+import AudioLibrary from './pages/AudioLibrary'
+import AiUstaz from './pages/AiUstaz'
+import Grammar from './pages/Grammar'
+import GrammarTopic from './pages/GrammarTopic'
+import Shop from './pages/Shop'
+import Product from './pages/Product'
+import Checkout from './pages/Checkout'
+import CheckoutDone from './pages/CheckoutDone'
 import Profile from './pages/Profile'
 import Alerts from './pages/Alerts'
-import AdminDashboard from './pages/admin/AdminDashboard'
 
-/* Show navbar only on non-auth pages */
-function Layout({ children }) {
-  const location = useLocation()
-  const isAuth = ['/', '/auth', '/login', '/signup'].includes(location.pathname)
-  return (
-    <>
-      {!isAuth && <Navbar />}
-      <div className={isAuth ? '' : 'pt-16'}>
-        {children}
-      </div>
-    </>
-  )
-}
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminAdmins from './pages/admin/AdminAdmins'
+import AdminMaterials from './pages/admin/AdminMaterials'
+import AdminProducts from './pages/admin/AdminProducts'
+import AdminCodes from './pages/admin/AdminCodes'
+import AdminOrders from './pages/admin/AdminOrders'
+import AdminAiConsole from './pages/admin/AdminAiConsole'
+import AdminProfile from './pages/admin/AdminProfile'
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Layout>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/auth" element={<Auth />} />
 
-            {/* Protected user routes */}
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/chat" element={<ProtectedRoute><AiChat /></ProtectedRoute>} />
-            <Route path="/dialogue" element={<ProtectedRoute><Dialogue /></ProtectedRoute>} />
-            <Route path="/practice" element={<ProtectedRoute><Practice /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/activate" element={<ProtectedRoute><Activate /></ProtectedRoute>} />
+      <Route path="/audio/:slug" element={<ProtectedRoute><AudioLibrary /></ProtectedRoute>} />
+      <Route path="/ai-ustaz" element={<ProtectedRoute><AiUstaz /></ProtectedRoute>} />
+      <Route path="/grammar" element={<ProtectedRoute><Grammar /></ProtectedRoute>} />
+      <Route path="/grammar/:topicId" element={<ProtectedRoute><GrammarTopic /></ProtectedRoute>} />
+      <Route path="/shop" element={<ProtectedRoute><Shop /></ProtectedRoute>} />
+      <Route path="/shop/:id" element={<ProtectedRoute><Product /></ProtectedRoute>} />
+      <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+      <Route path="/checkout/done" element={<ProtectedRoute><CheckoutDone /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
 
-            {/* Admin */}
-            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-          </Routes>
-        </Layout>
-      </AuthProvider>
-    </BrowserRouter>
+      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="admins" element={<AdminAdmins />} />
+        <Route path="materials" element={<AdminMaterials />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="codes" element={<AdminCodes />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="ai-console" element={<AdminAiConsole />} />
+        <Route path="profile" element={<AdminProfile />} />
+      </Route>
+    </Routes>
   )
 }

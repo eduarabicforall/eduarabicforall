@@ -1,286 +1,424 @@
--- ═══════════════════════════════════════════════════════════════════════
--- EduArabic for All — Supabase Schema + RLS + Seed
--- Run this in your Supabase SQL editor after connecting
--- ═══════════════════════════════════════════════════════════════════════
+-- EduArabic for All — Schema v1 (PRD v3.0)
+-- Applied via Supabase MCP migration "init_schema". Keep this file as the
+-- source of truth / for `supabase db reset` in local dev.
 
--- ─── Tables ──────────────────────────────────────────────────────────
+create extension if not exists pgcrypto;
 
-CREATE TABLE IF NOT EXISTS profiles (
-  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
-  full_name TEXT,
-  role TEXT DEFAULT 'user' CHECK (role IN ('user', 'admin')),
-  plan TEXT DEFAULT 'free' CHECK (plan IN ('free', 'plus', 'pro')),
-  xp INT DEFAULT 0,
-  streak INT DEFAULT 0,
-  locale TEXT DEFAULT 'en',
-  avatar_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+-- ============================================================
+-- 1. Core tables
+-- ============================================================
+
+create table profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text not null,
+  full_name text,
+  role text not null default 'student' check (role in ('student','admin')),
+  created_at timestamptz not null default now()
 );
 
-CREATE TABLE IF NOT EXISTS modules (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  slug TEXT UNIQUE NOT NULL,
-  category TEXT,
-  title_en TEXT NOT NULL,
-  title_ar TEXT,
-  level TEXT,
-  description TEXT,
-  price NUMERIC(10,2) DEFAULT 0,
-  old_price NUMERIC(10,2) DEFAULT 0,
-  cover TEXT,
-  icon TEXT,
-  is_bundle BOOLEAN DEFAULT FALSE,
-  order_index INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+create table admin_allowlist (
+  email text primary key,
+  added_at timestamptz not null default now()
 );
 
-CREATE TABLE IF NOT EXISTS units (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  module_id UUID REFERENCES modules(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  title_ar TEXT,
-  "order" INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+create table modules (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  slug text not null unique,
+  cover_url text,
+  is_grammar_free boolean not null default false,
+  created_at timestamptz not null default now()
 );
 
-CREATE TABLE IF NOT EXISTS lessons (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  unit_id UUID REFERENCES units(id) ON DELETE CASCADE,
-  type TEXT CHECK (type IN ('clip', 'exercise', 'audio', 'test')),
-  title TEXT NOT NULL,
-  title_ar TEXT,
-  youtube_id TEXT,
-  duration INT DEFAULT 0,
-  "order" INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+create table units (
+  id uuid primary key default gen_random_uuid(),
+  module_id uuid not null references modules(id) on delete cascade,
+  title text not null,
+  order_index int not null default 0
+);
+create index units_module_id_idx on units(module_id);
+
+create table audio_tracks (
+  id uuid primary key default gen_random_uuid(),
+  unit_id uuid not null references units(id) on delete cascade,
+  title_en text not null,
+  title_ar text,
+  storage_path text not null,
+  duration int,
+  order_index int not null default 0
+);
+create index audio_tracks_unit_id_idx on audio_tracks(unit_id);
+
+create table grammar_topics (
+  id uuid primary key default gen_random_uuid(),
+  order_index int not null default 0,
+  title_en text not null,
+  video_r2_key text,
+  description text,
+  unlock_after_topic_id uuid references grammar_topics(id)
 );
 
-CREATE TABLE IF NOT EXISTS progress (
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  lesson_id UUID REFERENCES lessons(id) ON DELETE CASCADE,
-  status TEXT DEFAULT 'locked' CHECK (status IN ('done', 'active', 'locked')),
-  completed_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  PRIMARY KEY (user_id, lesson_id)
+create table quiz_questions (
+  id uuid primary key default gen_random_uuid(),
+  topic_id uuid not null references grammar_topics(id) on delete cascade,
+  type text not null check (type in ('mcq','order','tf')),
+  payload_json jsonb not null,
+  order_index int not null default 0
+);
+create index quiz_questions_topic_id_idx on quiz_questions(topic_id);
+
+create table quiz_attempts (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  topic_id uuid not null references grammar_topics(id) on delete cascade,
+  score numeric not null,
+  completed_at timestamptz not null default now()
+);
+create index quiz_attempts_user_topic_idx on quiz_attempts(user_id, topic_id);
+
+create table module_ai_config (
+  module_id uuid primary key references modules(id) on delete cascade,
+  persona_name text not null default 'Ustaz',
+  system_prompt text not null default '',
+  model text not null default 'gemini-2.5-flash',
+  daily_quota int not null default 60
 );
 
-CREATE TABLE IF NOT EXISTS classes (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title TEXT NOT NULL,
-  tutor TEXT,
-  type TEXT CHECK (type IN ('group', 'one_on_one')),
-  start_at TIMESTAMPTZ,
-  join_url TEXT,
-  plan_required TEXT DEFAULT 'free',
-  max_students INT DEFAULT 30,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+-- Global secrets (Gemini API key, etc). RLS enabled, NO policies added below
+-- => no client role can read/write this table at all; only service_role
+-- (used by Edge Functions) bypasses RLS.
+create table admin_settings (
+  key text primary key,
+  value_encrypted text
 );
 
-CREATE TABLE IF NOT EXISTS orders (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'refunded', 'failed')),
-  ref TEXT,
-  method TEXT,
-  amount NUMERIC(10,2) DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+create table ai_usage_log (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  module_id uuid not null references modules(id) on delete cascade,
+  message_count int not null default 0,
+  date date not null default current_date,
+  unique (user_id, module_id, date)
 );
 
-CREATE TABLE IF NOT EXISTS order_items (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
-  module_id UUID REFERENCES modules(id),
-  price NUMERIC(10,2) DEFAULT 0
+create table products (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  price numeric not null default 0,
+  image_url text,
+  module_id uuid references modules(id) on delete set null,
+  stock int not null default 0,
+  on_sale boolean not null default true,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
 );
 
-CREATE TABLE IF NOT EXISTS enrollments (
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  module_id UUID REFERENCES modules(id) ON DELETE CASCADE,
-  granted_at TIMESTAMPTZ DEFAULT NOW(),
-  PRIMARY KEY (user_id, module_id)
+create table module_codes (
+  id uuid primary key default gen_random_uuid(),
+  code text not null unique,
+  module_id uuid not null references modules(id) on delete cascade,
+  batch_id uuid not null default gen_random_uuid(),
+  activated_count int not null default 0,
+  status text not null default 'active' check (status in ('active','disabled')),
+  created_at timestamptz not null default now()
 );
 
-CREATE TABLE IF NOT EXISTS ai_usage (
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  count INT DEFAULT 1,
-  month TEXT,
-  PRIMARY KEY (user_id, month)
+create table user_modules (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  module_id uuid not null references modules(id) on delete cascade,
+  activated_at timestamptz not null default now(),
+  via_code_id uuid references module_codes(id),
+  unique (user_id, module_id)
 );
 
-CREATE TABLE IF NOT EXISTS ai_chat_history (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  role TEXT CHECK (role IN ('user', 'assistant')),
-  content TEXT,
-  correction JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+create table orders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  total numeric not null,
+  payment_provider text check (payment_provider in ('bayarcash','toyyibpay')),
+  payment_status text not null default 'pending' check (payment_status in ('pending','paid','failed')),
+  shipping_status text not null default 'pending' check (shipping_status in ('pending','shipped','delivered')),
+  shipping_address jsonb,
+  created_at timestamptz not null default now()
+);
+create index orders_user_id_idx on orders(user_id);
+
+create table order_items (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null references orders(id) on delete cascade,
+  product_id uuid references products(id) on delete set null,
+  quantity int not null default 1,
+  price numeric not null
+);
+create index order_items_order_id_idx on order_items(order_id);
+
+-- ============================================================
+-- 2. is_admin() — SECURITY DEFINER, used inside RLS policies.
+--    Must bypass RLS on `profiles` itself or every policy that calls it
+--    recurses / silently returns false.
+-- ============================================================
+
+create or replace function is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from profiles where id = auth.uid() and role = 'admin'
+  );
+$$;
+
+-- ============================================================
+-- 3. Auto-profile + admin bootstrap trigger
+-- ============================================================
+
+create or replace function handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into profiles (id, email, full_name, role)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    case when exists (select 1 from admin_allowlist a where lower(a.email) = lower(new.email))
+      then 'admin' else 'student' end
+  );
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function handle_new_user();
+
+-- ============================================================
+-- 4. activate_module_code RPC — the only way user_modules gets a row
+--    from the client (no direct insert policy is granted).
+-- ============================================================
+
+create or replace function activate_module_code(p_code text)
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_code module_codes%rowtype;
+  v_uid uuid := auth.uid();
+begin
+  if v_uid is null then
+    raise exception 'not_authenticated';
+  end if;
+
+  select * into v_code from module_codes where code = upper(p_code) for update;
+
+  if not found then
+    raise exception 'invalid_code';
+  end if;
+  if v_code.status <> 'active' then
+    raise exception 'code_disabled';
+  end if;
+  if exists (select 1 from user_modules where user_id = v_uid and module_id = v_code.module_id) then
+    raise exception 'already_activated';
+  end if;
+
+  insert into user_modules (user_id, module_id, via_code_id)
+  values (v_uid, v_code.module_id, v_code.id);
+
+  update module_codes set activated_count = activated_count + 1 where id = v_code.id;
+
+  return (select json_build_object('module_id', m.id, 'slug', m.slug, 'name', m.name)
+          from modules m where m.id = v_code.module_id);
+end;
+$$;
+
+-- ============================================================
+-- 5. generate_module_codes RPC — admin-only batch code generation
+-- ============================================================
+
+create or replace function generate_module_codes(p_module_id uuid, p_quantity int)
+returns setof module_codes
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_prefix text;
+  v_batch uuid := gen_random_uuid();
+  i int;
+  v_code text;
+begin
+  if not is_admin() then
+    raise exception 'not_authorized';
+  end if;
+
+  select upper(left(regexp_replace(slug, '[^a-zA-Z]', '', 'g'), 4)) into v_prefix
+  from modules where id = p_module_id;
+  if v_prefix is null or length(v_prefix) = 0 then
+    v_prefix := 'MOD';
+  end if;
+
+  for i in 1..p_quantity loop
+    v_code := v_prefix || '-' || lpad((floor(random()*10000))::int::text, 4, '0');
+    insert into module_codes (code, module_id, batch_id)
+    values (v_code, p_module_id, v_batch)
+    on conflict (code) do nothing;
+  end loop;
+
+  return query select * from module_codes where batch_id = v_batch;
+end;
+$$;
+
+-- ============================================================
+-- 6. RLS
+-- ============================================================
+
+alter table profiles enable row level security;
+alter table admin_allowlist enable row level security;
+alter table modules enable row level security;
+alter table units enable row level security;
+alter table audio_tracks enable row level security;
+alter table grammar_topics enable row level security;
+alter table quiz_questions enable row level security;
+alter table quiz_attempts enable row level security;
+alter table module_ai_config enable row level security;
+alter table admin_settings enable row level security; -- no policies: locked to service_role only
+alter table ai_usage_log enable row level security;
+alter table products enable row level security;
+alter table module_codes enable row level security;
+alter table user_modules enable row level security;
+alter table orders enable row level security;
+alter table order_items enable row level security;
+
+-- profiles
+create policy "profiles_select_own_or_admin" on profiles for select
+  using (id = auth.uid() or is_admin());
+create policy "profiles_update_own" on profiles for update
+  using (id = auth.uid()) with check (id = auth.uid() and role = (select role from profiles p where p.id = auth.uid()));
+create policy "profiles_admin_all" on profiles for all
+  using (is_admin()) with check (is_admin());
+
+-- admin_allowlist — admin only
+create policy "admin_allowlist_admin_all" on admin_allowlist for all
+  using (is_admin()) with check (is_admin());
+
+-- modules / units — public catalog metadata (Landing, Dashboard browsing)
+create policy "modules_public_read" on modules for select using (true);
+create policy "modules_admin_write" on modules for insert with check (is_admin());
+create policy "modules_admin_update" on modules for update using (is_admin());
+create policy "modules_admin_delete" on modules for delete using (is_admin());
+
+create policy "units_public_read" on units for select using (true);
+create policy "units_admin_write" on units for insert with check (is_admin());
+create policy "units_admin_update" on units for update using (is_admin());
+create policy "units_admin_delete" on units for delete using (is_admin());
+
+-- audio_tracks — gated by activation (user_modules) or admin
+create policy "audio_tracks_activated_read" on audio_tracks for select using (
+  is_admin() or exists (
+    select 1 from units u
+    join user_modules um on um.module_id = u.module_id and um.user_id = auth.uid()
+    where u.id = audio_tracks.unit_id
+  )
+);
+create policy "audio_tracks_admin_write" on audio_tracks for insert with check (is_admin());
+create policy "audio_tracks_admin_update" on audio_tracks for update using (is_admin());
+create policy "audio_tracks_admin_delete" on audio_tracks for delete using (is_admin());
+
+-- grammar (free for every signed-in account)
+create policy "grammar_topics_auth_read" on grammar_topics for select using (auth.uid() is not null);
+create policy "grammar_topics_admin_write" on grammar_topics for insert with check (is_admin());
+create policy "grammar_topics_admin_update" on grammar_topics for update using (is_admin());
+create policy "grammar_topics_admin_delete" on grammar_topics for delete using (is_admin());
+
+create policy "quiz_questions_auth_read" on quiz_questions for select using (auth.uid() is not null);
+create policy "quiz_questions_admin_write" on quiz_questions for insert with check (is_admin());
+create policy "quiz_questions_admin_update" on quiz_questions for update using (is_admin());
+create policy "quiz_questions_admin_delete" on quiz_questions for delete using (is_admin());
+
+create policy "quiz_attempts_own_read" on quiz_attempts for select using (user_id = auth.uid() or is_admin());
+create policy "quiz_attempts_own_insert" on quiz_attempts for insert with check (user_id = auth.uid());
+
+-- module_ai_config — persona/model visible to signed-in users (needed by AI Ustaz UI),
+-- writes admin only. system_prompt exposure is an accepted fasa-1 simplification.
+create policy "module_ai_config_auth_read" on module_ai_config for select using (auth.uid() is not null);
+create policy "module_ai_config_admin_write" on module_ai_config for insert with check (is_admin());
+create policy "module_ai_config_admin_update" on module_ai_config for update using (is_admin());
+create policy "module_ai_config_admin_delete" on module_ai_config for delete using (is_admin());
+
+-- ai_usage_log — read own/admin; writes only via Edge Function (service_role, bypasses RLS)
+create policy "ai_usage_log_own_read" on ai_usage_log for select using (user_id = auth.uid() or is_admin());
+
+-- products — public read active ones, admin manages all
+create policy "products_public_read" on products for select using (is_active or is_admin());
+create policy "products_admin_write" on products for insert with check (is_admin());
+create policy "products_admin_update" on products for update using (is_admin());
+create policy "products_admin_delete" on products for delete using (is_admin());
+
+-- module_codes — admin only
+create policy "module_codes_admin_all" on module_codes for all using (is_admin()) with check (is_admin());
+
+-- user_modules — read own/admin; insert only via activate_module_code() RPC (security definer, no policy needed)
+create policy "user_modules_own_read" on user_modules for select using (user_id = auth.uid() or is_admin());
+
+-- orders / order_items
+create policy "orders_own_read" on orders for select using (user_id = auth.uid() or is_admin());
+create policy "orders_own_insert" on orders for insert with check (user_id = auth.uid());
+create policy "orders_admin_update" on orders for update using (is_admin());
+
+create policy "order_items_own_read" on order_items for select using (
+  is_admin() or exists (select 1 from orders o where o.id = order_items.order_id and o.user_id = auth.uid())
+);
+create policy "order_items_own_insert" on order_items for insert with check (
+  exists (select 1 from orders o where o.id = order_items.order_id and o.user_id = auth.uid())
 );
 
--- ─── Indexes ─────────────────────────────────────────────────────────
+-- ============================================================
+-- 7. Seed: modules from PRD §4.1 + owner as first admin
+-- ============================================================
 
-CREATE INDEX IF NOT EXISTS idx_modules_category ON modules(category);
-CREATE INDEX IF NOT EXISTS idx_lessons_unit ON lessons(unit_id);
-CREATE INDEX IF NOT EXISTS idx_progress_user ON progress(user_id);
-CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
-CREATE INDEX IF NOT EXISTS idx_classes_start ON classes(start_at);
-CREATE INDEX IF NOT EXISTS idx_ai_chat_user ON ai_chat_history(user_id);
+insert into admin_allowlist (email) values ('mnafiqaiman@gmail.com');
 
--- ─── RLS Policies ────────────────────────────────────────────────────
+insert into modules (name, slug, is_grammar_free) values
+  ('Bahasa Arab Pemula', 'pemula', false),
+  ('Arab Tujuan Kerjaya', 'kerjaya', false),
+  ('Bahasa Arab Al Quran', 'quran', false),
+  ('Anakku Berbahasa Arab', 'anakku', false);
 
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE modules ENABLE ROW LEVEL SECURITY;
-ALTER TABLE units ENABLE ROW LEVEL SECURITY;
-ALTER TABLE lessons ENABLE ROW LEVEL SECURITY;
-ALTER TABLE progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE classes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE enrollments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ai_usage ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ai_chat_history ENABLE ROW LEVEL SECURITY;
+insert into module_ai_config (module_id, persona_name, system_prompt, model, daily_quota)
+select id, case slug
+    when 'quran' then 'Ustaz Hakim'
+    when 'pemula' then 'Ustaz Zaid'
+    when 'kerjaya' then 'Ustaz Firdaus'
+    when 'anakku' then 'Ustaz Amin'
+  end,
+  'You are a friendly Arabic language teacher (Ustaz) helping a student practice the module content. Answer in simple English/Malay with Arabic examples where useful.',
+  'gemini-2.5-flash', 60
+from modules;
 
--- Profiles: users read/write own, admin full
-CREATE POLICY "Users read own profile" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Admins full access profiles" ON profiles FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-CREATE POLICY "Insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+insert into products (name, description, price, module_id, stock) select
+  'Bahasa Arab Pemula', 'Physical card & book set — beginner Arabic module.', 39.90, id, 100 from modules where slug='pemula';
+insert into products (name, description, price, module_id, stock) select
+  'Arab Tujuan Kerjaya', 'Physical card & book set — career-purpose Arabic module.', 59.90, id, 100 from modules where slug='kerjaya';
+insert into products (name, description, price, module_id, stock) select
+  'Bahasa Arab Al Quran', 'Physical card & book set — Quranic Arabic module.', 97.90, id, 100 from modules where slug='quran';
+insert into products (name, description, price, module_id, stock) select
+  'Anakku Berbahasa Arab', 'Physical card & book set — Arabic for kids module.', 27.90, id, 100 from modules where slug='anakku';
 
--- Modules: public read, admin write
-CREATE POLICY "Public read modules" ON modules FOR SELECT USING (true);
-CREATE POLICY "Admin write modules" ON modules FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
+insert into grammar_topics (order_index, title_en, description) values
+  (1, 'Nouns & articles', 'Introduction to Arabic nouns and definite articles.'),
+  (2, 'Verb conjugation', 'How Arabic verbs change with tense and subject.'),
+  (3, 'Sentence structure', 'Word order in Arabic sentences (verbal vs nominal).'),
+  (4, 'Case endings (i''rab)', 'Nominative, accusative and genitive case endings.'),
+  (5, 'Pronouns', 'Personal, demonstrative and relative pronouns.'),
+  (6, 'Common particles', 'Prepositions and particles used in everyday Arabic.');
 
--- Units: public read, admin write
-CREATE POLICY "Public read units" ON units FOR SELECT USING (true);
-CREATE POLICY "Admin write units" ON units FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Lessons: public read, admin write
-CREATE POLICY "Public read lessons" ON lessons FOR SELECT USING (true);
-CREATE POLICY "Admin write lessons" ON lessons FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Progress: users read/write own, admin read all
-CREATE POLICY "Users read own progress" ON progress FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users write own progress" ON progress FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own progress" ON progress FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Admin read all progress" ON progress FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Classes: public read, admin write
-CREATE POLICY "Public read classes" ON classes FOR SELECT USING (true);
-CREATE POLICY "Admin write classes" ON classes FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Orders: users read/create own, admin read all
-CREATE POLICY "Users read own orders" ON orders FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users create own orders" ON orders FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Admin read all orders" ON orders FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Order items: users read via own orders, admin read all
-CREATE POLICY "Users read own order items" ON order_items FOR SELECT USING (
-  EXISTS (SELECT 1 FROM orders WHERE id = order_id AND user_id = auth.uid())
-);
-CREATE POLICY "Admin write order items" ON order_items FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- Enrollments: users read own, admin full
-CREATE POLICY "Users read own enrollments" ON enrollments FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Admin write enrollments" ON enrollments FOR ALL USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- AI usage: users own
-CREATE POLICY "Users read own ai_usage" ON ai_usage FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users write own ai_usage" ON ai_usage FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own ai_usage" ON ai_usage FOR UPDATE USING (auth.uid() = user_id);
-
--- AI chat history: users own
-CREATE POLICY "Users read own chat" ON ai_chat_history FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users write own chat" ON ai_chat_history FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Admin read all chat" ON ai_chat_history FOR SELECT USING (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
-);
-
--- ─── Auto-create profile on signup ──────────────────────────────────
-
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.profiles (id, full_name, role)
-  VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'), 'user');
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- ─── Seed: Modules ──────────────────────────────────────────────────
-
-INSERT INTO modules (slug, category, title_en, title_ar, level, description, price, old_price, cover, icon, is_bundle, order_index)
-VALUES
-  ('nahw-foundations', 'Nahw', 'Nahw Foundations', 'أساسيات النحو', 'Beginner', 'Master the building blocks of Arabic grammar — nouns, verbs, and sentence structure.', 49, 79, 'linear-gradient(150deg,#17756A,#0C3A33)', 'book-open-01', false, 1),
-  ('sarf-essentials', 'Sarf', 'Sarf Essentials', 'علم الصرف', 'Beginner', 'Understand Arabic morphology — verb patterns, roots and word formation.', 45, 0, 'linear-gradient(150deg,#8C6A1E,#4A3607)', 'language-square', false, 2),
-  ('muhadathah', 'Conversation', 'Muhadathah: Everyday Speaking', 'المحادثة اليومية', 'Intermediate', 'Speak Arabic with confidence in real, everyday situations.', 59, 0, 'linear-gradient(150deg,#A33241,#5A121C)', 'bubble-chat', false, 3),
-  ('quranic-arabic', 'Qur''an', 'Qur''anic Arabic', 'لغة القرآن', 'Intermediate', 'Understand the language of the Qur''an word by word.', 65, 89, 'linear-gradient(150deg,#1C6D5C,#0A2C26)', 'quran-01', false, 4),
-  ('balaghah', 'Balaghah', 'Introduction to Balaghah', 'مدخل إلى البلاغة', 'Advanced', 'Discover the eloquence and rhetoric of the Arabic language.', 69, 0, 'linear-gradient(150deg,#5B4B8A,#241C3C)', 'quill-write-01', false, 5),
-  ('complete-pathway', 'Bundle', 'Complete Arabic Pathway', 'المسار الكامل', 'All levels', 'All five modules in one bundle — from foundations to balaghah.', 199, 287, 'linear-gradient(150deg,#2FC49F,#0C3A33)', 'package', true, 6)
-ON CONFLICT (slug) DO NOTHING;
-
--- ─── Seed: Units (Nahw Foundations) ─────────────────────────────────
-
-DO $$
-DECLARE
-  mod_id UUID;
-BEGIN
-  SELECT id INTO mod_id FROM modules WHERE slug = 'nahw-foundations';
-
-  INSERT INTO units (module_id, title, title_ar, "order") VALUES
-    (mod_id, 'The Nominal Sentence', 'الجُمْلَةُ الاِسْمِيَّة', 1),
-    (mod_id, 'The Verbal Sentence', 'الجُمْلَةُ الفِعْلِيَّة', 2),
-    (mod_id, 'Pronouns & Demonstratives', 'الضَّمَائِر', 3),
-    (mod_id, 'Prepositions & Adverbs', 'حُرُوف الجَرّ', 4)
-  ON CONFLICT DO NOTHING;
-END $$;
-
--- ─── Seed: Lessons (Unit 1) ────────────────────────────────────────
-
-DO $$
-DECLARE
-  unit_id UUID;
-BEGIN
-  SELECT id INTO unit_id FROM units WHERE title = 'The Nominal Sentence' LIMIT 1;
-
-  INSERT INTO lessons (unit_id, type, title, title_ar, youtube_id, duration, "order") VALUES
-    (unit_id, 'clip', 'What is a nominal sentence?', 'ما هي الجملة الاسمية?', 'dQw4w9WgXcQ', 180, 1),
-    (unit_id, 'clip', 'Mubtada & Khabar', 'المبتدأ والخبر', 'dQw4w9WgXcQ', 120, 2),
-    (unit_id, 'exercise', 'Practice: build the sentence', 'تمرين: اביטח الجملة', NULL, 300, 3),
-    (unit_id, 'audio', 'Podcast: sentences in speech', 'بودكاست: الجمل في المحادثة', NULL, 360, 4),
-    (unit_id, 'test', 'Unit 1 checkpoint', 'اختبار الوحدة الأولى', NULL, 600, 5)
-  ON CONFLICT DO NOTHING;
-END $$;
-
--- ─── Seed: Classes ──────────────────────────────────────────────────
-
-INSERT INTO classes (title, tutor, type, start_at, join_url, plan_required)
-VALUES
-  ('Muhadathah — Level 2', 'Ustaz Hakim', 'group', NOW() + INTERVAL '2 hours', 'https://zoom.us/j/example1', 'free'),
-  ('Nahw Q&A Session', 'Ustazah Aisyah', 'group', NOW() + INTERVAL '3 days', 'https://zoom.us/j/example2', 'plus'),
-  ('Qur''anic Recitation Circle', 'Ustaz Rashid', 'group', NOW() + INTERVAL '5 days', 'https://zoom.us/j/example3', 'free'),
-  ('1-on-1: Advanced Nahw', 'Ustaz Hakim', 'one_on_one', NOW() + INTERVAL '7 days', 'https://zoom.us/j/example4', 'pro')
-ON CONFLICT DO NOTHING;
+notify pgrst, 'reload schema';

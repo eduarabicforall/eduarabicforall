@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css">
+  <style>
+    body{margin:0;background:#05070d;color:#F3F5FA;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:36px 12px;background:#05070d;">
+  <div style="width:402px;max-width:100%;background:#070A14;border:1px solid rgba(255,255,255,.09);border-radius:36px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.5);min-height:820px;">
+
+    <sc-if value="{{ isLesson }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;padding:22px 20px 6px;">
+          <a href="Grammar.dc.html" style="width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="hgi-stroke hgi-arrow-left-01" style="font-size:16px;color:#A2AABD;"></i></a>
+          <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;">Sentence structure</div>
+        </div>
+
+        <div style="padding:14px 20px 8px;">
+          <div style="aspect-ratio:16/9;border-radius:16px;background:repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 8px, rgba(255,255,255,.02) 8px 16px);display:flex;align-items:center;justify-content:center;position:relative;">
+            <div style="width:52px;height:52px;border-radius:50%;background:rgba(240,180,41,.9);display:flex;align-items:center;justify-content:center;">
+              <i class="hgi-stroke hgi-play" style="font-size:22px;color:#241a04;"></i>
+            </div>
+            <span style="position:absolute;bottom:10px;left:12px;font-family:monospace;color:#6B7488;font-size:10.5px;">lesson video — 4:32</span>
+          </div>
+          <p style="color:#A2AABD;font-size:13.5px;line-height:1.6;margin:16px 0 0;">Learn how Arabic sentences are ordered — subject, verb and object — and how word order can shift for emphasis.</p>
+        </div>
+
+        <div style="padding:20px 20px 8px;">
+          <div style="font-size:12.5px;font-weight:700;color:#A2AABD;letter-spacing:.02em;margin-bottom:10px;">PRACTICE QUIZ</div>
+          <sc-for list="{{ quizTypes }}" as="q" hint-placeholder-count="3">
+            <button onClick="{{ q.open }}" style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.055);border-radius:16px;padding:14px;margin-bottom:10px;cursor:pointer;font-family:inherit;color:inherit;">
+              <div style="width:40px;height:40px;border-radius:11px;background:rgba(240,180,41,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="hgi-stroke {{ q.icon }}" style="color:#F0B429;font-size:18px;"></i>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:13.5px;margin-bottom:2px;">{{ q.title }}</div>
+                <div style="color:#6B7488;font-size:11.5px;">{{ q.count }} questions</div>
+              </div>
+              <i class="hgi-stroke hgi-arrow-right-01" style="color:#6B7488;font-size:17px;flex-shrink:0;"></i>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;padding:22px 20px 6px;">
+          <button onClick="{{ backToLesson }}" style="width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"><i class="hgi-stroke hgi-arrow-left-01" style="font-size:16px;color:#A2AABD;"></i></button>
+          <div style="flex:1;">
+            <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:16px;">{{ activeQuizTitle }}</div>
+          </div>
+        </div>
+        <div style="padding:8px 20px;">
+          <div style="height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin:10px 0 24px;">
+            <div style="height:100%;border-radius:4px;background:#F0B429;width:{{ quizProgressPct }}%;"></div>
+          </div>
+
+          <sc-if value="{{ isMcq }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="color:#6B7488;font-size:12px;font-weight:700;margin-bottom:8px;">MULTIPLE CHOICE</div>
+              <div style="font-weight:700;font-size:16px;margin-bottom:20px;line-height:1.5;">Which word usually comes first in a standard Arabic verbal sentence?</div>
+              <sc-for list="{{ mcqOptions }}" as="o" hint-placeholder-count="4">
+                <button onClick="{{ o.select }}" style="width:100%;text-align:left;background:{{ o.bg }};border:1px solid {{ o.border }};color:{{ o.color }};border-radius:13px;padding:14px 16px;margin-bottom:10px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;">{{ o.label }}</button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isOrder }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="color:#6B7488;font-size:12px;font-weight:700;margin-bottom:8px;">ARRANGE THE WORDS</div>
+              <div style="font-weight:700;font-size:16px;margin-bottom:20px;line-height:1.5;">Build the sentence: "The teacher wrote the lesson."</div>
+              <div style="min-height:56px;display:flex;flex-wrap:wrap;gap:8px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15);border-radius:13px;padding:12px;margin-bottom:16px;">
+                <sc-for list="{{ orderChosen }}" as="w" hint-placeholder-count="0">
+                  <button onClick="{{ w.remove }}" dir="rtl" style="background:rgba(240,180,41,.16);border:1px solid rgba(240,180,41,.3);color:#F0B429;border-radius:9px;padding:8px 14px;font-family:'Amiri',serif;font-size:16px;cursor:pointer;">{{ w.text }}</button>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <sc-for list="{{ orderPool }}" as="w" hint-placeholder-count="4">
+                  <button onClick="{{ w.add }}" dir="rtl" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:#F3F5FA;border-radius:9px;padding:8px 14px;font-family:'Amiri',serif;font-size:16px;cursor:pointer;">{{ w.text }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isTf }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <div style="color:#6B7488;font-size:12px;font-weight:700;margin-bottom:8px;">TRUE OR FALSE</div>
+              <div style="font-weight:700;font-size:16px;margin-bottom:24px;line-height:1.5;">In Arabic, the verb can come before the subject in a standard sentence.</div>
+              <div style="display:flex;gap:12px;">
+                <button onClick="{{ answerTrue }}" style="flex:1;background:rgba(47,196,159,.12);border:1px solid rgba(47,196,159,.3);color:#2FC49F;border-radius:13px;padding:16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;">True</button>
+                <button onClick="{{ answerFalse }}" style="flex:1;background:rgba(240,90,90,.1);border:1px solid rgba(240,90,90,.3);color:#f06868;border-radius:13px;padding:16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;">False</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <button onClick="{{ backToLesson }}" style="width:100%;background:#F0B429;color:#241a04;font-weight:700;font-size:15px;padding:15px;border-radius:13px;border:none;cursor:pointer;margin-top:28px;">Finish quiz</button>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  quizDefs = [
+    { id: 'mcq', title: 'Multiple choice', icon: 'hgi-checkmark-square-01', count: 8 },
+    { id: 'order', title: 'Arrange the words', icon: 'hgi-text-align-left-01', count: 5 },
+    { id: 'tf', title: 'True & False', icon: 'hgi-tick-double-02', count: 6 },
+  ];
+  mcqDefs = [
+    { id: 'a', label: 'The subject' },
+    { id: 'b', label: 'The verb' },
+    { id: 'c', label: 'The object' },
+    { id: 'd', label: 'It never changes order' },
+  ];
+  orderWords = ['كَتَبَ', 'المُعَلِّمُ', 'الدَّرْسَ'];
+  state = { view: 'lesson', activeQuiz: null, mcqSelected: null, orderChosenIds: [], tfAnswer: null };
+  renderVals() {
+    const s = this.state;
+    const activeDef = this.quizDefs.find((q) => q.id === s.activeQuiz);
+    return {
+      isLesson: s.view === 'lesson',
+      isQuiz: s.view === 'quiz',
+      quizTypes: this.quizDefs.map((q) => ({ ...q, open: () => this.setState({ view: 'quiz', activeQuiz: q.id, mcqSelected: null, orderChosenIds: [], tfAnswer: null }) })),
+      activeQuizTitle: activeDef ? activeDef.title : '',
+      quizProgressPct: 35,
+      backToLesson: () => this.setState({ view: 'lesson' }),
+
+      isMcq: s.activeQuiz === 'mcq',
+      mcqOptions: this.mcqDefs.map((o) => ({
+        label: o.label,
+        bg: s.mcqSelected === o.id ? (o.id === 'b' ? 'rgba(47,196,159,.14)' : 'rgba(240,90,90,.1)') : 'rgba(255,255,255,.05)',
+        border: s.mcqSelected === o.id ? (o.id === 'b' ? 'rgba(47,196,159,.35)' : 'rgba(240,90,90,.3)') : 'rgba(255,255,255,.09)',
+        color: '#F3F5FA',
+        select: () => this.setState({ mcqSelected: o.id }),
+      })),
+
+      isOrder: s.activeQuiz === 'order',
+      orderChosen: s.orderChosenIds.map((idx) => ({ text: this.orderWords[idx], remove: () => this.setState({ orderChosenIds: s.orderChosenIds.filter((i) => i !== idx) }) })),
+      orderPool: this.orderWords.map((w, idx) => ({ text: w, add: () => this.setState({ orderChosenIds: [...s.orderChosenIds, idx] }) })).filter((_, idx) => !s.orderChosenIds.includes(idx)),
+
+      isTf: s.activeQuiz === 'tf',
+      answerTrue: () => this.setState({ tfAnswer: true }),
+      answerFalse: () => this.setState({ tfAnswer: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>
