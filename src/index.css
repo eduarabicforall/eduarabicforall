@@ -2,36 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
-  height: 100%;
+/* Dark is the default app theme (matches the original design canvas). Light
+   is opt-in via [data-theme="light"] on <html>, toggled by ThemeContext and
+   persisted to localStorage — this only affects the student/admin app shell
+   (bg-app-*, text-app-* tokens); the Landing page uses its own fixed light
+   palette (bg-light-*, text-light-*) and is unaffected either way. */
+:root {
+  --app-bg: #070a14;
+  --app-outer: #05070d;
+  --app-ink: #f3f5fa;
+  --app-ink-soft: #a2aabd;
+  --app-ink-faint: #6b7488;
+  --app-border: rgba(255, 255, 255, 0.09);
+  --app-panel: rgba(255, 255, 255, 0.035);
+  --app-panel2: rgba(255, 255, 255, 0.06);
+  --app-surface: #0b1020;
+  --app-bg-translucent: rgba(7, 10, 20, 0.9);
+}
+
+:root[data-theme='light'] {
+  --app-bg: #f7f8fb;
+  --app-outer: #eef0f5;
+  --app-ink: #14161c;
+  --app-ink-soft: #5b6472;
+  --app-ink-faint: #8b93a3;
+  --app-border: rgba(20, 22, 28, 0.1);
+  --app-panel: #ffffff;
+  --app-panel2: rgba(20, 22, 28, 0.04);
+  --app-surface: #ffffff;
+  --app-bg-translucent: rgba(247, 248, 251, 0.9);
 }
 
 body {
   margin: 0;
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background: #070A14;
-  color: #F3F5FA;
+  -webkit-font-smoothing: antialiased;
 }
 
-.font-title {
-  font-family: 'Sora', sans-serif;
+/* A "berkelip" (twinkling) medal badge — used on the Landing page's award
+   logos. Combines a pulsing glow with a small sparkle so it reads as
+   shining, not just fading in/out like plain animate-pulse. */
+@keyframes medal-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px currentColor);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px currentColor);
+    transform: scale(1.08);
+  }
+}
+.animate-medal-glow {
+  animation: medal-glow 1.8s ease-in-out infinite;
 }
 
-.rtl-ar {
-  direction: rtl;
-  font-family: 'Amiri', serif;
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.6) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(20deg);
+  }
+}
+.animate-sparkle-twinkle {
+  animation: sparkle-twinkle 1.4s ease-in-out infinite;
 }
 
-/* App mobile frame (dark screens) */
-.app-frame {
-  max-width: 402px;
-  margin: 0 auto;
-  min-height: 100vh;
-  background: #070A14;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+/* Hide the scrollbar on horizontally-scrolling sliders (awards, modules,
+   reviews) while keeping them touch/drag-scrollable. */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 8px; }
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

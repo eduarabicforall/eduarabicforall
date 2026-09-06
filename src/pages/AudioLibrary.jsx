@@ -1,90 +1,198 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import BottomTabBar from '../components/layout/BottomTabBar'
-import Pill from '../components/ui/Pill'
-import Icon from '../components/Icon'
+import { useNavigate, useParams } from 'react-router-dom'
+import AppShell from '../components/AppShell.jsx'
+import BottomTabBar from '../components/BottomTabBar.jsx'
+import Icon from '../components/Icon.jsx'
+import { useModuleTree } from '../context/ModuleTreeContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { supabase } from '../lib/supabase.js'
 
 export default function AudioLibrary() {
-  const { slug } = useParams()
-  const [module, setModule] = useState(null)
-  const [units, setUnits] = useState([])
-  const [activeUnit, setActiveUnit] = useState(null)
-  const [tracks, setTracks] = useState([])
-  const [playingId, setPlayingId] = useState(null)
+  const { moduleId } = useParams()
+  const { moduleTree, loading: moduleTreeLoading } = useModuleTree()
+  const { user } = useAuth()
+  const material = moduleTree.find((m) => m.id === moduleId) || moduleTree[0]
+
+  const [unitIndex, setUnitIndex] = useState(0)
+  const [playingIndex, setPlayingIndex] = useState(null)
+  const [activated, setActivated] = useState(null) // null = checking
   const audioRef = useRef(null)
+  const navigate = useNavigate()
+  const tracks = material?.units[unitIndex]?.tracks || []
 
   useEffect(() => {
-    async function load() {
-      const { data: mod } = await supabase.from('modules').select('*').eq('slug', slug).single()
-      setModule(mod)
-      if (!mod) return
-      const { data: unitList } = await supabase.from('units').select('*').eq('module_id', mod.id).order('order_index')
-      setUnits(unitList ?? [])
-      setActiveUnit(unitList?.[0]?.id ?? null)
+    if (!material?.dbId || !user?.id) return
+    let active = true
+    setActivated(null)
+    supabase
+      .from('user_modules')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('module_id', material.dbId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (active) setActivated(!!data)
+      })
+    return () => {
+      active = false
     }
-    load()
-  }, [slug])
+  }, [material?.dbId, user?.id])
 
   useEffect(() => {
-    if (!activeUnit) return
-    supabase.from('audio_tracks').select('*').eq('unit_id', activeUnit).order('order_index')
-      .then(({ data }) => setTracks(data ?? []))
-  }, [activeUnit])
+    setUnitIndex(0)
+    setPlayingIndex(null)
+  }, [material?.id])
 
-  function togglePlay(track) {
-    if (playingId === track.id) {
-      audioRef.current?.pause()
-      setPlayingId(null)
+  useEffect(() => {
+    const el = audioRef.current
+    if (!el) return
+    const onEnded = () => setPlayingIndex(null)
+    el.addEventListener('ended', onEnded)
+    return () => el.removeEventListener('ended', onEnded)
+  }, [])
+
+  function togglePlay(i, track) {
+    const el = audioRef.current
+    if (playingIndex === i) {
+      el?.pause()
+      setPlayingIndex(null)
       return
     }
-    const { data } = supabase.storage.from('audio').getPublicUrl(track.storage_path)
-    if (audioRef.current) {
-      audioRef.current.src = data.publicUrl
-      audioRef.current.play()
+    if (track.audioUrl && el) {
+      el.src = track.audioUrl
+      el.play().catch(() => {})
     }
-    setPlayingId(track.id)
+    setPlayingIndex(i)
+  }
+
+  if (moduleTreeLoading) {
+    return (
+      <AppShell>
+        <div className="p-5 text-sm text-app-inkFaint">Loading…</div>
+        <BottomTabBar />
+      </AppShell>
+    )
+  }
+
+  if (!material) {
+    return (
+      <AppShell>
+        <div className="p-5 text-sm text-app-inkSoft">No module found.</div>
+        <BottomTabBar />
+      </AppShell>
+    )
+  }
+
+  const header = (
+    <div className="mb-3.5 flex items-center gap-3">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="flex h-9 w-9 items-center justify-center rounded-[11px] border border-app-border bg-app-panel2"
+      >
+        <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
+      </button>
+      <div>
+        <div className="font-sora text-base font-extrabold">Audio Library</div>
+        <div className="text-[11.5px] text-app-inkFaint">{material.name}</div>
+      </div>
+    </div>
+  )
+
+  if (activated === false) {
+    return (
+      <AppShell>
+        <div className="px-5 pb-1.5 pt-5.5 pt-[22px]">{header}</div>
+        <div className="mx-5 rounded-2xl border border-app-border bg-app-panel px-4 py-6 text-center">
+          <Icon name="lock" size={24} className="mx-auto mb-2.5 text-app-inkFaint" />
+          <div className="mb-1 text-[14px] font-bold">Module not activated</div>
+          <div className="mb-4 text-[12.5px] text-app-inkSoft">
+            Activate {material.name} with your code to unlock its Audio Library.
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/activate')}
+            className="rounded-xl bg-primary px-5 py-2.5 text-[13px] font-bold text-[#0B2A4A]"
+          >
+            Enter code
+          </button>
+        </div>
+        <BottomTabBar />
+      </AppShell>
+    )
   }
 
   return (
-    <div className="app-frame">
-      <header className="px-5 pt-6 pb-4">
-        <Link to="/dashboard" className="text-app-inkFaint text-sm mb-1 inline-flex items-center gap-1">
-          <Icon name="arrow-left-01" size={16} /> Audio Library
-        </Link>
-        <h1 className="font-title font-bold text-xl">{module?.name}</h1>
-      </header>
+    <AppShell>
+      <audio ref={audioRef} className="hidden" />
+      <div className="px-5 pb-1.5 pt-5.5 pt-[22px]">
+        {header}
 
-      <div className="flex gap-2 px-5 pb-3 overflow-x-auto">
-        {units.map((u, i) => (
-          <Pill key={u.id} active={activeUnit === u.id} onClick={() => setActiveUnit(u.id)}>
-            Unit {i + 1}
-          </Pill>
-        ))}
+        <div className="flex gap-2 overflow-x-auto pb-1.5">
+          {material.units.map((u, i) => {
+            const active = i === unitIndex
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => {
+                  setUnitIndex(i)
+                  setPlayingIndex(null)
+                  audioRef.current?.pause()
+                }}
+                className={`flex-shrink-0 whitespace-nowrap rounded-pill border px-4 py-2.5 text-[12.5px] font-bold ${
+                  active ? 'border-primary bg-primary/[.15] text-primary' : 'border-app-border bg-app-panel2 text-app-inkSoft'
+                }`}
+              >
+                {u.title}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      <main className="flex-1 px-5 pb-6 flex flex-col gap-2 overflow-y-auto">
-        {tracks.length === 0 && <p className="text-app-inkFaint text-sm mt-4">No tracks in this unit yet.</p>}
-        {tracks.map((t) => (
-          <div key={t.id} className="flex items-center gap-3 bg-app-panel border border-app-border rounded-card p-3">
-            <button
-              onClick={() => togglePlay(t)}
-              className="w-10 h-10 rounded-full bg-app-primary text-app-bg flex items-center justify-center shrink-0"
-            >
-              <Icon name={playingId === t.id ? 'pause' : 'play'} size={18} />
-            </button>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{t.title_en}</p>
-              {t.title_ar && <p className="rtl-ar text-app-inkSoft text-sm truncate">{t.title_ar}</p>}
-              {playingId === t.id && <div className="h-1 bg-app-panel2 rounded-pill mt-1"><div className="h-1 bg-app-primary rounded-pill w-1/3" /></div>}
-            </div>
-            {t.duration && <span className="text-xs text-app-inkFaint">{Math.floor(t.duration / 60)}:{String(t.duration % 60).padStart(2, '0')}</span>}
+      <div className="px-5 pb-2 pt-4">
+        {tracks.length === 0 && (
+          <div className="rounded-2xl border border-app-border bg-app-panel px-3.5 py-5 text-center text-[13px] text-app-inkFaint">
+            No dialogue tracks in this unit yet.
           </div>
-        ))}
-      </main>
+        )}
+        {tracks.map((t, i) => {
+          const playing = playingIndex === i
+          return (
+            <div
+              key={i}
+              className="mb-2.5 flex items-center gap-3 rounded-2xl border border-app-border bg-app-panel px-3.5 py-3"
+            >
+              <button
+                type="button"
+                onClick={() => togglePlay(i, t)}
+                disabled={!t.audioUrl}
+                title={t.audioUrl ? undefined : 'Audio not uploaded yet'}
+                className={`flex h-[38px] w-[38px] flex-shrink-0 items-center justify-center rounded-[11px] disabled:opacity-40 ${
+                  playing ? 'bg-primary' : 'bg-app-panel2'
+                }`}
+              >
+                <Icon name={playing ? 'pause' : 'play'} size={16} className={playing ? 'text-[#0B2A4A]' : 'text-app-ink'} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="mb-0.5 text-[13px] font-bold">{t.titleEn}</div>
+                <div dir="rtl" className="mb-1.5 font-amiri text-sm text-app-inkSoft">
+                  {t.titleAr}
+                </div>
+                {playing && (
+                  <div className="h-1 overflow-hidden rounded-full bg-app-panel2">
+                    <div className="h-full w-[42%] rounded-full bg-primary" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-shrink-0 text-[11px] text-app-inkFaint">{t.duration}</div>
+            </div>
+          )
+        })}
+      </div>
 
-      <audio ref={audioRef} onEnded={() => setPlayingId(null)} className="hidden" />
       <BottomTabBar />
-    </div>
+    </AppShell>
   )
 }

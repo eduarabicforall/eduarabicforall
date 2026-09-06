@@ -1,125 +1,161 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import { useAuth } from '../context/AuthContext'
-import BottomTabBar from '../components/layout/BottomTabBar'
-import Card from '../components/ui/Card'
-import Icon from '../components/Icon'
+import { useNavigate } from 'react-router-dom'
+import AppShell from '../components/AppShell.jsx'
+import BottomTabBar from '../components/BottomTabBar.jsx'
+import Icon from '../components/Icon.jsx'
+import PlaceholderBlock from '../components/PlaceholderBlock.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useModuleTree } from '../context/ModuleTreeContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
+import { supabase } from '../lib/supabase.js'
+
+function initials(name) {
+  return name
+    .split(' ')
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+}
 
 export default function Dashboard() {
-  const { user, profile, signOut } = useAuth()
-  const [modules, setModules] = useState([])
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
+  const { theme, toggleTheme } = useTheme()
+  const { moduleTree } = useModuleTree()
+  const [myModules, setMyModules] = useState(null) // null = loading
+  const navigate = useNavigate()
+  const name = user?.fullName || 'Student'
 
   useEffect(() => {
-    if (!user) return
-    let cancelled = false
-
-    async function load() {
-      const { data: userModules } = await supabase
-        .from('user_modules')
-        .select('module_id, modules(id, name, slug, cover_url)')
-        .eq('user_id', user.id)
-
-      const results = []
-      for (const um of userModules ?? []) {
-        const [{ count: totalTracks }, { data: units }] = await Promise.all([
-          supabase.from('audio_tracks').select('id, unit_id, units!inner(module_id)', { count: 'exact', head: true })
-            .eq('units.module_id', um.module_id),
-          supabase.from('units').select('id').eq('module_id', um.module_id),
-        ])
-        results.push({
-          ...um.modules,
-          totalTracks: totalTracks ?? 0,
-          totalUnits: units?.length ?? 0,
-          // Fasa 1: real audio-completion tracking (per-track "listened" state)
-          // isn't modelled yet — show unit count as progress denominator with
-          // 0 completed rather than a hardcoded percentage (PRD §6 issue #10).
-          doneUnits: 0,
-        })
-      }
-      if (!cancelled) {
-        setModules(results)
-        setLoading(false)
-      }
+    if (!user?.id) return
+    let active = true
+    supabase
+      .from('user_modules')
+      .select('module_id, modules(slug, name)')
+      .eq('user_id', user.id)
+      .then(({ data, error }) => {
+        if (!active) return
+        if (error) {
+          console.error('Failed to load activated modules', error)
+          setMyModules([])
+          return
+        }
+        setMyModules(data.map((row) => ({ id: row.modules.slug, name: row.modules.name })))
+      })
+    return () => {
+      active = false
     }
-    load()
-    return () => { cancelled = true }
-  }, [user])
+  }, [user?.id])
 
-  const initials = (profile?.full_name || user?.email || '?').slice(0, 2).toUpperCase()
+  function unitCountFor(slug) {
+    return moduleTree.find((m) => m.id === slug)?.units.length || 0
+  }
+
+  const today = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
 
   return (
-    <div className="app-frame">
-      <header className="flex items-center justify-between px-5 pt-6 pb-4">
-        <div className="relative">
-          <button onClick={() => setMenuOpen((o) => !o)} className="w-11 h-11 rounded-full bg-app-primary/20 text-app-primary font-bold flex items-center justify-center">
-            {initials}
+    <AppShell>
+      <div
+        className="flex items-center justify-between px-5 pb-4.5 pt-5.5 pt-[22px] pb-[18px]"
+        style={{ background: 'linear-gradient(180deg, rgba(61,125,216,.10), transparent)' }}
+      >
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-soft font-sora text-[17px] font-extrabold text-[#0B2A4A]"
+          >
+            {initials(name)}
           </button>
-          {menuOpen && (
-            <div className="absolute top-14 left-0 bg-app-panel2 border border-app-border rounded-xl overflow-hidden w-48 z-10">
-              <Link to="/profile" className="block px-4 py-3 text-sm hover:bg-app-panel">Profile settings</Link>
-              <button onClick={signOut} className="w-full text-left px-4 py-3 text-sm text-app-danger hover:bg-app-panel">Log out</button>
-            </div>
-          )}
-        </div>
-        <div className="text-center">
-          <p className="text-app-inkSoft text-xs">Assalamualaikum,</p>
-          <p className="font-semibold">{profile?.full_name || 'Student'}</p>
-        </div>
-        <Link to="/alerts" className="w-11 h-11 rounded-full bg-app-panel flex items-center justify-center">
-          <Icon name="notification-01" />
-        </Link>
-      </header>
 
-      <main className="flex-1 px-5 pb-6 flex flex-col gap-3 overflow-y-auto">
-        <h2 className="text-xs font-bold text-app-inkFaint tracking-wider mt-2">MY MODULES</h2>
+          <div>
+            <div className="mb-0.5 text-[10.5px] font-semibold text-app-inkFaint">{today}</div>
+            <div className="font-sora text-[19px] font-extrabold">{name}</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-panel2"
+          >
+            <Icon name={theme === 'dark' ? 'sun-01' : 'moon-02'} size={18} className="text-app-inkSoft" />
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/notifications')}
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-panel2"
+          >
+            <Icon name="notification-01" size={18} className="text-app-inkSoft" />
+          </button>
+        </div>
+      </div>
 
-        {loading && <p className="text-app-inkFaint text-sm">Loading…</p>}
-        {!loading && modules.length === 0 && (
-          <p className="text-app-inkFaint text-sm">No modules activated yet — activate one below.</p>
+      <div className="px-5 pb-2 pt-3.5">
+        <div className="mb-3 text-[13px] font-bold tracking-wide text-app-inkSoft">MY MODULES</div>
+
+        {myModules === null && <div className="mb-3 text-[12.5px] text-app-inkFaint">Loading your modules…</div>}
+
+        {myModules?.length === 0 && (
+          <div className="mb-3 rounded-2xl border border-dashed border-app-border bg-app-panel/60 p-4 text-[12.5px] text-app-inkSoft">
+            No modules activated yet. Activate one below to unlock its Audio Library.
+          </div>
         )}
 
-        {modules.map((m) => {
-          const pct = m.totalUnits ? Math.round((m.doneUnits / m.totalUnits) * 100) : 0
-          return (
-            <Link key={m.id} to={`/audio/${m.slug}`}>
-              <Card className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-xl bg-app-primary/15 flex items-center justify-center shrink-0">
-                  <Icon name="book-02" size={26} className="text-app-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold truncate">{m.name}</p>
-                  <div className="h-1.5 bg-app-panel2 rounded-pill mt-2 mb-1">
-                    <div className="h-1.5 bg-app-primary rounded-pill" style={{ width: `${pct}%` }} />
-                  </div>
-                  <p className="text-xs text-app-inkFaint">{pct}% · {m.doneUnits}/{m.totalUnits} units</p>
-                </div>
-              </Card>
-            </Link>
-          )
-        })}
-
-        <Link to="/activate">
-          <Card className="border-dashed flex items-center justify-between">
-            <span className="text-sm font-semibold">Activate a new module</span>
-            <span className="text-xs bg-app-panel2 rounded-pill px-3 py-1.5">Enter code</span>
-          </Card>
-        </Link>
-
-        <Link to="/grammar">
-          <Card className="border-app-gold/40 bg-app-gold/10 flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-app-gold">Grammar module</p>
-              <p className="text-xs text-app-inkSoft">Free for your account</p>
+        {myModules?.map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            onClick={() => navigate(`/audio/${m.id}`)}
+            className="mb-3 flex w-full items-center gap-3.5 rounded-2xl border border-app-border bg-app-panel p-4 text-left"
+          >
+            <PlaceholderBlock variant="dark" label="" className="h-[52px] w-[52px] flex-shrink-0 rounded-[13px]" />
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 text-sm font-bold">{m.name}</div>
+              <div className="text-[11px] text-app-inkFaint">{unitCountFor(m.id)} units available</div>
             </div>
-            <Icon name="arrow-right-01" className="text-app-gold" />
-          </Card>
-        </Link>
-      </main>
+            <div className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-[10px] bg-primary/[.12]">
+              <Icon name="arrow-right-01" size={16} className="text-primary" />
+            </div>
+          </button>
+        ))}
+
+        <div className="my-4.5 my-[18px] rounded-2xl border-[1.5px] border-dashed border-primary/[.35] bg-primary/[.05] px-4.5 py-5.5 px-[18px] py-[22px] text-center">
+          <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[.15]">
+            <Icon name="qr-code" size={22} className="text-primary" />
+          </div>
+          <div className="mb-1 text-[15px] font-bold">Activate a new module</div>
+          <div className="mb-4 text-[12.5px] text-app-inkSoft">Scan the QR in your module or enter its code.</div>
+          <button
+            type="button"
+            onClick={() => navigate('/activate')}
+            className="rounded-xl bg-primary px-[22px] py-3 text-sm font-bold text-[#0B2A4A]"
+          >
+            Enter code
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigate('/grammar')}
+          className="mt-3.5 flex w-full items-center gap-3 rounded-2xl border border-gold/[.22] bg-gold/[.08] px-4 py-3.5 text-left"
+        >
+          <Icon name="mortarboard-01" size={20} className="text-gold" />
+          <div className="flex-1">
+            <div className="text-[13px] font-bold">Grammar module</div>
+            <div className="text-[11.5px] text-app-inkSoft">Free for your account</div>
+          </div>
+          <Icon name="arrow-right-01" size={16} className="text-gold" />
+        </button>
+      </div>
 
       <BottomTabBar />
-    </div>
+    </AppShell>
   )
 }

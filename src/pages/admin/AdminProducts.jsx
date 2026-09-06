@@ -1,109 +1,285 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useToast } from '../../components/ui/Toast'
-import Button from '../../components/ui/Button'
-import Input from '../../components/ui/Input'
-import Pill from '../../components/ui/Pill'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { PRODUCT_FILTERS } from '../../data/adminMock.js'
+import { useAdmin } from '../../context/AdminContext.jsx'
+import R2MockUpload from '../../components/R2MockUpload.jsx'
 
-const FILTERS = ['All', 'Active', 'Inactive']
+// PRD §6 issue #6: admin product form now includes an image URL + description,
+// missing from the original design canvas mock (name/price/stock only). Image
+// is a pasted URL (R2/CDN) rather than a file upload, matching how audio and
+// video are handled elsewhere in Admin.
+const emptyDraft = { name: '', moduleId: '', price: '', stock: '', description: '', imageUrl: '', imageUrls: [] }
 
 export default function AdminProducts() {
-  const [products, setProducts] = useState([])
-  const [filter, setFilter] = useState('All')
-  const [editing, setEditing] = useState(null)
-  const toast = useToast()
+  const { products, productsLoading, addProduct, updateProduct, showToast, moduleTree } = useAdmin()
+  const [filter, setFilter] = useState('all')
+  const [editingId, setEditingId] = useState(null)
+  const [draft, setDraft] = useState(emptyDraft)
 
-  async function load() {
-    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
-    setProducts(data ?? [])
-  }
-  useEffect(() => { load() }, [])
+  const filtered = products.filter((p) => filter === 'all' || (filter === 'active' ? p.active : !p.active))
 
-  const filtered = products.filter((p) => filter === 'All' || (filter === 'Active' ? p.is_active : !p.is_active))
-
-  async function toggle(id, field, value) {
-    await supabase.from('products').update({ [field]: value }).eq('id', id)
-    load()
+  // A product with no matching entry in Manage Materials has nothing to
+  // actually unlock when a customer activates it — flag that instead of
+  // hiding it.
+  function materialFor(moduleDbId) {
+    return moduleTree.find((m) => m.dbId === moduleDbId)
   }
 
-  async function saveEdit(e) {
-    e.preventDefault()
-    const { id, name, price, stock, description, image_url } = editing
-    const { error } = await supabase.from('products').update({ name, price, stock, description, image_url }).eq('id', id)
-    if (error) return toast(error.message, 'danger')
-    toast('Product saved')
-    setEditing(null)
-    load()
+  function startEdit(p) {
+    setEditingId(p.id)
+    setDraft({
+      name: p.name,
+      moduleId: p.moduleId || '',
+      price: p.price,
+      stock: p.stock,
+      description: p.description || '',
+      imageUrl: p.imageUrl || '',
+      imageUrls: p.imageUrls || [],
+    })
   }
 
-  async function uploadImage(file) {
-    const path = `products/${Date.now()}-${file.name}`
-    const { error } = await supabase.storage.from('audio').upload(path, file) // shared public bucket
-    if (error) return toast(error.message, 'danger')
-    const { data } = supabase.storage.from('audio').getPublicUrl(path)
-    setEditing((e) => ({ ...e, image_url: data.publicUrl }))
+  function saveEdit() {
+    updateProduct(editingId, { ...draft, imageUrls: draft.imageUrls.map((u) => u.trim()).filter(Boolean) })
+    setEditingId(null)
+    setDraft(emptyDraft)
+    showToast('Product saved.')
   }
 
   return (
     <div>
-      <h1 className="font-title font-extrabold text-2xl mb-6">Manage products</h1>
-
-      <div className="flex gap-2 mb-4">
-        {FILTERS.map((f) => <Pill key={f} active={filter === f} onClick={() => setFilter(f)}>{f}</Pill>)}
+      <div className="mb-1.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="mb-1 text-xs font-bold tracking-wide text-app-inkFaint">MANAGE PRODUCTS</div>
+          <h1 className="font-sora text-2xl font-extrabold">
+            {PRODUCT_FILTERS.find((f) => f.id === filter)?.label}
+          </h1>
+        </div>
+        <button
+          type="button"
+          onClick={addProduct}
+          className="self-start rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+        >
+          + New product
+        </button>
       </div>
 
-      <table className="w-full text-sm mb-6">
-        <thead>
-          <tr className="text-left text-app-inkFaint border-b border-app-border">
-            <th className="py-2">Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Sell in-app</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((p) => (
-            <tr key={p.id} className="border-b border-app-border/50">
-              <td className="py-2">{p.name}</td>
-              <td>RM{Number(p.price).toFixed(2)}</td>
-              <td>{p.stock}</td>
-              <td>
-                <button onClick={() => toggle(p.id, 'is_active', !p.is_active)} className={`text-xs rounded-pill px-2 py-1 ${p.is_active ? 'bg-app-primary/15 text-app-primary' : 'bg-app-panel2 text-app-inkFaint'}`}>
-                  {p.is_active ? 'Active' : 'Inactive'}
-                </button>
-              </td>
-              <td>
-                <button onClick={() => toggle(p.id, 'on_sale', !p.on_sale)} className={`text-xs rounded-pill px-2 py-1 ${p.on_sale ? 'bg-app-primary/15 text-app-primary' : 'bg-app-panel2 text-app-inkFaint'}`}>
-                  {p.on_sale ? 'On' : 'Off'}
-                </button>
-              </td>
-              <td><button onClick={() => setEditing(p)} className="text-app-primary text-xs font-semibold">Edit</button></td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="mb-4 mt-3 flex gap-2">
+        {PRODUCT_FILTERS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setFilter(f.id)}
+            className={`rounded-pill border px-3.5 py-1.5 text-xs font-bold ${
+              filter === f.id ? 'border-primary/40 bg-primary/[.14] text-primary' : 'border-app-border text-app-inkFaint'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
 
-      {editing && (
-        <form onSubmit={saveEdit} className="bg-app-panel border border-app-border rounded-card p-5 max-w-md flex flex-col gap-3">
-          <p className="font-semibold">Edit product</p>
-          <Input label="Name" value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
-          <Input label="Price (RM)" type="number" step="0.01" value={editing.price} onChange={(e) => setEditing({ ...editing, price: e.target.value })} />
-          <Input label="Stock" type="number" value={editing.stock} onChange={(e) => setEditing({ ...editing, stock: e.target.value })} />
-          <label className="block text-left">
-            <span className="block text-xs text-app-inkSoft mb-1.5">Description</span>
-            <textarea
-              value={editing.description ?? ''}
-              onChange={(e) => setEditing({ ...editing, description: e.target.value })}
-              className="w-full rounded-xl bg-app-panel2 border border-app-border px-4 py-3 text-sm"
-              rows={3}
+      {productsLoading ? (
+        <div className="text-sm text-app-inkFaint">Loading…</div>
+      ) : (
+      <div className="overflow-x-auto rounded-2xl border border-app-border bg-app-panel">
+        <table className="w-full min-w-[760px] border-collapse">
+          <thead>
+            <tr className="border-b border-app-border bg-app-panel">
+              {['Product', 'Module', 'Price', 'Stock', 'Status', 'Sell in app', ''].map((h) => (
+                <th key={h} className="px-3.5 py-3.5 text-left text-[11.5px] font-bold tracking-wide text-app-inkFaint">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((p) => (
+              <tr key={p.id} className="border-t border-app-border">
+                <td className="px-3.5 py-3.5 text-[13px] font-semibold">{p.name}</td>
+                <td className="px-3.5 py-3.5 text-[13px]">
+                  <span className="text-app-inkSoft">{p.module}</span>
+                  {!materialFor(p.moduleId) && (
+                    <span className="ml-1.5 rounded-pill bg-danger/[.15] px-2 py-0.5 text-[10px] font-bold text-danger" title="No matching entry in Manage Materials">
+                      unlinked
+                    </span>
+                  )}
+                </td>
+                <td className="px-3.5 py-3.5 text-[13px]">RM{p.price}</td>
+                <td className="px-3.5 py-3.5 text-[13px] text-app-inkSoft">{p.stock}</td>
+                <td className="px-3.5 py-3.5">
+                  <button
+                    type="button"
+                    onClick={() => updateProduct(p.id, { active: !p.active })}
+                    className={`rounded-pill px-2.5 py-1 text-[11px] font-bold ${
+                      p.active ? 'bg-primary/[.15] text-primary' : 'bg-app-panel2 text-app-inkFaint'
+                    }`}
+                  >
+                    {p.active ? 'Active' : 'Tidak Aktif'}
+                  </button>
+                </td>
+                <td className="px-3.5 py-3.5">
+                  <button
+                    type="button"
+                    onClick={() => updateProduct(p.id, { onSale: !p.onSale })}
+                    className={`relative h-[22px] w-[38px] rounded-pill ${p.onSale ? 'bg-primary' : 'bg-app-border'}`}
+                  >
+                    <div
+                      className="absolute top-[3px] h-4 w-4 rounded-full bg-white transition-all"
+                      style={{ left: p.onSale ? '19px' : '3px' }}
+                    />
+                  </button>
+                </td>
+                <td className="px-3.5 py-3.5 text-right">
+                  <button
+                    type="button"
+                    onClick={() => startEdit(p)}
+                    className="rounded-lg border border-app-border px-3 py-1.5 text-xs text-app-inkSoft"
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      )}
+
+      {editingId !== null && (
+        <div className="mt-4.5 mt-[18px] max-w-[440px] rounded-[14px] border border-primary/[.25] bg-app-panel p-4.5 p-[18px]">
+          <div className="mb-3 text-[13.5px] font-bold">Edit product</div>
+
+          <label className="mb-2.5 block text-xs font-semibold text-app-inkSoft">
+            Image URL (R2/CDN)
+            <div className="mt-1.5 flex items-center gap-3">
+              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-[10px] border border-app-border bg-app-panel2">
+                {draft.imageUrl ? (
+                  <img src={draft.imageUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-[10px] text-app-inkFaint">No image</span>
+                )}
+              </div>
+              <R2MockUpload
+                value={draft.imageUrl}
+                onChange={(url) => setDraft((d) => ({ ...d, imageUrl: url }))}
+                placeholder="https://images.eduarabic.my/pemula-cover.jpg"
+              />
+            </div>
+          </label>
+
+          <div className="mb-2.5 block text-xs font-semibold text-app-inkSoft">
+            Additional preview images (product page gallery)
+            <div className="mt-1.5 flex flex-col gap-2">
+              {draft.imageUrls.map((url, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-[9px] border border-app-border bg-app-panel2">
+                    {url ? (
+                      <img src={url} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-[9px] text-app-inkFaint">—</span>
+                    )}
+                  </div>
+                  <R2MockUpload
+                    value={url}
+                    onChange={(newUrl) =>
+                      setDraft((d) => ({
+                        ...d,
+                        imageUrls: d.imageUrls.map((u, j) => (j === i ? newUrl : u)),
+                      }))
+                    }
+                    placeholder="https://images.eduarabic.my/pemula-2.jpg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setDraft((d) => ({ ...d, imageUrls: d.imageUrls.filter((_, j) => j !== i) }))}
+                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-[9px] border border-app-border text-app-inkFaint"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setDraft((d) => ({ ...d, imageUrls: [...d.imageUrls, ''] }))}
+                className="self-start rounded-[9px] border border-app-border px-3 py-1.5 text-[11.5px] font-semibold text-app-inkSoft"
+              >
+                + Add image
+              </button>
+            </div>
+          </div>
+
+          <label className="mb-2.5 block text-xs font-semibold text-app-inkSoft">
+            Name
+            <input
+              value={draft.name}
+              onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
+              className="mt-1 block w-full rounded-[9px] border border-app-border bg-app-panel2 px-2.5 py-2 text-[13px] text-app-ink"
             />
           </label>
-          <label className="block text-left">
-            <span className="block text-xs text-app-inkSoft mb-1.5">Image</span>
-            <input type="file" accept="image/*" onChange={(e) => e.target.files[0] && uploadImage(e.target.files[0])} />
+
+          <label className="mb-2.5 block text-xs font-semibold text-app-inkSoft">
+            Module (Manage Materials)
+            <select
+              value={draft.moduleId}
+              onChange={(e) => setDraft((d) => ({ ...d, moduleId: e.target.value }))}
+              className="mt-1 block w-full rounded-[9px] border border-app-border bg-app-panel2 px-2.5 py-2 text-[13px] text-app-ink"
+            >
+              {moduleTree.map((m) => (
+                <option key={m.dbId} value={m.dbId}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+            <Link
+              to={`/admin/materials/${moduleTree.find((m) => m.dbId === draft.moduleId)?.id || ''}`}
+              className="mt-1 inline-block text-[11px] font-semibold text-primary"
+            >
+              Manage this module's materials →
+            </Link>
           </label>
-          <div className="flex gap-2 mt-2">
-            <Button type="submit">Save changes</Button>
-            <Button type="button" variant="ghost" onClick={() => setEditing(null)}>Cancel</Button>
+
+          <label className="mb-3.5 block text-xs font-semibold text-app-inkSoft">
+            Description
+            <textarea
+              value={draft.description}
+              onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
+              rows={3}
+              className="mt-1 block w-full resize-none rounded-[9px] border border-app-border bg-app-panel2 px-2.5 py-2 text-[13px] text-app-ink"
+            />
+          </label>
+
+          <div className="mb-3.5 flex gap-2.5">
+            <label className="flex-1 text-xs font-semibold text-app-inkSoft">
+              Price (RM)
+              <input
+                value={draft.price}
+                onChange={(e) => setDraft((d) => ({ ...d, price: e.target.value }))}
+                className="mt-1 block w-full rounded-[9px] border border-app-border bg-app-panel2 px-2.5 py-2 text-[13px] text-app-ink"
+              />
+            </label>
+            <label className="flex-1 text-xs font-semibold text-app-inkSoft">
+              Stock
+              <input
+                value={draft.stock}
+                onChange={(e) => setDraft((d) => ({ ...d, stock: e.target.value }))}
+                className="mt-1 block w-full rounded-[9px] border border-app-border bg-app-panel2 px-2.5 py-2 text-[13px] text-app-ink"
+              />
+            </label>
           </div>
-        </form>
+
+          <div className="flex gap-2.5">
+            <button type="button" onClick={saveEdit} className="rounded-[9px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-[#0B2A4A]">
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditingId(null)}
+              className="rounded-[9px] border border-app-border px-4.5 px-[18px] py-2.5 text-xs text-app-inkSoft"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )

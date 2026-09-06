@@ -1,8 +1,117 @@
-export default function Icon({ name, size = 20, className = '', style = {} }) {
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  AlertCircleIcon,
+  ArrowDown01Icon,
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+  Book02Icon,
+  Cancel01Icon,
+  Chatting01Icon,
+  CheckmarkCircle02Icon,
+  CheckmarkSquare01Icon,
+  Clock01Icon,
+  DashboardSquare01Icon,
+  Discount01Icon,
+  Download01Icon,
+  EyeIcon,
+  EyeOffIcon,
+  Folder01Icon,
+  GoogleIcon,
+  GraduationScrollIcon,
+  HeadphonesIcon,
+  Home01Icon,
+  Image02Icon,
+  Key01Icon,
+  LockIcon,
+  Login01Icon,
+  Logout01Icon,
+  Mail01Icon,
+  Medal01Icon,
+  Menu01Icon,
+  Message01Icon,
+  Moon02Icon,
+  Mortarboard01Icon,
+  Notification01Icon,
+  PackageIcon,
+  Sun01Icon,
+  PauseIcon,
+  PlayIcon,
+  QrCodeIcon,
+  SentIcon,
+  ShieldUserIcon,
+  ShoppingBag01Icon,
+  ShoppingBag02Icon,
+  ShoppingCart01Icon,
+  SparklesIcon,
+  StarIcon,
+  TextAlignLeft01Icon,
+  TickDouble02Icon,
+  TruckIcon,
+  UserIcon,
+} from '@hugeicons/core-free-icons'
+
+const ICONS = {
+  'alert-circle': AlertCircleIcon,
+  'arrow-down-01': ArrowDown01Icon,
+  'arrow-left-01': ArrowLeft01Icon,
+  'arrow-right-01': ArrowRight01Icon,
+  'book-02': Book02Icon,
+  'cancel-01': Cancel01Icon,
+  'chatting-01': Chatting01Icon,
+  'checkmark-circle-02': CheckmarkCircle02Icon,
+  'checkmark-square-01': CheckmarkSquare01Icon,
+  'clock-01': Clock01Icon,
+  'dashboard-square-01': DashboardSquare01Icon,
+  'discount-01': Discount01Icon,
+  'download-01': Download01Icon,
+  eye: EyeIcon,
+  'eye-off': EyeOffIcon,
+  'folder-01': Folder01Icon,
+  google: GoogleIcon,
+  'graduation-scroll': GraduationScrollIcon,
+  headphones: HeadphonesIcon,
+  'home-01': Home01Icon,
+  'image-02': Image02Icon,
+  'key-01': Key01Icon,
+  lock: LockIcon,
+  'login-01': Login01Icon,
+  'logout-01': Logout01Icon,
+  'mail-01': Mail01Icon,
+  'medal-01': Medal01Icon,
+  'menu-01': Menu01Icon,
+  'message-01': Message01Icon,
+  'moon-02': Moon02Icon,
+  'mortarboard-01': Mortarboard01Icon,
+  'notification-01': Notification01Icon,
+  package: PackageIcon,
+  'sun-01': Sun01Icon,
+  pause: PauseIcon,
+  play: PlayIcon,
+  'qr-code': QrCodeIcon,
+  sent: SentIcon,
+  'shield-user': ShieldUserIcon,
+  'shopping-bag-01': ShoppingBag01Icon,
+  'shopping-bag-02': ShoppingBag02Icon,
+  'shopping-cart-01': ShoppingCart01Icon,
+  sparkles: SparklesIcon,
+  star: StarIcon,
+  'text-align-left-01': TextAlignLeft01Icon,
+  'tick-double-02': TickDouble02Icon,
+  truck: TruckIcon,
+  user: UserIcon,
+}
+
+export default function Icon({ name, size = 20, className = '', style = {}, strokeWidth = 1.8 }) {
+  const icon = ICONS[name]
+  if (!icon) return null
   return (
-    <i
-      className={`hgi-stroke hgi-${name} ${className}`}
-      style={{ fontSize: `${size}px`, lineHeight: 1, ...style }}
+    <HugeiconsIcon
+      icon={icon}
+      size={size}
+      color="currentColor"
+      strokeWidth={strokeWidth}
+      className={className}
+      style={style}
     />
   )
 }

@@ -1,87 +1,123 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useToast } from '../../components/ui/Toast'
-import Button from '../../components/ui/Button'
-import Input from '../../components/ui/Input'
-import Pill from '../../components/ui/Pill'
+import { useState } from 'react'
+import Icon from '../../components/Icon.jsx'
+import PasswordInput from '../../components/PasswordInput.jsx'
+import { AI_MODULE_TABS } from '../../data/adminMock.js'
+import { useAdmin } from '../../context/AdminContext.jsx'
 
 export default function AdminAiConsole() {
-  const [geminiKey, setGeminiKey] = useState('')
-  const [modules, setModules] = useState([])
-  const [activeModuleId, setActiveModuleId] = useState(null)
-  const [config, setConfig] = useState(null)
-  const toast = useToast()
+  const { aiConfigs, aiConfigsLoading, saveAiConfig, confirmSaveAiConfig, apiKeySaved, saveApiKey } = useAdmin()
+  const [aiModule, setAiModule] = useState('quran')
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const config = aiConfigs[aiModule]
 
-  useEffect(() => {
-    supabase.from('modules').select('*').order('name').then(({ data }) => {
-      setModules(data ?? [])
-      setActiveModuleId(data?.[0]?.id ?? null)
-    })
-  }, [])
-
-  useEffect(() => {
-    if (!activeModuleId) return
-    supabase.from('module_ai_config').select('*').eq('module_id', activeModuleId).single().then(({ data }) => setConfig(data))
-  }, [activeModuleId])
-
-  async function saveKey(e) {
-    e.preventDefault()
-    const { data: { session } } = await supabase.auth.getSession()
-    const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/save-admin-settings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
-      body: JSON.stringify({ key: 'gemini_api_key', value: geminiKey }),
-    })
-    if (res.ok) { toast('Gemini API key saved'); setGeminiKey('') } else { toast('Failed to save key', 'danger') }
+  function handleSaveApiKey() {
+    if (!apiKeyInput.trim()) return
+    saveApiKey()
+    setApiKeyInput('')
   }
 
-  async function saveConfig(e) {
-    e.preventDefault()
-    const { error } = await supabase.from('module_ai_config').upsert({ module_id: activeModuleId, ...config })
-    if (error) return toast(error.message, 'danger')
-    toast('Save configuration')
+  if (aiConfigsLoading || !config) {
+    return <div className="text-sm text-app-inkFaint">Loading…</div>
   }
 
   return (
     <div>
-      <h1 className="font-title font-extrabold text-2xl mb-6">AI console</h1>
+      <h1 className="mb-6 font-sora text-2xl font-extrabold">AI console</h1>
 
-      <form onSubmit={saveKey} className="bg-app-panel border border-app-border rounded-card p-5 max-w-md mb-8">
-        <p className="font-semibold mb-1">Gemini API key</p>
-        <p className="text-xs text-app-inkFaint mb-3">One key powers every module below. Never re-displayed once saved.</p>
-        <div className="flex gap-2">
-          <Input type="password" placeholder="AIza…" value={geminiKey} onChange={(e) => setGeminiKey(e.target.value)} className="flex-1" />
-          <Button type="submit">Save</Button>
+      <div className="mb-7 max-w-[640px] rounded-2xl border border-violet/20 bg-violet/[.06] p-5.5 p-[22px]">
+        <div className="mb-3 flex items-center gap-2">
+          <Icon name="key-01" size={16} className="text-violet" />
+          <span className="text-[13.5px] font-bold">Gemini API key</span>
         </div>
-      </form>
-
-      <div className="flex gap-2 mb-4">
-        {modules.map((m) => <Pill key={m.id} active={activeModuleId === m.id} onClick={() => setActiveModuleId(m.id)}>{m.name}</Pill>)}
+        <div className="flex flex-col gap-2.5 sm:flex-row">
+          <PasswordInput
+            value={apiKeyInput}
+            onChange={(e) => setApiKeyInput(e.target.value)}
+            placeholder={apiKeySaved ? '•••••••••••••••••••••••••••• (saved)' : 'AIza…'}
+            wrapperClassName="flex-1"
+            className="rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 font-mono text-[13px] text-app-ink placeholder:text-app-inkFaint"
+          />
+          <button
+            type="button"
+            onClick={handleSaveApiKey}
+            className="rounded-[10px] bg-violet px-4.5 px-[18px] py-2.5 text-[13px] font-bold text-[#1a1230]"
+          >
+            Save key
+          </button>
+        </div>
+        <div className="mt-2.5 text-[11.5px] text-app-inkFaint">
+          One key powers every module below — stored encrypted server-side, never sent back to the client. Set here
+          once; each module below only configures persona, prompt and quota.
+        </div>
+        <div className="mt-2 text-[11.5px] text-gold">
+          Not yet wired to a backend — saving here only updates this screen. Persisting it needs a server-side Edge
+          Function (the underlying table has no client-writable policy by design).
+        </div>
       </div>
 
-      {config && (
-        <form onSubmit={saveConfig} className="flex flex-col gap-3 max-w-md">
-          <Input label="Persona name" value={config.persona_name} onChange={(e) => setConfig({ ...config, persona_name: e.target.value })} />
-          <label className="block text-left">
-            <span className="block text-xs text-app-inkSoft mb-1.5">System prompt</span>
-            <textarea
-              value={config.system_prompt}
-              onChange={(e) => setConfig({ ...config, system_prompt: e.target.value })}
-              className="w-full rounded-xl bg-app-panel2 border border-app-border px-4 py-3 text-sm"
-              rows={4}
-            />
-          </label>
-          <label className="block text-left">
-            <span className="block text-xs text-app-inkSoft mb-1.5">Model</span>
-            <select value={config.model} onChange={(e) => setConfig({ ...config, model: e.target.value })} className="rounded-xl bg-app-panel2 border border-app-border px-4 py-3 text-sm">
+      <div className="mb-5 flex flex-wrap gap-2.5">
+        {AI_MODULE_TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setAiModule(t.id)}
+            className={`rounded-pill border px-4 py-2.5 text-[12.5px] font-bold ${
+              aiModule === t.id ? 'border-violet bg-violet/[.15] text-violet' : 'border-app-border bg-app-panel2 text-app-inkSoft'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex max-w-[640px] flex-col gap-4 rounded-2xl border border-app-border bg-app-panel p-6">
+        <label className="text-xs font-semibold text-app-inkSoft">
+          Persona name
+          <input
+            value={config.persona}
+            onChange={(e) => saveAiConfig(aiModule, { persona: e.target.value })}
+            className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13.5px] text-app-ink"
+          />
+        </label>
+        <label className="text-xs font-semibold text-app-inkSoft">
+          System prompt
+          <textarea
+            value={config.prompt}
+            onChange={(e) => saveAiConfig(aiModule, { prompt: e.target.value })}
+            rows={5}
+            className="mt-1.5 block w-full resize-y rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
+          />
+        </label>
+        <div className="flex flex-col gap-3.5 sm:flex-row">
+          <label className="flex-1 text-xs font-semibold text-app-inkSoft">
+            Model
+            <select
+              value={config.model}
+              onChange={(e) => saveAiConfig(aiModule, { model: e.target.value })}
+              className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
+            >
               <option value="gemini-2.5-flash">gemini-2.5-flash</option>
               <option value="gemini-2.5-pro">gemini-2.5-pro</option>
             </select>
           </label>
-          <Input label="Daily quota/user" type="number" value={config.daily_quota} onChange={(e) => setConfig({ ...config, daily_quota: Number(e.target.value) })} />
-          <Button type="submit">Save configuration</Button>
-        </form>
-      )}
+          <label className="flex-1 text-xs font-semibold text-app-inkSoft">
+            Daily quota / user
+            <input
+              type="number"
+              value={config.quota}
+              onChange={(e) => saveAiConfig(aiModule, { quota: parseInt(e.target.value) || 0 })}
+              className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
+            />
+          </label>
+        </div>
+        <button
+          type="button"
+          onClick={() => confirmSaveAiConfig(aiModule)}
+          className="mt-1 self-start rounded-[11px] bg-primary px-5.5 px-[22px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+        >
+          Save configuration
+        </button>
+      </div>
     </div>
   )
 }

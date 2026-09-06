@@ -1,132 +1,245 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-import { useAuth } from '../context/AuthContext'
-import BottomTabBar from '../components/layout/BottomTabBar'
-import Icon from '../components/Icon'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import AppShell from '../components/AppShell.jsx'
+import Icon from '../components/Icon.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { supabase } from '../lib/supabase.js'
+
+// No real Gemini/Edge Function wired yet — the Ustaz's replies here are
+// canned, not generated. Everything else (which modules are unlocked, the
+// persona name, the daily quota) is real, read from the same tables Admin's
+// AI console manages, so the mock at least reflects real configuration.
+const MOCK_REPLIES = [
+  "Good question! Let's break that down together — could you tell me which word you're unsure about?",
+  'Right, that\'s a common one for learners. Try saying it out loud a few times — repetition really helps with Arabic.',
+  "You're on the right track! Take a look at the dialogue in your current unit for more examples like this.",
+  'Great effort! One tip: pay attention to the vowel marks (harakat) — they change the meaning quite a bit.',
+  "Let's practice this together. Can you use it in a short sentence?",
+]
+
+function pickReply() {
+  return MOCK_REPLIES[Math.floor(Math.random() * MOCK_REPLIES.length)]
+}
 
 export default function AiUstaz() {
   const { user } = useAuth()
-  const [modules, setModules] = useState([])
-  const [activeModuleId, setActiveModuleId] = useState(null)
-  const [chats, setChats] = useState({}) // { [moduleId]: [{role, text}] }
-  const [input, setInput] = useState('')
-  const [quota, setQuota] = useState({ used: 0, total: 60 })
-  const [sending, setSending] = useState(false)
+  const navigate = useNavigate()
+  const [modules, setModules] = useState(null) // null = loading
+  const [moduleId, setModuleId] = useState('')
+  const [chats, setChats] = useState({})
+  const [usedByModule, setUsedByModule] = useState({})
+  const [draft, setDraft] = useState('')
+  const [typing, setTyping] = useState(false)
+  const scrollRef = useRef(null)
 
   useEffect(() => {
+    if (!user?.id) return
+    let active = true
+
     async function load() {
-      const { data: userModules } = await supabase
+      const { data: activated, error: activatedError } = await supabase
         .from('user_modules')
-        .select('modules(id, name, slug)')
+        .select('modules(id, slug, name)')
         .eq('user_id', user.id)
-      const list = (userModules ?? []).map((um) => um.modules).filter(Boolean)
+      if (activatedError) {
+        console.error('Failed to load activated modules', activatedError)
+        if (active) setModules([])
+        return
+      }
+
+      const { data: configs } = await supabase
+        .from('module_ai_config')
+        .select('module_id, persona_name, daily_quota, modules(slug)')
+
+      const configBySlug = {}
+      for (const c of configs || []) {
+        if (c.modules) configBySlug[c.modules.slug] = { persona: c.persona_name, quota: c.daily_quota }
+      }
+
+      const list = (activated || [])
+        .filter((row) => row.modules)
+        .map((row) => ({
+          id: row.modules.slug,
+          name: row.modules.name,
+          persona: configBySlug[row.modules.slug]?.persona || 'Ustaz',
+          limit: configBySlug[row.modules.slug]?.quota || 60,
+        }))
+
+      if (!active) return
       setModules(list)
-      setActiveModuleId(list[0]?.id ?? null)
+      if (list.length > 0) {
+        setModuleId(list[0].id)
+        setChats({ [list[0].id]: [{ from: 'them', text: `Assalamualaikum! I'm ${list[0].persona}. What are you working on today?` }] })
+      }
     }
-    if (user) load()
-  }, [user])
+
+    load()
+    return () => {
+      active = false
+    }
+  }, [user?.id])
 
   useEffect(() => {
-    if (!activeModuleId || !user) return
-    async function loadQuota() {
-      const today = new Date().toISOString().slice(0, 10)
-      const [{ data: usage }, { data: config }] = await Promise.all([
-        supabase.from('ai_usage_log').select('message_count').eq('user_id', user.id).eq('module_id', activeModuleId).eq('date', today).maybeSingle(),
-        supabase.from('module_ai_config').select('daily_quota').eq('module_id', activeModuleId).single(),
-      ])
-      setQuota({ used: usage?.message_count ?? 0, total: config?.daily_quota ?? 60 })
-    }
-    loadQuota()
-  }, [activeModuleId, user])
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+  }, [chats, moduleId, typing])
 
-  const activeModule = modules.find((m) => m.id === activeModuleId)
-  const messages = chats[activeModuleId] ?? []
+  const currentModule = modules?.find((m) => m.id === moduleId)
+  const messages = chats[moduleId] || []
+  const used = usedByModule[moduleId] || 0
+  const quotaReached = currentModule && used >= currentModule.limit
+  const quotaPct = currentModule ? Math.round((used / currentModule.limit) * 100) : 0
 
-  async function sendMessage(e) {
-    e.preventDefault()
-    if (!input.trim() || !activeModuleId) return
-    const text = input
-    setInput('')
-    setChats((c) => ({ ...c, [activeModuleId]: [...(c[activeModuleId] ?? []), { role: 'user', text }] }))
-    setSending(true)
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-ustaz-chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
-        body: JSON.stringify({ module_id: activeModuleId, message: text }),
-      })
-      const data = await res.json()
-      setChats((c) => ({
-        ...c,
-        [activeModuleId]: [...(c[activeModuleId] ?? []), { role: 'assistant', text: res.ok ? data.reply : `Error: ${data.error}` }],
+  function switchModule(id) {
+    setModuleId(id)
+    if (!chats[id]) {
+      const m = modules.find((mod) => mod.id === id)
+      setChats((prev) => ({
+        ...prev,
+        [id]: [{ from: 'them', text: `Assalamualaikum! I'm ${m.persona}. What are you working on today?` }],
       }))
-      setQuota((q) => ({ ...q, used: q.used + 1 }))
-    } catch {
-      setChats((c) => ({ ...c, [activeModuleId]: [...(c[activeModuleId] ?? []), { role: 'assistant', text: 'Failed to reach AI Ustaz. Try again later.' }] }))
-    } finally {
-      setSending(false)
     }
   }
 
-  if (!activeModuleId) {
+  function send(e) {
+    e.preventDefault()
+    if (!draft.trim() || quotaReached) return
+    const text = draft.trim()
+    setChats((prev) => ({ ...prev, [moduleId]: [...(prev[moduleId] || []), { from: 'me', text }] }))
+    setDraft('')
+    setUsedByModule((prev) => ({ ...prev, [moduleId]: (prev[moduleId] || 0) + 1 }))
+    setTyping(true)
+    setTimeout(() => {
+      setChats((prev) => ({ ...prev, [moduleId]: [...(prev[moduleId] || []), { from: 'them', text: pickReply() }] }))
+      setTyping(false)
+    }, 700 + Math.random() * 500)
+  }
+
+  if (modules === null) {
     return (
-      <div className="app-frame items-center justify-center px-5 text-center">
-        <Icon name="chatting-01" size={40} className="text-app-violet mb-3" />
-        <p className="text-app-inkSoft">Activate a module to chat with its AI Ustaz.</p>
-        <BottomTabBar />
-      </div>
+      <AppShell>
+        <div className="p-5 text-sm text-app-inkFaint">Loading…</div>
+      </AppShell>
+    )
+  }
+
+  if (modules.length === 0) {
+    return (
+      <AppShell>
+        <div className="flex items-center gap-3 px-5 pb-1.5 pt-5.5 pt-[22px]">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="flex h-9 w-9 items-center justify-center rounded-[11px] border border-app-border bg-app-panel2"
+          >
+            <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
+          </button>
+          <div className="font-sora text-base font-extrabold">AI Ustaz</div>
+        </div>
+        <div className="mx-5 mt-2 rounded-2xl border border-app-border bg-app-panel px-4 py-6 text-center">
+          <Icon name="sparkles" size={22} className="mx-auto mb-2.5 text-violet" />
+          <div className="mb-1 text-[14px] font-bold">No module activated yet</div>
+          <div className="mb-4 text-[12.5px] text-app-inkSoft">
+            Activate a module to unlock its AI Ustaz.
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/activate')}
+            className="rounded-xl bg-primary px-5 py-2.5 text-[13px] font-bold text-[#0B2A4A]"
+          >
+            Enter code
+          </button>
+        </div>
+      </AppShell>
     )
   }
 
   return (
-    <div className="app-frame">
-      <header className="px-5 pt-6 pb-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2 text-app-violet font-semibold">
-            <Icon name="chatting-01" /> {activeModule?.name}
+    <AppShell>
+      <div className="border-b border-app-border px-5 pb-3.5 pt-5">
+        <div className="mb-3.5 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[11px] border border-app-border bg-app-panel2"
+          >
+            <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
+          </button>
+          <div className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-[10px] bg-violet/[.15]">
+            <Icon name="sparkles" size={17} className="text-violet" />
           </div>
-          <select
-            value={activeModuleId}
-            onChange={(e) => setActiveModuleId(e.target.value)}
-            className="bg-app-panel2 border border-app-border rounded-pill text-xs px-3 py-1.5"
-          >
-            {modules.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-          </select>
+          <div className="font-sora text-[15px] font-extrabold">{currentModule.persona}</div>
         </div>
-        <div className="h-1.5 bg-app-panel2 rounded-pill">
-          <div className="h-1.5 bg-app-violet rounded-pill" style={{ width: `${Math.min(100, (quota.used / quota.total) * 100)}%` }} />
-        </div>
-        <p className="text-xs text-app-inkFaint mt-1">{quota.used}/{quota.total} messages today</p>
-      </header>
 
-      <main className="flex-1 px-5 pb-3 flex flex-col gap-3 overflow-y-auto">
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            dir={m.role === 'user' ? 'auto' : 'ltr'}
-            className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
-              m.role === 'user' ? 'self-end bg-app-primary/20' : 'self-start bg-app-panel2'
-            }`}
-          >
-            {m.text}
+        <div className="mb-3.5 flex items-center gap-2">
+          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-app-panel2">
+            <div className="h-full rounded-full bg-violet" style={{ width: `${quotaPct}%` }} />
+          </div>
+          <div className="flex-shrink-0 text-[11px] font-bold text-violet">
+            {used}/{currentModule.limit}
+          </div>
+        </div>
+
+        <select
+          value={moduleId}
+          onChange={(e) => switchModule(e.target.value)}
+          className="w-full rounded-[11px] border border-app-border bg-app-panel2 px-3 py-2.5 text-[13px] font-semibold text-app-ink"
+        >
+          {modules.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.name} · {m.persona}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div ref={scrollRef} className="flex flex-1 flex-col gap-3.5 overflow-y-auto px-5 py-4.5 py-[18px]">
+        {messages.map((msg, i) => (
+          <div key={i} className={`max-w-[82%] ${msg.from === 'me' ? 'self-end' : 'self-start'}`}>
+            <div
+              dir="auto"
+              className={`px-4 py-2.5 text-[13.5px] leading-relaxed ${
+                msg.from === 'me'
+                  ? 'rounded-[14px_14px_4px_14px] bg-primary/[.16]'
+                  : 'rounded-[14px_14px_14px_4px] bg-app-panel2'
+              }`}
+            >
+              {msg.text}
+            </div>
           </div>
         ))}
-      </main>
+        {typing && (
+          <div className="max-w-[82%] self-start">
+            <div className="flex items-center gap-1 rounded-[14px_14px_14px_4px] bg-app-panel2 px-4 py-3">
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-app-inkFaint [animation-delay:-0.2s]" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-app-inkFaint" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-app-inkFaint [animation-delay:0.2s]" />
+            </div>
+          </div>
+        )}
+      </div>
 
-      <form onSubmit={sendMessage} className="px-5 pb-5 flex gap-2">
+      {quotaReached && (
+        <div className="px-5 pb-2 text-center text-[12px] font-semibold text-danger">
+          Daily quota reached for {currentModule.persona}. Come back tomorrow!
+        </div>
+      )}
+
+      <form onSubmit={send} className="flex items-center gap-2.5 border-t border-app-border px-4 pb-5 pt-3.5">
         <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          disabled={quotaReached}
           placeholder="Ask your Ustaz…"
-          className="flex-1 bg-app-panel2 border border-app-border rounded-pill px-4 py-3 text-sm"
+          className="flex-1 rounded-pill border border-app-border bg-app-panel2 px-4 py-3 text-[13.5px] text-app-ink placeholder:text-app-inkFaint disabled:opacity-50"
         />
-        <button disabled={sending} className="w-11 h-11 rounded-full bg-app-primary text-app-bg flex items-center justify-center shrink-0 disabled:opacity-50">
-          <Icon name="sent" size={18} />
+        <button
+          type="submit"
+          disabled={quotaReached}
+          className="flex h-[42px] w-[42px] flex-shrink-0 items-center justify-center rounded-full bg-violet disabled:opacity-50"
+        >
+          <Icon name="sent" size={17} className="text-[#1a1230]" />
         </button>
       </form>
-
-      <BottomTabBar />
-    </div>
+    </AppShell>
   )
 }
