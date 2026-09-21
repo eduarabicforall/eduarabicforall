@@ -6,13 +6,6 @@ export const MODULE_TREE_NAV = [
   { id: 'grammar', name: 'Grammar module' },
 ]
 
-export const MODULE_STATS = [
-  { name: 'Al Quran', pct: 78, count: 1204 },
-  { name: 'Pemula', pct: 62, count: 960 },
-  { name: 'Kerjaya', pct: 34, count: 528 },
-  { name: 'Anakku', pct: 21, count: 326 },
-]
-
 export const ORDER_FILTERS = [
   { id: 'all', label: 'All orders' },
   { id: 'pending', label: 'Pending' },

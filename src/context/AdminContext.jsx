@@ -269,6 +269,21 @@ export function AdminProvider({ children }) {
     }
   }
 
+  // Products and codes point at the module, so their lists are refreshed too.
+  // Returns true on success so the caller can navigate away from the
+  // now-deleted module's page.
+  async function removeModule(moduleDbId) {
+    try {
+      await moduleTreeStore.removeModule(moduleDbId)
+      await Promise.all([refreshProducts(), refreshCodes(), refreshAiConfigs()])
+      showToast('Module deleted.')
+      return true
+    } catch (err) {
+      showToast(err.message || 'Could not delete module.')
+      return false
+    }
+  }
+
   async function addAudio(unitId, track) {
     try {
       await moduleTreeStore.addAudio(unitId, track)
@@ -524,6 +539,7 @@ export function AdminProvider({ children }) {
       removeAdmin,
       moduleTree,
       moduleTreeLoading: moduleTreeStore.loading,
+      removeModule,
       addUnit,
       addAudio,
       updateUnitTitle,

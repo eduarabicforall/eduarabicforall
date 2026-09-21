@@ -106,6 +106,15 @@ export function ModuleTreeProvider({ children }) {
     return data
   }
 
+  // `.select()` so a delete blocked by RLS (0 rows, no error) is reported
+  // instead of looking like it worked.
+  async function removeModule(moduleDbId) {
+    const { data, error } = await supabase.from('modules').delete().eq('id', moduleDbId).select('id')
+    if (error) throw error
+    if (!data?.length) throw new Error('Module was not deleted — check your permissions.')
+    await refresh()
+  }
+
   async function addUnit(moduleDbId) {
     const { data: existing } = await supabase.from('units').select('id').eq('module_id', moduleDbId)
     const orderIndex = existing?.length || 0
@@ -170,6 +179,7 @@ export function ModuleTreeProvider({ children }) {
         loading,
         refresh,
         addModule,
+        removeModule,
         addUnit,
         addAudio,
         updateUnitTitle,

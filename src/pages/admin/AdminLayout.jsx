@@ -56,39 +56,39 @@ function SidebarContent({ user, onNavigate }) {
 
   return (
     <div className="flex h-full flex-col p-3.5">
-      <div className="flex items-center gap-2 px-2 pb-5.5 pb-[22px] pt-1.5">
+      <div className="flex flex-shrink-0 items-center gap-2 px-2 pb-5.5 pb-[22px] pt-1.5">
         <img src="/logo.png" alt="EduArabic for All" className="h-6 w-auto" />
         <span className="text-[11px] font-bold text-app-inkFaint">Admin</span>
       </div>
 
-      {NAV_ITEMS.map((item) => {
-        const subItems = item.to === '/admin/materials' ? materialsSubItems : item.subItems
-        return (
-          <div key={item.to}>
-            <NavLink to={item.to} end={item.end} className={linkClass} onClick={onNavigate}>
-              <Icon name={item.icon} size={17} />
-              {item.label}
-            </NavLink>
-            {subItems && (
-              <div className="ml-5 mb-1.5 flex flex-col gap-px border-l border-app-border pl-3">
-                {subItems.map((sub) => (
-                  <NavLink key={sub.to} to={sub.to} end={sub.end} className={subLinkClass} onClick={onNavigate}>
-                    <Icon name="folder-01" size={13} className="flex-shrink-0" />
-                    {sub.label}
-                  </NavLink>
-                ))}
-              </div>
-            )}
-          </div>
-        )
-      })}
-
-      <div className="flex-1" />
+      <div className="scrollbar-none -mx-1 min-h-0 flex-1 overflow-y-auto px-1">
+        {NAV_ITEMS.map((item) => {
+          const subItems = item.to === '/admin/materials' ? materialsSubItems : item.subItems
+          return (
+            <div key={item.to}>
+              <NavLink to={item.to} end={item.end} className={linkClass} onClick={onNavigate}>
+                <Icon name={item.icon} size={17} />
+                {item.label}
+              </NavLink>
+              {subItems && (
+                <div className="ml-5 mb-1.5 flex flex-col gap-px border-l border-app-border pl-3">
+                  {subItems.map((sub) => (
+                    <NavLink key={sub.to} to={sub.to} end={sub.end} className={subLinkClass} onClick={onNavigate}>
+                      <Icon name="folder-01" size={13} className="flex-shrink-0" />
+                      {sub.label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
 
       <NavLink
         to="/dashboard"
         onClick={onNavigate}
-        className="mb-2.5 flex items-center gap-3 rounded-[11px] border border-primary/40 bg-primary/[.14] px-3 py-2.5 text-[13px] font-bold text-primary"
+        className="mb-2.5 mt-2.5 flex flex-shrink-0 items-center gap-3 rounded-[11px] border border-primary/40 bg-primary/[.14] px-3 py-2.5 text-[13px] font-bold text-primary"
       >
         <Icon name="home-01" size={17} />
         Switch to student view
@@ -98,7 +98,7 @@ function SidebarContent({ user, onNavigate }) {
         to="/admin/profile"
         onClick={onNavigate}
         className={({ isActive }) =>
-          `mt-2.5 flex items-center gap-2.5 rounded-[11px] border-t border-app-border p-3 ${
+          `mt-2.5 flex flex-shrink-0 items-center gap-2.5 rounded-[11px] border-t border-app-border p-3 ${
             isActive ? 'bg-primary/[.14] text-primary' : 'text-app-ink'
           }`
         }
@@ -145,8 +145,8 @@ export default function AdminLayout() {
         </button>
       </div>
 
-      {/* Desktop sidebar — its own scroll region, stays put while content scrolls */}
-      <div className="hidden border-r border-app-border md:block md:h-screen md:overflow-y-auto">
+      {/* Desktop sidebar — only the nav list scrolls; logo, student-view and profile stay pinned */}
+      <div className="hidden border-r border-app-border md:block md:h-screen md:overflow-hidden">
         <SidebarContent user={user} />
       </div>
 
