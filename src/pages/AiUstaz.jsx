@@ -22,6 +22,13 @@ const FALLBACK_ERROR = "Sorry, I couldn't reply just now. Please try again in a 
 // The function counts usage per UTC day, so the client reads the same day.
 const todayUtc = () => new Date().toISOString().slice(0, 10)
 
+const greeting = (m) => ({
+  from: 'them',
+  text: `Assalamualaikum! I'm ${m.persona}. What are you working on today?`,
+})
+
+const HISTORY_LIMIT = 60
+
 const vocabKey = (kind, arabic) => `${kind}|${arabic}`
 
 // A reply whose word / example sentences can be saved to My Vocab: each line that
@@ -68,7 +75,26 @@ export default function AiUstaz() {
   const [savedKeys, setSavedKeys] = useState(() => new Set())
   const [savingKeys, setSavingKeys] = useState(() => new Set())
   const [vocabError, setVocabError] = useState('')
+  const [historyLoading, setHistoryLoading] = useState(false)
   const scrollRef = useRef(null)
+
+  // The saved conversation for one module: the greeting, then the last messages
+  // from the learner's account (written by the ai-ustaz-chat function).
+  async function fetchHistory(mod) {
+    const { data, error } = await supabase
+      .from('ai_chat_messages')
+      .select('role, content')
+      .eq('user_id', user.id)
+      .eq('module_id', mod.dbId)
+      .order('created_at', { ascending: false })
+      .limit(HISTORY_LIMIT)
+    if (error) console.error('Failed to load chat history', error)
+    const past = (data || []).reverse().map((row) => ({
+      from: row.role === 'user' ? 'me' : 'them',
+      text: row.content,
+    }))
+    return [greeting(mod), ...past]
+  }
 
   useEffect(() => {
     if (!user?.id) return
@@ -116,12 +142,14 @@ export default function AiUstaz() {
         if (m) usedBySlug[m.id] = row.message_count
       }
 
+      const firstChat = list.length > 0 ? await fetchHistory(list[0]) : null
+
       if (!active) return
       setModules(list)
       setUsedByModule(usedBySlug)
       if (list.length > 0) {
         setModuleId(list[0].id)
-        setChats({ [list[0].id]: [{ from: 'them', text: `Assalamualaikum! I'm ${list[0].persona}. What are you working on today?` }] })
+        setChats({ [list[0].id]: firstChat })
       }
     }
 
@@ -180,20 +208,19 @@ export default function AiUstaz() {
   const quotaReached = currentModule && used >= currentModule.limit
   const quotaPct = currentModule ? Math.round((used / currentModule.limit) * 100) : 0
 
-  function switchModule(id) {
+  async function switchModule(id) {
     setModuleId(id)
-    if (!chats[id]) {
-      const m = modules.find((mod) => mod.id === id)
-      setChats((prev) => ({
-        ...prev,
-        [id]: [{ from: 'them', text: `Assalamualaikum! I'm ${m.persona}. What are you working on today?` }],
-      }))
-    }
+    if (chats[id]) return
+    const m = modules.find((mod) => mod.id === id)
+    setHistoryLoading(true)
+    const history = await fetchHistory(m)
+    setChats((prev) => (prev[id] ? prev : { ...prev, [id]: history }))
+    setHistoryLoading(false)
   }
 
   async function send(e) {
     e.preventDefault()
-    if (!draft.trim() || quotaReached || typing) return
+    if (!draft.trim() || quotaReached || typing || historyLoading) return
     const text = draft.trim()
     const targetId = moduleId
     const target = currentModule
@@ -356,7 +383,7 @@ export default function AiUstaz() {
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          disabled={quotaReached}
+          disabled={quotaReached || historyLoading}
           maxLength={1000}
           placeholder="Ask your Ustaz…"
           className="flex-1 rounded-pill border border-app-border bg-app-panel2 px-4 py-3 text-[13.5px] text-app-ink placeholder:text-app-inkFaint disabled:opacity-50"

@@ -178,5 +178,15 @@ Deno.serve(async (req: Request) => {
     message_count: (usage?.message_count ?? 0) + 1,
   }, { onConflict: "user_id,module_id,date" });
 
-  return json({ reply: tidyReply(reply), used: (usage?.message_count ?? 0) + 1, limit: config.daily_quota });
+  // Keep the conversation on the learner's account. Explicit timestamps so the
+  // question always sorts before its answer.
+  const finalReply = tidyReply(reply);
+  const now = Date.now();
+  const { error: saveError } = await admin.from("ai_chat_messages").insert([
+    { user_id: user.id, module_id, role: "user", content: message, created_at: new Date(now).toISOString() },
+    { user_id: user.id, module_id, role: "assistant", content: finalReply, created_at: new Date(now + 1).toISOString() },
+  ]);
+  if (saveError) console.error("ai-ustaz-chat could not save the conversation", saveError.message);
+
+  return json({ reply: finalReply, used: (usage?.message_count ?? 0) + 1, limit: config.daily_quota });
 });

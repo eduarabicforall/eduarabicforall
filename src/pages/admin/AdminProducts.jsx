@@ -9,7 +9,7 @@ import R2MockUpload from '../../components/R2MockUpload.jsx'
 // missing from the original design canvas mock (name/price/stock only). Image
 // is a pasted URL (R2/CDN) rather than a file upload, matching how audio and
 // video are handled elsewhere in Admin.
-const emptyDraft = { name: '', moduleId: '', price: '', stock: '', description: '', imageUrl: '', imageUrls: [] }
+const emptyDraft = { name: '', moduleId: '', price: '', stock: '', description: '', includedText: '', imageUrl: '', imageUrls: [] }
 
 export default function AdminProducts() {
   const { products, productsLoading, addProduct, updateProduct, deleteProduct, showToast, moduleTree } = useAdmin()
@@ -36,13 +36,23 @@ export default function AdminProducts() {
       price: p.price,
       stock: p.stock,
       description: p.description || '',
+      includedText: (p.included || []).join('\n'),
       imageUrl: p.imageUrl || '',
       imageUrls: p.imageUrls || [],
     })
   }
 
   function saveEdit() {
-    updateProduct(editingId, { ...draft, imageUrls: draft.imageUrls.map((u) => u.trim()).filter(Boolean) })
+    const { includedText, ...rest } = draft
+    updateProduct(editingId, {
+      ...rest,
+      imageUrls: draft.imageUrls.map((u) => u.trim()).filter(Boolean),
+      included: includedText
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .slice(0, 8),
+    })
     setEditingId(null)
     setDraft(emptyDraft)
     showToast('Product saved.')
@@ -264,6 +274,20 @@ export default function AdminProducts() {
               rows={3}
               className="mt-1 block w-full resize-none rounded-[9px] border border-app-border bg-app-panel2 px-2.5 py-2 text-[13px] text-app-ink"
             />
+          </label>
+
+          <label className="mb-3.5 block text-xs font-semibold text-app-inkSoft">
+            What's included (shown at checkout)
+            <textarea
+              value={draft.includedText}
+              onChange={(e) => setDraft((d) => ({ ...d, includedText: e.target.value }))}
+              rows={4}
+              placeholder={'One line per point, e.g.\nInteractive physical book with illustrated dialogues\nAudio Library for self-paced learning'}
+              className="mt-1 block w-full resize-none rounded-[9px] border border-app-border bg-app-panel2 px-2.5 py-2 text-[13px] text-app-ink placeholder:text-app-inkFaint"
+            />
+            <span className="mt-1 block text-[11px] font-normal text-app-inkFaint">
+              Each line becomes a ✓ point. Leave empty to show the standard list.
+            </span>
           </label>
 
           <div className="mb-3.5 flex gap-2.5">

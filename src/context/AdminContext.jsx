@@ -50,7 +50,7 @@ async function loadAdmins() {
 async function loadProducts() {
   const { data, error } = await supabase
     .from('products')
-    .select('id, name, description, price, image_url, image_urls, module_id, stock, on_sale, is_active, modules(name)')
+    .select('id, name, description, price, image_url, image_urls, module_id, stock, on_sale, is_active, included, modules(name)')
     .order('created_at')
   if (error) throw error
   return data.map((p) => ({
@@ -60,6 +60,7 @@ async function loadProducts() {
     price: String(p.price),
     imageUrl: p.image_url || '',
     imageUrls: p.image_urls || [],
+    included: p.included || [],
     moduleId: p.module_id,
     module: p.modules?.name || '',
     stock: p.stock,
@@ -480,6 +481,7 @@ export function AdminProvider({ children }) {
       if (patch.price !== undefined) dbPatch.price = patch.price
       if (patch.imageUrl !== undefined) dbPatch.image_url = patch.imageUrl
       if (patch.imageUrls !== undefined) dbPatch.image_urls = patch.imageUrls
+      if (patch.included !== undefined) dbPatch.included = patch.included.length ? patch.included : null
       if (patch.moduleId !== undefined) dbPatch.module_id = patch.moduleId
       if (patch.stock !== undefined) dbPatch.stock = patch.stock
       if (patch.onSale !== undefined) dbPatch.on_sale = patch.onSale

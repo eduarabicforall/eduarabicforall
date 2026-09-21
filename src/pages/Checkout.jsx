@@ -11,7 +11,8 @@ const SHIPPING = 6
 const inputClass =
   'rounded-[14px] border border-app-border bg-app-panel2 px-4 py-3.5 text-sm text-app-ink placeholder:text-app-inkFaint'
 
-// What's included with every physical module — same claims the landing page makes.
+// Default "what's included" lines — used when a product has none of its own
+// (set per product in Admin → Manage products).
 const INCLUDED = [
   'Physical card & book set, delivered to your door',
   'Audio Library + AI Ustaz unlocked with your activation code',
@@ -83,7 +84,7 @@ export default function Checkout() {
     if (!productId) return
     supabase
       .from('products')
-      .select('id, name, price')
+      .select('id, name, price, included')
       .eq('id', productId)
       .single()
       .then(({ data, error: err }) => {
@@ -249,7 +250,7 @@ export default function Checkout() {
             Physical module · RM{product.price} each
           </div>
           <ul className="flex flex-col gap-2.5">
-            {INCLUDED.map((line) => (
+            {(product.included?.length ? product.included : INCLUDED).map((line) => (
               <li key={line} className="flex items-start gap-2.5 text-[13.5px] font-semibold leading-snug">
                 <Icon name="checkmark-circle-02" size={18} className="mt-px flex-shrink-0 text-[#F1D08A]" />
                 {line}
