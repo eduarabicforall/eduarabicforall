@@ -100,35 +100,45 @@ Deno.serve(async (req: Request) => {
   ].join("\n");
   const systemPrompt = `${guardrails}\n\nModule-specific instructions from the teacher:\n${config.system_prompt ?? ""}`;
 
-  // Google AI Studio keys ("AIza…") use the Generative Language API; the newer
-  // Google Cloud / Vertex AI Express keys ("AQ.…") use the Vertex endpoint.
-  const isVertexKey = String(apiKey).startsWith("AQ.");
-  const endpoint = isVertexKey
-    ? `https://aiplatform.googleapis.com/v1/publishers/google/models/${config.model}:generateContent?key=${apiKey}`
-    : `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${apiKey}`;
+  // Google AI Studio keys are sent to the Generative Language API. Newer keys
+  // ("AQ.…") can come from either AI Studio or Vertex AI Express mode, so for
+  // those we try AI Studio first and fall back to the Vertex endpoint.
+  const studioEndpoint =
+    `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${apiKey}`;
+  const vertexEndpoint =
+    `https://aiplatform.googleapis.com/v1/publishers/google/models/${config.model}:generateContent?key=${apiKey}`;
+  const endpoints = String(apiKey).startsWith("AQ.") ? [studioEndpoint, vertexEndpoint] : [studioEndpoint];
+  const requestBody = JSON.stringify({
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    contents: [{ role: "user", parts: [{ text: message }] }],
+  });
 
   let reply: string | undefined;
   let upstream: { status: number; message: string } | undefined;
-  try {
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: message }] }],
-      }),
-    });
-    const data = await res.json().catch(() => null);
-    reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!reply) {
+  const failures: string[] = [];
+  for (const endpoint of endpoints) {
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: requestBody,
+      });
+      const data = await res.json().catch(() => null);
+      reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (reply) break;
       const raw = data?.error?.message ??
         (data?.promptFeedback?.blockReason ? `blocked: ${data.promptFeedback.blockReason}` : "empty reply");
-      upstream = { status: res.status, message: String(raw).split(String(apiKey)).join("[key]").slice(0, 300) };
-      console.error("ai-ustaz-chat upstream failure", upstream.status, upstream.message);
+      const via = endpoint === vertexEndpoint ? "vertex" : "ai-studio";
+      const message = `[${via}] ${String(raw).split(String(apiKey)).join("[key]").slice(0, 200)}`;
+      failures.push(message);
+      upstream = { status: upstream?.status ?? res.status, message: failures.join(" | ") };
+      console.error("ai-ustaz-chat upstream failure", res.status, message);
+    } catch (err) {
+      console.error("ai-ustaz-chat upstream unreachable", String(err));
+      if (endpoint === endpoints[endpoints.length - 1] && !upstream) {
+        return json({ error: "upstream_unavailable" }, 502);
+      }
     }
-  } catch (err) {
-    console.error("ai-ustaz-chat upstream unreachable", String(err));
-    return json({ error: "upstream_unavailable" }, 502);
   }
   // No usable reply (blocked, empty, upstream error) — don't spend the learner's quota.
   // Admins also get the upstream reason so setup problems (wrong key, wrong model) are visible.

@@ -103,8 +103,9 @@ export default function AdminAiConsole() {
                 onChange={(e) => saveAiConfig(aiModule, { model: e.target.value })}
                 className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
               >
-                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                <option value="gemini-3.6-flash">gemini-3.6-flash</option>
+                {/* Older models stay selectable only while a module is still set to one. */}
+                {config.model !== 'gemini-3.6-flash' && <option value={config.model}>{config.model}</option>}
               </select>
             </label>
             <label className="flex-1 text-xs font-semibold text-app-inkSoft">

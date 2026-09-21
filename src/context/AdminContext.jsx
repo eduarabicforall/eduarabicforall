@@ -461,7 +461,7 @@ export function AdminProvider({ children }) {
         persona_name: 'Ustaz',
         system_prompt:
           'You are a friendly Arabic tutor for this module. Help learners understand its vocabulary, grammar and dialogues, step by step.',
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.6-flash',
         daily_quota: 60,
       })
       if (aiError) console.error('Could not create the default AI config', aiError)
