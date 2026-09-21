@@ -90,13 +90,42 @@ function HowVisual({ index }) {
   )
 }
 
+// The feature panel rotates between these every FEATURE_ROTATE_MS.
+const FEATURE_ROTATE_MS = 10000
+const FEATURE_SLIDES = [
+  {
+    badge: 'AI Ustaz',
+    title: 'A different Ustaz for',
+    highlight: 'every module',
+    body: 'Ask anything about a topic in your language, then Ai Ustaz will teach you how to use the words and sentences in real situations.',
+    image: '/UstazAi.png',
+    alt: 'AI Ustaz chat teaching Arabic vocabulary and example sentences on two phones',
+  },
+  {
+    badge: 'My Vocab',
+    title: 'Save every new word and sentence',
+    highlight: 'you learn',
+    body: 'Tap Save on any word or sentence from Ai Ustaz and it goes straight into My Vocab, ready to search, review and listen to anytime.',
+    image: '/MyVocab.png',
+    alt: 'My Vocab screen listing saved Arabic sentences with transliteration, meaning and a Listen button',
+  },
+]
+
 export default function Landing() {
   const [openFaq, setOpenFaq] = useState(0)
+  const [featureSlide, setFeatureSlide] = useState(0)
   const [products, setProducts] = useState([])
   const rootRef = useRef(null)
   const modulesScrollRef = useRef(null)
   const [modulesScroll, setModulesScroll] = useState({ prev: false, next: false })
   const navigate = useTransitionNavigate()
+
+  // Auto-advance the feature panel; depending on featureSlide restarts the
+  // 10s timer whenever someone picks a slide by hand.
+  useEffect(() => {
+    const t = setTimeout(() => setFeatureSlide((i) => (i + 1) % FEATURE_SLIDES.length), FEATURE_ROTATE_MS)
+    return () => clearTimeout(t)
+  }, [featureSlide])
 
   // Track whether the modules row overflows and which way it can still scroll,
   // so the arrows / edge fades only show when there really are more products
@@ -388,7 +417,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* AI Ustaz — a dark feature panel; the phone in the middle is the slot for the real app mockup */}
+      {/* AI Ustaz / My Vocab — a dark feature panel that rotates between the two app mockups */}
       <section id="ai" className="px-[4vw] pb-[70px] sm:px-[5vw]">
         <div
           className="gs-reveal relative mx-auto max-w-[1100px] overflow-hidden rounded-[32px] px-6 py-12 text-center sm:rounded-[40px] md:px-14 md:py-16"
@@ -397,30 +426,63 @@ export default function Landing() {
               'radial-gradient(60% 50% at 50% 0%, rgba(61,125,216,.28) 0%, transparent 70%), radial-gradient(50% 40% at 50% 100%, rgba(61,125,216,.22) 0%, transparent 70%), linear-gradient(160deg, #070A14 0%, #0C1D3D 55%, #0A1730 100%)',
           }}
         >
-          <div className="mb-5 inline-flex items-center gap-2.5 rounded-pill border border-white/15 bg-white/[.08] px-4 py-2 text-[12px] font-bold uppercase tracking-[.14em] text-white/90">
-            <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-goldBright" /> AI Ustaz
+          {/* Slides sit on top of each other in one grid cell so the panel keeps the height of the tallest one. */}
+          <div className="grid">
+            {FEATURE_SLIDES.map((slide, i) => (
+              <div
+                key={slide.badge}
+                aria-hidden={i !== featureSlide}
+                className={`col-start-1 row-start-1 transition-all duration-700 motion-reduce:transition-none ${
+                  i === featureSlide ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
+                }`}
+              >
+                <div className="mb-5 inline-flex items-center gap-2.5 rounded-pill border border-white/15 bg-white/[.08] px-4 py-2 text-[12px] font-bold uppercase tracking-[.14em] text-white/90">
+                  <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-goldBright" /> {slide.badge}
+                </div>
+                <h2 className="mx-auto mb-4 max-w-[640px] font-poppins text-[28px] font-extrabold leading-[1.15] text-white sm:text-[36px] md:text-[42px]">
+                  {slide.title}{' '}
+                  <span className="bg-gradient-to-r from-[#FFE27A] via-[#FFC93C] to-[#FFA928] bg-clip-text text-transparent">
+                    {slide.highlight}
+                  </span>
+                </h2>
+                <p className="mx-auto max-w-[560px] text-[15px] leading-[1.7] text-white/75 sm:text-base">{slide.body}</p>
+              </div>
+            ))}
           </div>
-          <h2 className="mx-auto mb-4 max-w-[640px] font-poppins text-[28px] font-extrabold leading-[1.15] text-white sm:text-[36px] md:text-[42px]">
-            A different Ustaz for{' '}
-            <span className="bg-gradient-to-r from-[#FFE27A] via-[#FFC93C] to-[#FFA928] bg-clip-text text-transparent">
-              every module
-            </span>
-          </h2>
-          <p className="mx-auto max-w-[560px] text-[15px] leading-[1.7] text-white/75 sm:text-base">
-            Ask anything about a topic in your language, then Ai Ustaz will teach you how to use the words and
-            sentences in real situations.
-          </p>
 
-          {/* PHONE MOCKUP — /Testmockup.png is a temporary placeholder; replace the file (or the src) with the real AI Ustaz mockup. */}
-          <img
-            src="/Testmockup.png"
-            alt="EduArabic for All app preview"
-            width={2000}
-            height={2000}
-            loading="lazy"
-            decoding="async"
-            className="mx-auto -my-2 mt-6 h-auto w-full max-w-[420px] drop-shadow-[0_24px_40px_rgba(0,0,0,.45)] sm:max-w-[520px] md:max-w-[560px]"
-          />
+          <div className="mx-auto -my-2 mt-6 grid w-full max-w-[420px] sm:max-w-[520px] md:max-w-[560px]">
+            {FEATURE_SLIDES.map((slide, i) => (
+              <img
+                key={slide.image}
+                src={slide.image}
+                alt={slide.alt}
+                aria-hidden={i !== featureSlide}
+                width={2000}
+                height={2000}
+                loading="lazy"
+                decoding="async"
+                className={`col-start-1 row-start-1 h-auto w-full drop-shadow-[0_24px_40px_rgba(0,0,0,.45)] transition-all duration-700 motion-reduce:transition-none ${
+                  i === featureSlide ? 'translate-y-0 scale-100 opacity-100' : 'translate-y-3 scale-[.97] opacity-0'
+                }`}
+              />
+            ))}
+          </div>
+
+          <div className="mt-2 flex justify-center gap-2" role="tablist" aria-label="Feature">
+            {FEATURE_SLIDES.map((slide, i) => (
+              <button
+                key={slide.badge}
+                type="button"
+                role="tab"
+                aria-selected={i === featureSlide}
+                aria-label={slide.badge}
+                onClick={() => setFeatureSlide(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === featureSlide ? 'w-6 bg-goldBright' : 'w-2 bg-white/30'
+                }`}
+              />
+            ))}
+          </div>
 
           <div className="mt-10">
             <TransitionLink
