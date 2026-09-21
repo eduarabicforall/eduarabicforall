@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 
 // No notifications table/backend exists yet — this is an honest empty state
 // rather than fabricated sample notifications.
 export default function Notifications() {
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
 
   return (
     <AppShell>

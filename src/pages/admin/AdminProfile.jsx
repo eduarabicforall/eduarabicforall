@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useTransitionNavigate } from '../../components/TransitionNavLink.jsx'
 import PasswordInput from '../../components/PasswordInput.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useAdmin } from '../../context/AdminContext.jsx'
@@ -7,7 +7,7 @@ import { useAdmin } from '../../context/AdminContext.jsx'
 export default function AdminProfile() {
   const { user, signOut } = useAuth()
   const { showToast } = useAdmin()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const [fullName, setFullName] = useState(user?.fullName || 'Admin')
   const [email, setEmail] = useState(user?.email || '')
   const [showChangePassword, setShowChangePassword] = useState(false)

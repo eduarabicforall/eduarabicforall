@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import BottomTabBar from '../components/BottomTabBar.jsx'
 import Icon from '../components/Icon.jsx'
@@ -17,7 +18,7 @@ export default function AudioLibrary() {
   const [playingIndex, setPlayingIndex] = useState(null)
   const [activated, setActivated] = useState(null) // null = checking
   const audioRef = useRef(null)
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const tracks = material?.units[unitIndex]?.tracks || []
 
   useEffect(() => {

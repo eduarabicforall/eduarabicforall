@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { Navigate, useSearchParams } from 'react-router-dom'
+import { TransitionLink, useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import gsap from 'gsap'
 import Icon from '../components/Icon.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
@@ -50,7 +51,7 @@ export default function Auth() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const { user, signIn, signUp } = useAuth()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const cardRef = useRef(null)
   const isFirstViewRender = useRef(true)
 
@@ -126,9 +127,9 @@ export default function Auth() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-app-bg p-10 text-app-ink">
       <div ref={cardRef} className="w-full max-w-[400px]">
-        <Link to="/" className="mb-6 inline-flex items-center gap-1.5 text-[13px] font-semibold text-app-inkSoft">
+        <TransitionLink to="/" className="mb-6 inline-flex items-center gap-1.5 text-[13px] font-semibold text-app-inkSoft">
           <Icon name="arrow-left-01" size={14} /> Back to site
-        </Link>
+        </TransitionLink>
 
         {view === 'signin' && (
           <form onSubmit={handleSignIn} className="flex flex-col gap-4.5 gap-y-[18px]">

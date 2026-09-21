@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
+import { useTransitionNavigate } from '../../components/TransitionNavLink.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog.jsx'
 import Icon from '../../components/Icon.jsx'
 import { useAdmin } from '../../context/AdminContext.jsx'
@@ -302,7 +303,7 @@ export default function AdminMaterials() {
   const { moduleId } = useParams()
   const admin = useAdmin()
   const { moduleTree, addUnit, removeModule } = admin
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
 

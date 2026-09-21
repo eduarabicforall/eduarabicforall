@@ -1,10 +1,11 @@
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 
 export default function CheckoutDone() {
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const { state } = useLocation()
   const { user } = useAuth()
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -23,7 +23,7 @@ function pickReply() {
 
 export default function AiUstaz() {
   const { user } = useAuth()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const [modules, setModules] = useState(null) // null = loading
   const [moduleId, setModuleId] = useState('')
   const [chats, setChats] = useState({})

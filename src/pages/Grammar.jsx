@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import BottomTabBar from '../components/BottomTabBar.jsx'
 import Icon from '../components/Icon.jsx'
@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase.js'
 import { fetchCompletedTopicIds, getTopicStatuses } from '../lib/progress.js'
 
 export default function Grammar() {
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const { user } = useAuth()
   const [rawTopics, setRawTopics] = useState(null)
   const [doneIds, setDoneIds] = useState([])

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import Star from '../components/Star.jsx'
@@ -23,7 +24,7 @@ function Stars({ value, size = 14 }) {
 
 export default function Product() {
   const { productId } = useParams()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const { user } = useAuth()
   const [product, setProduct] = useState(null)
   const [reviews, setReviews] = useState(null)

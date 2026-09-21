@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
@@ -18,7 +18,7 @@ function initials(name) {
 
 export default function Profile() {
   const { user, signOut, refreshUser } = useAuth()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const [fullName, setFullName] = useState(user?.fullName || '')
   const [savingName, setSavingName] = useState(false)
   const [nameMessage, setNameMessage] = useState('')

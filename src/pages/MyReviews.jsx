@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import Star from '../components/Star.jsx'
@@ -125,7 +125,7 @@ function ReviewCard({ product, review, userId, fullName, onSaved }) {
 
 export default function MyReviews() {
   const { user } = useAuth()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const [products, setProducts] = useState(null)
   const [reviews, setReviews] = useState({})
 

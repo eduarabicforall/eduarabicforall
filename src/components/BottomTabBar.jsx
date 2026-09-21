@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import TransitionNavLink from './TransitionNavLink.jsx'
 import Icon from './Icon.jsx'
 
 // Single fixed tab order used on every screen (PRD §6 issue #3 — the design
@@ -13,9 +13,9 @@ const TABS = [
 
 export default function BottomTabBar() {
   return (
-    <div className="sticky bottom-0 mt-auto flex items-center justify-around border-t border-app-border bg-[var(--app-bg-translucent)] px-2.5 pb-5 pt-3.5 backdrop-blur-md md:hidden">
+    <div className="vt-tabbar sticky bottom-0 mt-auto flex items-center justify-around border-t border-app-border bg-[var(--app-bg-translucent)] px-2.5 pb-5 pt-3.5 backdrop-blur-md md:hidden">
       {TABS.map((tab) => (
-        <NavLink
+        <TransitionNavLink
           key={tab.to}
           to={tab.to}
           className={({ isActive }) =>
@@ -24,7 +24,7 @@ export default function BottomTabBar() {
         >
           <Icon name={tab.icon} size={20} />
           <span className="text-[10.5px] font-semibold">{tab.label}</span>
-        </NavLink>
+        </TransitionNavLink>
       ))}
     </div>
   )

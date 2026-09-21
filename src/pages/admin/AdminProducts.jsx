@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { TransitionLink } from '../../components/TransitionNavLink.jsx'
 import { PRODUCT_FILTERS } from '../../data/adminMock.js'
 import { useAdmin } from '../../context/AdminContext.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog.jsx'
@@ -248,12 +248,12 @@ export default function AdminProducts() {
                 </option>
               ))}
             </select>
-            <Link
+            <TransitionLink
               to={`/admin/materials/${moduleTree.find((m) => m.dbId === draft.moduleId)?.id || ''}`}
               className="mt-1 inline-block text-[11px] font-semibold text-primary"
             >
               Manage this module's materials →
-            </Link>
+            </TransitionLink>
           </label>
 
           <label className="mb-3.5 block text-xs font-semibold text-app-inkSoft">

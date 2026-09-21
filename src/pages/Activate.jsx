@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import PlaceholderBlock from '../components/PlaceholderBlock.jsx'
@@ -27,7 +27,7 @@ export default function Activate() {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [activatedModule, setActivatedModule] = useState(null)
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
 
   async function handleActivate(e) {
     e.preventDefault()

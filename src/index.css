@@ -81,3 +81,42 @@ body {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* Page-to-page transitions (see TransitionNavLink). The sidebar and bottom tab
+   bar carry their own view-transition-name so they stay put — only the page
+   content cross-fades, sliding up a few pixels as it arrives. */
+.vt-sidebar {
+  view-transition-name: app-sidebar;
+}
+.vt-tabbar {
+  view-transition-name: app-tabbar;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.26s;
+  animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+::view-transition-old(root) {
+  animation-name: vt-fade-out;
+}
+::view-transition-new(root) {
+  animation-name: vt-fade-in-up;
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

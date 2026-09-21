@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { TransitionLink, useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
@@ -25,7 +25,9 @@ export default function Landing() {
   const [products, setProducts] = useState([])
   const rootRef = useRef(null)
   const awardsScrollRef = useRef(null)
-  const navigate = useNavigate()
+  const modulesScrollRef = useRef(null)
+  const [modulesScroll, setModulesScroll] = useState({ prev: false, next: false })
+  const navigate = useTransitionNavigate()
 
   // Continuously drift the awards row sideways on mobile, where it's an
   // overflowing slider — a slow, steady crawl rather than a jump every few
@@ -70,6 +72,32 @@ export default function Landing() {
       el.removeEventListener('pointerleave', resume)
     }
   }, [])
+
+  // Track whether the modules row overflows and which way it can still scroll,
+  // so the arrows / edge fades only show when there really are more products
+  // to slide to.
+  useEffect(() => {
+    const el = modulesScrollRef.current
+    if (!el) return
+    function update() {
+      const max = el.scrollWidth - el.clientWidth
+      setModulesScroll({ prev: el.scrollLeft > 4, next: max > 4 && el.scrollLeft < max - 4 })
+    }
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      el.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [products])
+
+  function slideModules(direction) {
+    const el = modulesScrollRef.current
+    const card = el?.firstElementChild
+    if (!el || !card) return
+    el.scrollBy({ left: direction * (card.getBoundingClientRect().width + 18), behavior: 'smooth' })
+  }
 
   useEffect(() => {
     supabase
@@ -159,7 +187,7 @@ export default function Landing() {
             A new-age way to learn Arabic. With interactive modules powered by AI.
           </p>
           <div className="gs-hero-item flex flex-col items-center gap-3.5 sm:flex-row sm:flex-wrap sm:justify-center">
-            <Link
+            <TransitionLink
               to="/auth?view=signup"
               className="gs-float relative inline-block w-full max-w-[340px] overflow-hidden rounded-[13px] bg-primary px-[26px] py-[15px] text-center text-[15px] font-bold text-[#0B2A4A] shadow-[0_8px_24px_rgba(61,125,216,.35)] sm:w-auto sm:max-w-none"
             >
@@ -171,7 +199,7 @@ export default function Landing() {
                 }}
               />
               <span className="relative">Start Now!</span>
-            </Link>
+            </TransitionLink>
             <a
               href="#modules"
               className="inline-flex w-full max-w-[340px] items-center justify-center gap-2 rounded-[13px] border border-light-ink/10 bg-light-ink/[.045] px-[26px] py-[15px] text-[15px] font-semibold text-light-ink sm:w-auto sm:max-w-none"
@@ -274,11 +302,44 @@ export default function Landing() {
         <p className="mb-11 text-center text-[15px] text-light-inkSoft">
           Each one ships with its own audio library and AI Ustaz.
         </p>
-        <div className="gs-stagger scrollbar-none -mx-[6vw] flex snap-x snap-mandatory gap-[18px] overflow-x-auto px-[6vw] pb-2 md:mx-0 md:px-0">
+        <div className="relative">
+          {modulesScroll.prev && (
+            <>
+              <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-light-bg to-transparent" />
+              <button
+                type="button"
+                aria-label="Previous modules"
+                onClick={() => slideModules(-1)}
+                className="absolute left-1 top-[38%] z-20 hidden h-10 w-10 items-center justify-center rounded-full border border-light-ink/10 bg-white shadow-md sm:flex"
+              >
+                <Icon name="arrow-left-01" size={18} />
+              </button>
+            </>
+          )}
+          {modulesScroll.next && (
+            <>
+              <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-light-bg to-transparent" />
+              <button
+                type="button"
+                aria-label="Next modules"
+                onClick={() => slideModules(1)}
+                className="absolute right-1 top-[38%] z-20 hidden h-10 w-10 items-center justify-center rounded-full border border-light-ink/10 bg-white shadow-md sm:flex"
+              >
+                <Icon name="arrow-right-01" size={18} />
+              </button>
+            </>
+          )}
+        <div
+          ref={modulesScrollRef}
+          className="gs-stagger scrollbar-none -mx-[6vw] flex snap-x snap-mandatory scroll-pl-[6vw] gap-[18px] overflow-x-auto px-[6vw] pb-2 md:mx-0 md:scroll-pl-0 md:px-0"
+        >
           {products.map((mod) => (
             <div
               key={mod.id}
-              className="w-[68vw] flex-shrink-0 snap-start overflow-hidden rounded-[18px] border border-light-ink/[.07] bg-light-ink/[.03] sm:w-[260px] md:w-[calc(50%-9px)]"
+              // Auto margins on the first/last card centre a short row (e.g. a
+              // single product) but collapse to 0 once the row overflows, so
+              // it still scrolls from the start.
+              className="w-[68vw] flex-shrink-0 snap-start overflow-hidden rounded-[18px] border border-light-ink/[.07] bg-light-ink/[.03] first:ml-auto last:mr-auto sm:w-[260px] md:w-[280px]"
             >
               {mod.image_url ? (
                 <img src={mod.image_url} alt="" className="aspect-square w-full object-cover" />
@@ -308,6 +369,7 @@ export default function Landing() {
               </div>
             </div>
           ))}
+        </div>
         </div>
 
         <div className="mt-10">

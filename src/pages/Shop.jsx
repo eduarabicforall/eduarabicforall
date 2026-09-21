@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { TransitionLink, useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import BottomTabBar from '../components/BottomTabBar.jsx'
 import Icon from '../components/Icon.jsx'
@@ -17,7 +17,7 @@ const TABS = [
 const NEW_RELEASE_DAYS = 30
 
 export default function Shop() {
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const { user } = useAuth()
   const [products, setProducts] = useState(null)
   const [tab, setTab] = useState('all')
@@ -47,12 +47,12 @@ export default function Shop() {
       {/* Signed-out visitors get the bare layout (no account sidebar / tab bar) */}
       {!user && (
         <div className="flex items-center justify-between px-5 pt-5.5 pt-[22px]">
-          <Link to="/">
+          <TransitionLink to="/">
             <img src="/logo.png" alt="EduArabic for All" className="h-7 w-auto" />
-          </Link>
-          <Link to="/auth" className="text-[13px] font-semibold text-app-inkSoft">
+          </TransitionLink>
+          <TransitionLink to="/auth" className="text-[13px] font-semibold text-app-inkSoft">
             Sign in
-          </Link>
+          </TransitionLink>
         </div>
       )}
       <div

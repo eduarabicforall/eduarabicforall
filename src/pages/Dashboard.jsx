@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useState } from 'react'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
+import gsap from 'gsap'
 import AppShell from '../components/AppShell.jsx'
 import BottomTabBar from '../components/BottomTabBar.jsx'
 import Icon from '../components/Icon.jsx'
@@ -23,7 +24,7 @@ export default function Dashboard() {
   const { theme, toggleTheme } = useTheme()
   const { moduleTree } = useModuleTree()
   const [myModules, setMyModules] = useState(null) // null = loading
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const name = user?.fullName || 'Student'
 
   useEffect(() => {
@@ -47,6 +48,35 @@ export default function Dashboard() {
     }
   }, [user?.id])
 
+  // Entrance motion — layout effects so elements are hidden before first paint
+  // (no flash), reverted on unmount. Skipped for reduced-motion users.
+  useLayoutEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const ctx = gsap.context(() => {
+      gsap.from('.gs-dash-head', { opacity: 0, y: -14, duration: 0.5, ease: 'power2.out' })
+      gsap.from('.gs-dash-static', {
+        opacity: 0,
+        y: 22,
+        duration: 0.55,
+        ease: 'power2.out',
+        stagger: 0.09,
+        delay: 0.12,
+      })
+    })
+    return () => ctx.revert()
+  }, [])
+
+  // Module cards arrive asynchronously, so they get their own reveal once the
+  // list has loaded.
+  useLayoutEffect(() => {
+    if (myModules === null || !myModules.length) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const ctx = gsap.context(() => {
+      gsap.from('.gs-dash-module', { opacity: 0, y: 18, scale: 0.98, duration: 0.5, ease: 'power3.out', stagger: 0.08 })
+    })
+    return () => ctx.revert()
+  }, [myModules])
+
   function unitCountFor(slug) {
     return moduleTree.find((m) => m.id === slug)?.units.length || 0
   }
@@ -61,7 +91,7 @@ export default function Dashboard() {
   return (
     <AppShell>
       <div
-        className="flex items-center justify-between px-5 pb-4.5 pt-5.5 pt-[22px] pb-[18px]"
+        className="gs-dash-head flex items-center justify-between px-5 pb-4.5 pt-5.5 pt-[22px] pb-[18px]"
         style={{ background: 'linear-gradient(180deg, rgba(61,125,216,.10), transparent)' }}
       >
         <div className="flex items-center gap-3">
@@ -98,7 +128,7 @@ export default function Dashboard() {
       </div>
 
       <div className="px-5 pb-2 pt-3.5">
-        <div className="mb-3 text-[13px] font-bold tracking-wide text-app-inkSoft">MY MODULES</div>
+        <div className="gs-dash-static mb-3 text-[13px] font-bold tracking-wide text-app-inkSoft">MY MODULES</div>
 
         {myModules === null && <div className="mb-3 text-[12.5px] text-app-inkFaint">Loading your modules…</div>}
 
@@ -113,7 +143,7 @@ export default function Dashboard() {
             key={m.id}
             type="button"
             onClick={() => navigate(`/audio/${m.id}`)}
-            className="mb-3 flex w-full items-center gap-3.5 rounded-2xl border border-app-border bg-app-panel p-4 text-left"
+            className="gs-dash-module mb-3 flex w-full items-center gap-3.5 rounded-2xl border border-app-border bg-app-panel p-4 text-left"
           >
             <PlaceholderBlock variant="dark" label="" className="h-[52px] w-[52px] flex-shrink-0 rounded-[13px]" />
             <div className="min-w-0 flex-1">
@@ -126,7 +156,7 @@ export default function Dashboard() {
           </button>
         ))}
 
-        <div className="my-4.5 my-[18px] rounded-2xl border-[1.5px] border-dashed border-primary/[.35] bg-primary/[.05] px-4.5 py-5.5 px-[18px] py-[22px] text-center">
+        <div className="gs-dash-static my-4.5 my-[18px] rounded-2xl border-[1.5px] border-dashed border-primary/[.35] bg-primary/[.05] px-4.5 py-5.5 px-[18px] py-[22px] text-center">
           <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[.15]">
             <Icon name="qr-code" size={22} className="text-primary" />
           </div>
@@ -144,7 +174,7 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => navigate('/grammar')}
-          className="mt-3.5 flex w-full items-center gap-3 rounded-2xl border border-gold/[.22] bg-gold/[.08] px-4 py-3.5 text-left"
+          className="gs-dash-static mt-3.5 flex w-full items-center gap-3 rounded-2xl border border-gold/[.22] bg-gold/[.08] px-4 py-3.5 text-left"
         >
           <Icon name="mortarboard-01" size={20} className="text-gold" />
           <div className="flex-1">

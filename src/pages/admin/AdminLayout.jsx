@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import TransitionNavLink from '../../components/TransitionNavLink.jsx'
 import Icon from '../../components/Icon.jsx'
 import Toast from '../../components/Toast.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -66,17 +67,17 @@ function SidebarContent({ user, onNavigate }) {
           const subItems = item.to === '/admin/materials' ? materialsSubItems : item.subItems
           return (
             <div key={item.to}>
-              <NavLink to={item.to} end={item.end} className={linkClass} onClick={onNavigate}>
+              <TransitionNavLink to={item.to} end={item.end} className={linkClass} onClick={onNavigate}>
                 <Icon name={item.icon} size={17} />
                 {item.label}
-              </NavLink>
+              </TransitionNavLink>
               {subItems && (
                 <div className="ml-5 mb-1.5 flex flex-col gap-px border-l border-app-border pl-3">
                   {subItems.map((sub) => (
-                    <NavLink key={sub.to} to={sub.to} end={sub.end} className={subLinkClass} onClick={onNavigate}>
+                    <TransitionNavLink key={sub.to} to={sub.to} end={sub.end} className={subLinkClass} onClick={onNavigate}>
                       <Icon name="folder-01" size={13} className="flex-shrink-0" />
                       {sub.label}
-                    </NavLink>
+                    </TransitionNavLink>
                   ))}
                 </div>
               )}
@@ -85,16 +86,16 @@ function SidebarContent({ user, onNavigate }) {
         })}
       </div>
 
-      <NavLink
+      <TransitionNavLink
         to="/dashboard"
         onClick={onNavigate}
         className="mb-2.5 mt-2.5 flex flex-shrink-0 items-center gap-3 rounded-[11px] border border-primary/40 bg-primary/[.14] px-3 py-2.5 text-[13px] font-bold text-primary"
       >
         <Icon name="home-01" size={17} />
         Switch to student view
-      </NavLink>
+      </TransitionNavLink>
 
-      <NavLink
+      <TransitionNavLink
         to="/admin/profile"
         onClick={onNavigate}
         className={({ isActive }) =>
@@ -107,7 +108,7 @@ function SidebarContent({ user, onNavigate }) {
           {(user?.fullName || 'A')[0].toUpperCase()}
         </div>
         <div className="text-[12.5px] font-semibold">{user?.fullName || 'Admin'} (admin)</div>
-      </NavLink>
+      </TransitionNavLink>
     </div>
   )
 }
@@ -146,7 +147,7 @@ export default function AdminLayout() {
       </div>
 
       {/* Desktop sidebar — only the nav list scrolls; logo, student-view and profile stay pinned */}
-      <div className="hidden border-r border-app-border md:block md:h-screen md:overflow-hidden">
+      <div className="vt-sidebar hidden border-r border-app-border md:block md:h-screen md:overflow-hidden">
         <SidebarContent user={user} />
       </div>
 

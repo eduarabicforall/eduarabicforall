@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
+import { useTransitionNavigate } from './TransitionNavLink.jsx'
+import TransitionNavLink from './TransitionNavLink.jsx'
 import Icon from './Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabase.js'
@@ -25,10 +27,15 @@ const subLinkClass = ({ isActive }) =>
     isActive ? 'bg-app-panel2 text-app-ink' : 'text-app-inkFaint'
   }`
 
+// Every page renders its own AppShell, so the sidebar remounts on each route
+// change. Keeping the last-fetched module list here lets the submenu render
+// filled straight away instead of popping in after the request.
+let cachedModules = { userId: null, list: [] }
+
 function ModulesNavItem() {
   const { user } = useAuth()
   const location = useLocation()
-  const [myModules, setMyModules] = useState([])
+  const [myModules, setMyModules] = useState(() => (cachedModules.userId === user?.id ? cachedModules.list : []))
   const [open, setOpen] = useState(true)
 
   useEffect(() => {
@@ -40,7 +47,9 @@ function ModulesNavItem() {
       .eq('user_id', user.id)
       .then(({ data, error }) => {
         if (!active || error) return
-        setMyModules(data.filter((row) => row.modules).map((row) => ({ id: row.modules.slug, name: row.modules.name })))
+        const list = data.filter((row) => row.modules).map((row) => ({ id: row.modules.slug, name: row.modules.name }))
+        cachedModules = { userId: user.id, list }
+        setMyModules(list)
       })
     return () => {
       active = false
@@ -64,15 +73,15 @@ function ModulesNavItem() {
       </button>
       {open && (
         <div className="ml-5 mb-1.5 mt-0.5 flex flex-col gap-px border-l border-app-border pl-3">
-          <NavLink to="/grammar" className={subLinkClass}>
+          <TransitionNavLink to="/grammar" className={subLinkClass}>
             <Icon name="book-02" size={13} className="flex-shrink-0" />
             Grammar
-          </NavLink>
+          </TransitionNavLink>
           {myModules.map((m) => (
-            <NavLink key={m.id} to={`/audio/${m.id}`} className={subLinkClass}>
+            <TransitionNavLink key={m.id} to={`/audio/${m.id}`} className={subLinkClass}>
               <Icon name="headphones" size={13} className="flex-shrink-0" />
               {m.name}
-            </NavLink>
+            </TransitionNavLink>
           ))}
         </div>
       )}
@@ -82,7 +91,7 @@ function ModulesNavItem() {
 
 function Sidebar() {
   const { user, signOut } = useAuth()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
 
   return (
     <div className="flex h-full flex-col p-3.5">
@@ -90,24 +99,24 @@ function Sidebar() {
         <img src="/logo.png" alt="EduArabic for All" className="h-7 w-auto" />
       </div>
 
-      <NavLink to="/dashboard" className={linkClass}>
+      <TransitionNavLink to="/dashboard" className={linkClass}>
         <Icon name="home-01" size={18} />
         Home
-      </NavLink>
+      </TransitionNavLink>
 
       <ModulesNavItem />
 
       {NAV_ITEMS.slice(1).map((item) => (
-        <NavLink key={item.to} to={item.to} className={linkClass}>
+        <TransitionNavLink key={item.to} to={item.to} className={linkClass}>
           <Icon name={item.icon} size={18} />
           {item.label}
-        </NavLink>
+        </TransitionNavLink>
       ))}
 
       <div className="flex-1" />
 
       {user?.role === 'admin' && (
-        <NavLink
+        <TransitionNavLink
           to="/admin"
           className={({ isActive }) =>
             `mb-2.5 flex items-center gap-3 rounded-[11px] border px-3 py-2.5 text-[13.5px] font-bold ${
@@ -117,7 +126,7 @@ function Sidebar() {
         >
           <Icon name="shield-user" size={18} />
           Admin console
-        </NavLink>
+        </TransitionNavLink>
       )}
 
       <button
@@ -159,7 +168,7 @@ export default function AppShell({ children, bare = false }) {
   return (
     <div className="min-h-screen bg-app-bg text-app-ink md:flex">
       <div className="hidden w-[230px] flex-shrink-0 border-r border-app-border md:block">
-        <div className="sticky top-0 h-screen">
+        <div className="vt-sidebar sticky top-0 h-screen">
           <Sidebar />
         </div>
       </div>

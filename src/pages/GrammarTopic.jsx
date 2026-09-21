@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -23,7 +24,7 @@ function shuffle(arr) {
 
 export default function GrammarTopic() {
   const { topicId } = useParams()
-  const navigate = useNavigate()
+  const navigate = useTransitionNavigate()
   const { user } = useAuth()
 
   const [topic, setTopic] = useState(null)
