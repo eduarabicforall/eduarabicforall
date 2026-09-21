@@ -75,7 +75,7 @@ export default function AdminProducts() {
         <button
           type="button"
           onClick={addProduct}
-          className="self-start rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+          className="self-start rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-white"
         >
           + New product
         </button>
@@ -286,7 +286,7 @@ export default function AdminProducts() {
           </div>
 
           <div className="flex gap-2.5">
-            <button type="button" onClick={saveEdit} className="rounded-[9px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-[#0B2A4A]">
+            <button type="button" onClick={saveEdit} className="rounded-[9px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-white">
               Save
             </button>
             <button

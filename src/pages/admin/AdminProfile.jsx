@@ -46,7 +46,7 @@ export default function AdminProfile() {
         <button
           type="button"
           onClick={() => showToast('Profile updated.')}
-          className="mt-0.5 self-start rounded-[11px] bg-primary px-5.5 px-[22px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+          className="mt-0.5 self-start rounded-[11px] bg-primary px-5.5 px-[22px] py-2.5 text-[13.5px] font-bold text-white"
         >
           Save changes
         </button>
@@ -77,7 +77,7 @@ export default function AdminProfile() {
                 setShowChangePassword(false)
                 showToast('Password updated.')
               }}
-              className="self-start rounded-[9px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-[#0B2A4A]"
+              className="self-start rounded-[9px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-white"
             >
               Update password
             </button>

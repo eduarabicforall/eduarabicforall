@@ -181,7 +181,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={submitting}
-              className="mt-1 rounded-xl bg-primary py-3.5 text-[15px] font-bold text-[#0B2A4A] disabled:opacity-60"
+              className="mt-1 rounded-xl bg-primary py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
             >
               {submitting ? 'Signing in…' : 'Sign in'}
             </button>
@@ -251,7 +251,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={submitting}
-              className="mt-1 rounded-xl bg-primary py-3.5 text-[15px] font-bold text-[#0B2A4A] disabled:opacity-60"
+              className="mt-1 rounded-xl bg-primary py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
             >
               {submitting ? 'Creating account…' : 'Create account'}
             </button>
@@ -317,7 +317,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full rounded-xl bg-primary py-3.5 text-[15px] font-bold text-[#0B2A4A] disabled:opacity-60"
+                  className="w-full rounded-xl bg-primary py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
                 >
                   {submitting ? 'Sending…' : 'Send reset link'}
                 </button>

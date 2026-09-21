@@ -155,7 +155,7 @@ export default function Product() {
         <button
           type="button"
           onClick={() => navigate(`/checkout?product=${product.id}`)}
-          className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-[#0B2A4A]"
+          className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-white"
         >
           Buy now
         </button>

@@ -120,7 +120,7 @@ function Sidebar() {
           to="/admin"
           className={({ isActive }) =>
             `mb-2.5 flex items-center gap-3 rounded-[11px] border px-3 py-2.5 text-[13.5px] font-bold ${
-              isActive ? 'border-primary bg-primary text-[#0B2A4A]' : 'border-primary/40 bg-primary/[.14] text-primary'
+              isActive ? 'border-primary bg-primary text-white' : 'border-primary/40 bg-primary/[.14] text-primary'
             }`
           }
         >

@@ -73,7 +73,7 @@ export default function AboutUs() {
           </p>
           <a
             href="/contact"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-[14px] font-bold text-[#0B2A4A]"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-[14px] font-bold text-white"
           >
             <Icon name="mail-01" size={16} />
             Contact Us

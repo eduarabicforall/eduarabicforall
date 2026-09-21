@@ -42,7 +42,7 @@ export default function ContactUs() {
                   href={MAPS_DIRECTIONS_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-[13.5px] font-bold text-white"
                 >
                   <Icon name="arrow-right-01" size={16} />
                   Get Directions

@@ -113,7 +113,7 @@ export default function AudioLibrary() {
           <button
             type="button"
             onClick={() => navigate('/activate')}
-            className="rounded-xl bg-primary px-5 py-2.5 text-[13px] font-bold text-[#0B2A4A]"
+            className="rounded-xl bg-primary px-5 py-2.5 text-[13px] font-bold text-white"
           >
             Enter code
           </button>
@@ -174,7 +174,7 @@ export default function AudioLibrary() {
                   playing ? 'bg-primary' : 'bg-app-panel2'
                 }`}
               >
-                <Icon name={playing ? 'pause' : 'play'} size={16} className={playing ? 'text-[#0B2A4A]' : 'text-app-ink'} />
+                <Icon name={playing ? 'pause' : 'play'} size={16} className={playing ? 'text-white' : 'text-app-ink'} />
               </button>
               <div className="min-w-0 flex-1">
                 <div className="mb-0.5 text-[13px] font-bold">{t.titleEn}</div>

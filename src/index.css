@@ -120,3 +120,30 @@ body {
     animation: none !important;
   }
 }
+
+/* Awards ticker: the track holds two identical copies of the row, so sliding
+   it by exactly half its width loops seamlessly. */
+@keyframes awards-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-awards-marquee {
+  animation: awards-marquee 34s linear infinite;
+}
+
+/* Mobile menu sheet fades/slides in. */
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+.animate-sheet-in {
+  animation: sheet-in 0.2s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-sheet-in {
+    animation: none;
+  }
+}

@@ -98,7 +98,7 @@ function ReviewCard({ product, review, userId, fullName, onSaved }) {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-[10px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-[#0B2A4A] disabled:opacity-60"
+              className="rounded-[10px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-white disabled:opacity-60"
             >
               {saving ? 'Saving…' : review ? 'Save changes' : 'Submit review'}
             </button>

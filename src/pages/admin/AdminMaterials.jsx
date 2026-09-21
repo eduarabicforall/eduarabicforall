@@ -160,7 +160,7 @@ function TrackForm({ initial, onSave, onCancel }) {
         <button
           type="submit"
           disabled={status !== 'done'}
-          className="rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-[#0B2A4A] disabled:opacity-50"
+          className="rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-white disabled:opacity-50"
         >
           {initial ? 'Save' : 'Add'}
         </button>
@@ -354,7 +354,7 @@ export default function AdminMaterials() {
           <button
             type="button"
             onClick={() => addUnit(material.dbId)}
-            className="flex-shrink-0 whitespace-nowrap rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+            className="flex-shrink-0 whitespace-nowrap rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-white"
           >
             + Add unit
           </button>

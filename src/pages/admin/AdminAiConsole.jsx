@@ -8,12 +8,15 @@ export default function AdminAiConsole() {
   const { aiConfigs, aiConfigsLoading, saveAiConfig, confirmSaveAiConfig, apiKeySaved, saveApiKey } = useAdmin()
   const [aiModule, setAiModule] = useState('quran')
   const [apiKeyInput, setApiKeyInput] = useState('')
+  const [savingKey, setSavingKey] = useState(false)
   const config = aiConfigs[aiModule]
 
-  function handleSaveApiKey() {
-    if (!apiKeyInput.trim()) return
-    saveApiKey()
-    setApiKeyInput('')
+  async function handleSaveApiKey() {
+    if (!apiKeyInput.trim() || savingKey) return
+    setSavingKey(true)
+    const ok = await saveApiKey(apiKeyInput.trim())
+    setSavingKey(false)
+    if (ok) setApiKeyInput('')
   }
 
   if (aiConfigsLoading || !config) {
@@ -40,18 +43,15 @@ export default function AdminAiConsole() {
           <button
             type="button"
             onClick={handleSaveApiKey}
-            className="rounded-[10px] bg-violet px-4.5 px-[18px] py-2.5 text-[13px] font-bold text-[#1a1230]"
+            disabled={savingKey || !apiKeyInput.trim()}
+            className="rounded-[10px] bg-violet px-4.5 px-[18px] py-2.5 text-[13px] font-bold text-[#1a1230] disabled:opacity-60"
           >
-            Save key
+            {savingKey ? 'Saving…' : 'Save key'}
           </button>
         </div>
         <div className="mt-2.5 text-[11.5px] text-app-inkFaint">
-          One key powers every module below — stored encrypted server-side, never sent back to the client. Set here
-          once; each module below only configures persona, prompt and quota.
-        </div>
-        <div className="mt-2 text-[11.5px] text-gold">
-          Not yet wired to a backend — saving here only updates this screen. Persisting it needs a server-side Edge
-          Function (the underlying table has no client-writable policy by design).
+          One key powers every module below — saved server-side and never sent back to the client, so this field can
+          only replace it. Each module below configures its own persona, prompt and daily quota.
         </div>
       </div>
 
@@ -113,7 +113,7 @@ export default function AdminAiConsole() {
         <button
           type="button"
           onClick={() => confirmSaveAiConfig(aiModule)}
-          className="mt-1 self-start rounded-[11px] bg-primary px-5.5 px-[22px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+          className="mt-1 self-start rounded-[11px] bg-primary px-5.5 px-[22px] py-2.5 text-[13.5px] font-bold text-white"
         >
           Save configuration
         </button>

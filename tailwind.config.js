@@ -26,6 +26,8 @@ export default {
           soft: '#2A5A96',
         },
         gold: '#C69443',
+        // Brighter gold for accents on dark backgrounds (the hero) where the brand gold looks muted.
+        goldBright: '#FFC93C',
         violet: '#B9A7F0',
         danger: '#f06868',
       },

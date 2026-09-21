@@ -3,23 +3,23 @@ import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { functionErrorCode } from '../lib/functionError.js'
 import { supabase } from '../lib/supabase.js'
 
-// No real Gemini/Edge Function wired yet — the Ustaz's replies here are
-// canned, not generated. Everything else (which modules are unlocked, the
-// persona name, the daily quota) is real, read from the same tables Admin's
-// AI console manages, so the mock at least reflects real configuration.
-const MOCK_REPLIES = [
-  "Good question! Let's break that down together — could you tell me which word you're unsure about?",
-  'Right, that\'s a common one for learners. Try saying it out loud a few times — repetition really helps with Arabic.',
-  "You're on the right track! Take a look at the dialogue in your current unit for more examples like this.",
-  'Great effort! One tip: pay attention to the vowel marks (harakat) — they change the meaning quite a bit.',
-  "Let's practice this together. Can you use it in a short sentence?",
-]
-
-function pickReply() {
-  return MOCK_REPLIES[Math.floor(Math.random() * MOCK_REPLIES.length)]
+// What the Ustaz tells the learner when the ai-ustaz-chat function refuses or
+// fails. Each module's Ustaz is conditional server-side: the learner must have
+// activated the module, be under its daily quota, and the Ustaz only answers
+// within Arabic learning / that module's subject.
+const ERROR_MESSAGES = {
+  module_not_activated: 'Activate this module first to chat with its Ustaz.',
+  not_configured: "The Ustaz isn't available yet — please check back soon.",
+  message_too_long: 'That message is too long — please keep it shorter.',
+  not_authenticated: 'Please sign in again to keep chatting.',
 }
+const FALLBACK_ERROR = "Sorry, I couldn't reply just now. Please try again in a moment."
+
+// The function counts usage per UTC day, so the client reads the same day.
+const todayUtc = () => new Date().toISOString().slice(0, 10)
 
 export default function AiUstaz() {
   const { user } = useAuth()
@@ -60,13 +60,27 @@ export default function AiUstaz() {
         .filter((row) => row.modules)
         .map((row) => ({
           id: row.modules.slug,
+          dbId: row.modules.id,
           name: row.modules.name,
           persona: configBySlug[row.modules.slug]?.persona || 'Ustaz',
           limit: configBySlug[row.modules.slug]?.quota || 60,
         }))
 
+      // Today's real usage, so the quota bar survives a reload.
+      const { data: usageRows } = await supabase
+        .from('ai_usage_log')
+        .select('module_id, message_count')
+        .eq('user_id', user.id)
+        .eq('date', todayUtc())
+      const usedBySlug = {}
+      for (const row of usageRows || []) {
+        const m = list.find((mod) => mod.dbId === row.module_id)
+        if (m) usedBySlug[m.id] = row.message_count
+      }
+
       if (!active) return
       setModules(list)
+      setUsedByModule(usedBySlug)
       if (list.length > 0) {
         setModuleId(list[0].id)
         setChats({ [list[0].id]: [{ from: 'them', text: `Assalamualaikum! I'm ${list[0].persona}. What are you working on today?` }] })
@@ -100,18 +114,35 @@ export default function AiUstaz() {
     }
   }
 
-  function send(e) {
+  async function send(e) {
     e.preventDefault()
-    if (!draft.trim() || quotaReached) return
+    if (!draft.trim() || quotaReached || typing) return
     const text = draft.trim()
-    setChats((prev) => ({ ...prev, [moduleId]: [...(prev[moduleId] || []), { from: 'me', text }] }))
+    const targetId = moduleId
+    const target = currentModule
+    const addMessage = (msg) =>
+      setChats((prev) => ({ ...prev, [targetId]: [...(prev[targetId] || []), msg] }))
+
+    addMessage({ from: 'me', text })
     setDraft('')
-    setUsedByModule((prev) => ({ ...prev, [moduleId]: (prev[moduleId] || 0) + 1 }))
     setTyping(true)
-    setTimeout(() => {
-      setChats((prev) => ({ ...prev, [moduleId]: [...(prev[moduleId] || []), { from: 'them', text: pickReply() }] }))
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-ustaz-chat', {
+        body: { module_id: target.dbId, message: text },
+      })
+      if (error) throw error
+      addMessage({ from: 'them', text: data.reply })
+      setUsedByModule((prev) => ({ ...prev, [targetId]: data.used ?? (prev[targetId] || 0) + 1 }))
+    } catch (err) {
+      const code = await functionErrorCode(err)
+      if (code === 'quota_exceeded') {
+        setUsedByModule((prev) => ({ ...prev, [targetId]: target.limit }))
+        return
+      }
+      addMessage({ from: 'them', text: ERROR_MESSAGES[code] || FALLBACK_ERROR, isError: true })
+    } finally {
       setTyping(false)
-    }, 700 + Math.random() * 500)
+    }
   }
 
   if (modules === null) {
@@ -144,7 +175,7 @@ export default function AiUstaz() {
           <button
             type="button"
             onClick={() => navigate('/activate')}
-            className="rounded-xl bg-primary px-5 py-2.5 text-[13px] font-bold text-[#0B2A4A]"
+            className="rounded-xl bg-primary px-5 py-2.5 text-[13px] font-bold text-white"
           >
             Enter code
           </button>
@@ -200,7 +231,9 @@ export default function AiUstaz() {
               className={`px-4 py-2.5 text-[13.5px] leading-relaxed ${
                 msg.from === 'me'
                   ? 'rounded-[14px_14px_4px_14px] bg-primary/[.16]'
-                  : 'rounded-[14px_14px_14px_4px] bg-app-panel2'
+                  : msg.isError
+                    ? 'rounded-[14px_14px_14px_4px] bg-danger/[.12] text-danger'
+                    : 'rounded-[14px_14px_14px_4px] bg-app-panel2'
               }`}
             >
               {msg.text}
@@ -229,12 +262,13 @@ export default function AiUstaz() {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           disabled={quotaReached}
+          maxLength={1000}
           placeholder="Ask your Ustaz…"
           className="flex-1 rounded-pill border border-app-border bg-app-panel2 px-4 py-3 text-[13.5px] text-app-ink placeholder:text-app-inkFaint disabled:opacity-50"
         />
         <button
           type="submit"
-          disabled={quotaReached}
+          disabled={quotaReached || typing}
           className="flex h-[42px] w-[42px] flex-shrink-0 items-center justify-center rounded-full bg-violet disabled:opacity-50"
         >
           <Icon name="sent" size={17} className="text-[#1a1230]" />

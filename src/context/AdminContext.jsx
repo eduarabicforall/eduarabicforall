@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { functionErrorCode } from '../lib/functionError.js'
 import { supabase } from '../lib/supabase.js'
 import { useModuleTree } from './ModuleTreeContext.jsx'
 
@@ -158,7 +159,9 @@ export function AdminProvider({ children }) {
   const [grammarTopicsLoading, setGrammarTopicsLoading] = useState(true)
   const [aiConfigs, setAiConfigs] = useState({})
   const [aiConfigsLoading, setAiConfigsLoading] = useState(true)
-  const [apiKeySaved, setApiKeySaved] = useState(true)
+  // Write-only setting — the client can't tell whether a key is already stored,
+  // so this only turns true after a successful save in this session.
+  const [apiKeySaved, setApiKeySaved] = useState(false)
   const [toast, setToast] = useState(null)
   const toastTimer = useRef(null)
 
@@ -556,9 +559,24 @@ export function AdminProvider({ children }) {
     }
   }
 
-  function saveApiKey() {
-    setApiKeySaved(true)
-    showToast('Gemini API key saved.')
+  // The key goes straight to the save-admin-settings Edge Function (admin-only,
+  // service role). It is write-only: nothing ever reads the value back.
+  async function saveApiKey(value) {
+    try {
+      const { error } = await supabase.functions.invoke('save-admin-settings', {
+        body: { key: 'gemini_api_key', value },
+      })
+      if (error) {
+        const code = await functionErrorCode(error)
+        throw new Error(code === 'not_authorized' ? 'Only admins can save the API key.' : 'Could not save the API key.')
+      }
+      setApiKeySaved(true)
+      showToast('Gemini API key saved.')
+      return true
+    } catch (err) {
+      showToast(err.message || 'Could not save the API key.')
+      return false
+    }
   }
 
   const value = useMemo(

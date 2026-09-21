@@ -2,7 +2,7 @@ import Icon from './Icon.jsx'
 
 export default function FaqItem({ q, a, open, onToggle }) {
   return (
-    <div className="overflow-hidden rounded-[14px] border border-light-ink/[.07] bg-light-ink/[.03]">
+    <div className="overflow-hidden rounded-[14px] border border-primary/15 bg-white">
       <button
         type="button"
         onClick={onToggle}

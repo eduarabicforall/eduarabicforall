@@ -27,7 +27,7 @@ export default function AdminAdmins() {
           type="email"
           className="flex-1 rounded-[11px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13.5px] text-app-ink placeholder:text-app-inkFaint sm:max-w-[340px]"
         />
-        <button type="submit" className="rounded-[11px] bg-primary px-5 py-2.5 text-[13.5px] font-bold text-[#0B2A4A]">
+        <button type="submit" className="rounded-[11px] bg-primary px-5 py-2.5 text-[13.5px] font-bold text-white">
           Add admin
         </button>
       </form>

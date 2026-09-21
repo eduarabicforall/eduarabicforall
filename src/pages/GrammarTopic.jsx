@@ -394,7 +394,7 @@ export default function GrammarTopic() {
           <button
             type="button"
             onClick={() => setView('lesson')}
-            className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-[#0B2A4A]"
+            className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-white"
           >
             Back to lesson
           </button>

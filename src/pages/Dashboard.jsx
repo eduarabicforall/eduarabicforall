@@ -98,7 +98,7 @@ export default function Dashboard() {
           <button
             type="button"
             onClick={() => navigate('/profile')}
-            className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-soft font-poppins text-[17px] font-extrabold text-[#0B2A4A]"
+            className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-soft font-poppins text-[17px] font-extrabold text-white"
           >
             {initials(name)}
           </button>
@@ -165,7 +165,7 @@ export default function Dashboard() {
           <button
             type="button"
             onClick={() => navigate('/activate')}
-            className="rounded-xl bg-primary px-[22px] py-3 text-sm font-bold text-[#0B2A4A]"
+            className="rounded-xl bg-primary px-[22px] py-3 text-sm font-bold text-white"
           >
             Enter code
           </button>

@@ -210,7 +210,7 @@ function VideoUrlField({ topic, setTopicVideo }) {
           className="flex-1 rounded-[9px] border border-app-border bg-app-bg px-2.5 py-1.5 text-[12.5px] text-app-ink placeholder:text-app-inkFaint"
         />
         <div className="flex gap-2">
-          <button type="submit" className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-[#0B2A4A]">
+          <button type="submit" className="rounded-lg bg-primary px-3 py-1.5 text-xs font-bold text-white">
             Save
           </button>
           {topic.videoUrl && (
@@ -365,7 +365,7 @@ export default function AdminGrammarMaterial() {
             placeholder="New topic title"
             className="rounded-[11px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13.5px] text-app-ink placeholder:text-app-inkFaint"
           />
-          <button type="submit" className="self-start rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]">
+          <button type="submit" className="self-start rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-white">
             + Add topic
           </button>
         </form>

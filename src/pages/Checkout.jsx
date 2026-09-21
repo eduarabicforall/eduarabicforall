@@ -478,7 +478,7 @@ export default function Checkout() {
           <button
             type="submit"
             disabled={submitting || phoneMissing}
-            className="w-full rounded-pill bg-primary py-4 text-[15px] font-bold text-[#0B2A4A] shadow-[0_8px_24px_rgba(61,125,216,.3)] disabled:opacity-50 disabled:shadow-none"
+            className="w-full rounded-pill bg-primary py-4 text-[15px] font-bold text-white shadow-[0_8px_24px_rgba(61,125,216,.3)] disabled:opacity-50 disabled:shadow-none"
           >
             {submitting ? 'Placing order…' : `Place order · RM${total} →`}
           </button>

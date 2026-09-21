@@ -37,33 +37,6 @@ export const HOW_IT_WORKS = [
   },
 ]
 
-export const APP_FEATURES = [
-  {
-    icon: 'mortarboard-01',
-    color: 'text-gold',
-    title: 'Free Grammar module',
-    body: 'Included for every registered account — no code needed.',
-  },
-  {
-    icon: 'headphones',
-    color: 'text-primary',
-    title: 'Audio Library',
-    body: 'Unit-by-unit lessons with a simple play/pause player.',
-  },
-  {
-    icon: 'sparkles',
-    color: 'text-violet',
-    title: 'AI Ustaz per module',
-    body: 'Ask questions and get answers grounded in your module.',
-  },
-  {
-    icon: 'qr-code',
-    color: 'text-primary',
-    title: 'Instant activation',
-    body: 'Scan the code in your physical module to unlock it.',
-  },
-]
-
 export const REVIEWS = [
   {
     quote:

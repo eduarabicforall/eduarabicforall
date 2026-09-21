@@ -112,7 +112,7 @@ export default function Shop() {
             <button
               type="button"
               onClick={() => navigate(`/checkout?product=${p.id}`)}
-              className="mx-3 mb-3 mt-1 rounded-[10px] bg-primary py-2 text-[12.5px] font-bold text-[#0B2A4A]"
+              className="mx-3 mb-3 mt-1 rounded-[10px] bg-primary py-2 text-[12.5px] font-bold text-white"
             >
               Buy
             </button>

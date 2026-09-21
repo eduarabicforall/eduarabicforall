@@ -80,7 +80,7 @@ export default function Activate() {
             <button
               type="submit"
               disabled={submitting}
-              className="mt-5.5 mt-[22px] w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-[#0B2A4A] disabled:opacity-60"
+              className="mt-5.5 mt-[22px] w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-white disabled:opacity-60"
             >
               {submitting ? 'Activating…' : 'Activate'}
             </button>
@@ -97,7 +97,7 @@ export default function Activate() {
             <button
               type="button"
               onClick={() => setStatus('idle')}
-              className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-[#0B2A4A]"
+              className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-white"
             >
               Try again
             </button>
@@ -120,7 +120,7 @@ export default function Activate() {
             <button
               type="button"
               onClick={() => navigate('/dashboard')}
-              className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-[#0B2A4A]"
+              className="w-full rounded-[13px] bg-primary py-[15px] text-[15px] font-bold text-white"
             >
               Start learning
             </button>

@@ -82,7 +82,7 @@ export default function Profile() {
 
       <div className="flex flex-col gap-4 px-5 py-4">
         <div className="flex items-center gap-3.5 rounded-2xl border border-app-border bg-app-panel p-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-soft font-poppins text-base font-extrabold text-[#0B2A4A]">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-soft font-poppins text-base font-extrabold text-white">
             {initials(user?.fullName)}
           </div>
           <div className="min-w-0 flex-1">
@@ -104,7 +104,7 @@ export default function Profile() {
           <button
             type="submit"
             disabled={savingName}
-            className="self-start rounded-[10px] bg-primary px-5 py-2.5 text-[13px] font-bold text-[#0B2A4A] disabled:opacity-60"
+            className="self-start rounded-[10px] bg-primary px-5 py-2.5 text-[13px] font-bold text-white disabled:opacity-60"
           >
             {savingName ? 'Saving…' : 'Save changes'}
           </button>
@@ -160,7 +160,7 @@ export default function Profile() {
                 <button
                   type="submit"
                   disabled={savingPassword}
-                  className="rounded-[9px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-[#0B2A4A] disabled:opacity-60"
+                  className="rounded-[9px] bg-primary px-4.5 px-[18px] py-2.5 text-xs font-bold text-white disabled:opacity-60"
                 >
                   {savingPassword ? 'Updating…' : 'Update password'}
                 </button>

@@ -82,7 +82,7 @@ export default function AdminDiscounts() {
         <button
           type="submit"
           disabled={creating}
-          className="rounded-[11px] bg-primary px-5 py-2.5 text-[13.5px] font-bold text-[#0B2A4A] disabled:opacity-60"
+          className="rounded-[11px] bg-primary px-5 py-2.5 text-[13.5px] font-bold text-white disabled:opacity-60"
         >
           {creating ? 'Creating…' : '+ New code'}
         </button>
