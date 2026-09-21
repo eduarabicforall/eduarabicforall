@@ -4,6 +4,7 @@ import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { functionErrorBody } from '../lib/functionError.js'
+import { parseUstazReply } from '../lib/vocabParse.js'
 import { supabase } from '../lib/supabase.js'
 
 // What the Ustaz tells the learner when the ai-ustaz-chat function refuses or
@@ -21,6 +22,40 @@ const FALLBACK_ERROR = "Sorry, I couldn't reply just now. Please try again in a 
 // The function counts usage per UTC day, so the client reads the same day.
 const todayUtc = () => new Date().toISOString().slice(0, 10)
 
+const vocabKey = (kind, arabic) => `${kind}|${arabic}`
+
+// A reply whose word / example sentences can be saved to My Vocab: each line that
+// carries one gets a small save button beside it.
+function UstazReply({ text, savedKeys, savingKeys, onSave }) {
+  const actions = parseUstazReply(text)
+  return text.split('\n').map((line, i) => {
+    const item = actions[i]
+    const key = item && vocabKey(item.kind, item.arabic)
+    const saved = key && savedKeys.has(key)
+    return (
+      <div key={i} className="flex items-start gap-2">
+        <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">{line || '\u00a0'}</span>
+        {item && (
+          <button
+            type="button"
+            disabled={saved || savingKeys.has(key)}
+            onClick={() => onSave(item)}
+            aria-label={saved ? 'Saved to My Vocab' : item.kind === 'word' ? 'Save word to My Vocab' : 'Save sentence to My Vocab'}
+            className={`mt-px flex flex-shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10.5px] font-bold ${
+              saved
+                ? 'border-primary/30 bg-primary/10 text-primary'
+                : 'border-app-border bg-app-panel text-app-inkSoft hover:border-primary/40 hover:text-primary'
+            }`}
+          >
+            <Icon name={saved ? 'checkmark-circle-02' : 'bookmark-02'} size={11} />
+            {saved ? 'Saved' : item.kind === 'word' ? 'Save word' : 'Save'}
+          </button>
+        )}
+      </div>
+    )
+  })
+}
+
 export default function AiUstaz() {
   const { user } = useAuth()
   const navigate = useTransitionNavigate()
@@ -30,6 +65,9 @@ export default function AiUstaz() {
   const [usedByModule, setUsedByModule] = useState({})
   const [draft, setDraft] = useState('')
   const [typing, setTyping] = useState(false)
+  const [savedKeys, setSavedKeys] = useState(() => new Set())
+  const [savingKeys, setSavingKeys] = useState(() => new Set())
+  const [vocabError, setVocabError] = useState('')
   const scrollRef = useRef(null)
 
   useEffect(() => {
@@ -92,6 +130,45 @@ export default function AiUstaz() {
       active = false
     }
   }, [user?.id])
+
+  // What the learner has already saved, so those buttons show "Saved".
+  useEffect(() => {
+    if (!user?.id) return
+    supabase
+      .from('user_vocab')
+      .select('kind, arabic')
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        if (data) setSavedKeys(new Set(data.map((r) => vocabKey(r.kind, r.arabic))))
+      })
+  }, [user?.id])
+
+  async function saveVocab(item) {
+    const key = vocabKey(item.kind, item.arabic)
+    setVocabError('')
+    setSavingKeys((prev) => new Set(prev).add(key))
+    const { error } = await supabase.from('user_vocab').insert({
+      user_id: user.id,
+      module_id: currentModule?.dbId ?? null,
+      kind: item.kind,
+      arabic: item.arabic,
+      transliteration: item.transliteration || null,
+      translation: item.translation || null,
+      topic: item.topic || null,
+    })
+    setSavingKeys((prev) => {
+      const next = new Set(prev)
+      next.delete(key)
+      return next
+    })
+    // 23505 = already saved earlier; treat it as saved.
+    if (error && error.code !== '23505') {
+      console.error('Failed to save vocab', error)
+      setVocabError("Couldn't save that — please try again.")
+      return
+    }
+    setSavedKeys((prev) => new Set(prev).add(key))
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -202,7 +279,15 @@ export default function AiUstaz() {
           <div className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-[10px] bg-violet/[.15]">
             <Icon name="sparkles" size={17} className="text-violet" />
           </div>
-          <div className="font-poppins text-[15px] font-extrabold">{currentModule.persona}</div>
+          <div className="min-w-0 flex-1 truncate font-poppins text-[15px] font-extrabold">{currentModule.persona}</div>
+          <button
+            type="button"
+            onClick={() => navigate('/my-vocab')}
+            className="flex flex-shrink-0 items-center gap-1.5 rounded-[11px] border border-app-border bg-app-panel2 px-3 py-2 text-[12px] font-bold text-app-inkSoft"
+          >
+            <Icon name="book-bookmark-02" size={14} />
+            My Vocab
+          </button>
         </div>
 
         <div className="mb-3.5 flex items-center gap-2">
@@ -240,7 +325,11 @@ export default function AiUstaz() {
                     : 'rounded-[14px_14px_14px_4px] bg-app-panel2'
               }`}
             >
-              {msg.text}
+              {msg.from === 'them' && !msg.isError ? (
+                <UstazReply text={msg.text} savedKeys={savedKeys} savingKeys={savingKeys} onSave={saveVocab} />
+              ) : (
+                msg.text
+              )}
             </div>
           </div>
         ))}
@@ -260,6 +349,8 @@ export default function AiUstaz() {
           Daily quota reached for {currentModule.persona}. Come back tomorrow!
         </div>
       )}
+
+      {vocabError && <div className="px-5 pb-2 text-center text-[12px] font-semibold text-danger">{vocabError}</div>}
 
       <form onSubmit={send} className="flex items-center gap-2.5 border-t border-app-border px-4 pb-5 pt-3.5">
         <input

@@ -112,6 +112,16 @@ export default function Profile() {
 
         <button
           type="button"
+          onClick={() => navigate('/my-vocab')}
+          className="flex items-center gap-3 rounded-2xl border border-app-border bg-app-panel p-4 text-left"
+        >
+          <Icon name="book-bookmark-02" size={18} className="text-primary" />
+          <div className="min-w-0 flex-1 text-[13.5px] font-bold">My Vocab</div>
+          <Icon name="arrow-right-01" size={16} className="text-app-inkFaint" />
+        </button>
+
+        <button
+          type="button"
           onClick={() => navigate('/my-reviews')}
           className="flex items-center gap-3 rounded-2xl border border-app-border bg-app-panel p-4 text-left"
         >

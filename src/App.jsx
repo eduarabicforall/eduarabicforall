@@ -22,6 +22,7 @@ import Shop from './pages/Shop.jsx'
 import Product from './pages/Product.jsx'
 import Checkout from './pages/Checkout.jsx'
 import CheckoutDone from './pages/CheckoutDone.jsx'
+import MyVocab from './pages/MyVocab.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import AdminRoute from './components/AdminRoute.jsx'
 import { AdminProvider } from './context/AdminContext.jsx'
@@ -71,6 +72,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <MyReviews />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-vocab"
+          element={
+            <ProtectedRoute>
+              <MyVocab />
             </ProtectedRoute>
           }
         />

@@ -14,6 +14,7 @@ import { supabase } from '../lib/supabase.js'
 const NAV_ITEMS = [
   { to: '/dashboard', icon: 'home-01', label: 'Home' },
   { to: '/ai-ustaz', icon: 'message-01', label: 'AI Ustaz' },
+  { to: '/my-vocab', icon: 'book-bookmark-02', label: 'My Vocab' },
   { to: '/shop', icon: 'shopping-bag-02', label: 'Shop' },
 ]
 

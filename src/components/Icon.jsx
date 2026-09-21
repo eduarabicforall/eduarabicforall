@@ -5,6 +5,8 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   Book02Icon,
+  BookBookmark02Icon,
+  Bookmark02Icon,
   Cancel01Icon,
   Chatting01Icon,
   CheckmarkCircle02Icon,
@@ -44,11 +46,13 @@ import {
   ShoppingBag02Icon,
   ShoppingCart01Icon,
   SparklesIcon,
+  StopIcon,
   StarIcon,
   TextAlignLeft01Icon,
   TickDouble02Icon,
   TruckIcon,
   UserIcon,
+  VolumeHighIcon,
 } from '@hugeicons/core-free-icons'
 
 const ICONS = {
@@ -57,6 +61,8 @@ const ICONS = {
   'arrow-left-01': ArrowLeft01Icon,
   'arrow-right-01': ArrowRight01Icon,
   'book-02': Book02Icon,
+  'book-bookmark-02': BookBookmark02Icon,
+  'bookmark-02': Bookmark02Icon,
   'cancel-01': Cancel01Icon,
   'delete-02': Delete02Icon,
   'chatting-01': Chatting01Icon,
@@ -96,11 +102,13 @@ const ICONS = {
   'shopping-bag-02': ShoppingBag02Icon,
   'shopping-cart-01': ShoppingCart01Icon,
   sparkles: SparklesIcon,
+  stop: StopIcon,
   star: StarIcon,
   'text-align-left-01': TextAlignLeft01Icon,
   'tick-double-02': TickDouble02Icon,
   truck: TruckIcon,
   user: UserIcon,
+  'volume-high': VolumeHighIcon,
 }
 
 export default function Icon({ name, size = 20, className = '', style = {}, strokeWidth = 1.8 }) {
