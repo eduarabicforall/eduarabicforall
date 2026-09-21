@@ -232,7 +232,7 @@ export default function AiUstaz() {
           <div key={i} className={`max-w-[82%] ${msg.from === 'me' ? 'self-end' : 'self-start'}`}>
             <div
               dir="auto"
-              className={`px-4 py-2.5 text-[13.5px] leading-relaxed ${
+              className={`whitespace-pre-wrap break-words px-4 py-2.5 text-[13.5px] leading-relaxed ${
                 msg.from === 'me'
                   ? 'rounded-[14px_14px_4px_14px] bg-primary/[.16]'
                   : msg.isError
