@@ -149,7 +149,7 @@ export default function Auth() {
               type="button"
               onClick={handleGoogle}
               disabled={submitting}
-              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink disabled:opacity-60"
+              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink transition-all duration-200 enabled:hover:-translate-y-px enabled:hover:border-primary/50 enabled:hover:bg-primary/[.08] enabled:active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 disabled:opacity-60 motion-reduce:transition-none motion-reduce:enabled:hover:translate-y-0"
             >
               <GoogleLogo size={16} /> Continue with Google
             </button>
@@ -220,7 +220,7 @@ export default function Auth() {
               type="button"
               onClick={handleGoogle}
               disabled={submitting}
-              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink disabled:opacity-60"
+              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink transition-all duration-200 enabled:hover:-translate-y-px enabled:hover:border-primary/50 enabled:hover:bg-primary/[.08] enabled:active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 disabled:opacity-60 motion-reduce:transition-none motion-reduce:enabled:hover:translate-y-0"
             >
               <GoogleLogo size={16} /> Continue with Google
             </button>
