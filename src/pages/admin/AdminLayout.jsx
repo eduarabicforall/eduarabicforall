@@ -13,6 +13,7 @@ import { ORDER_FILTERS } from '../../data/adminMock.js'
 const NAV_ITEMS = [
   { to: '/admin', end: true, icon: 'dashboard-square-01', label: 'Dashboard' },
   { to: '/admin/admins', icon: 'shield-user', label: 'Manage admins' },
+  { to: '/admin/users', icon: 'user', label: 'Users' },
   { to: '/admin/materials', icon: 'book-02', label: 'Manage materials' },
   { to: '/admin/products', icon: 'shopping-bag-02', label: 'Manage products' },
   { to: '/admin/codes', icon: 'key-01', label: 'Activation codes' },

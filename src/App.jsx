@@ -29,6 +29,7 @@ import { AdminProvider } from './context/AdminContext.jsx'
 import AdminLayout from './pages/admin/AdminLayout.jsx'
 import AdminDashboard from './pages/admin/AdminDashboard.jsx'
 import AdminAdmins from './pages/admin/AdminAdmins.jsx'
+import AdminUsers from './pages/admin/AdminUsers.jsx'
 import AdminMaterials from './pages/admin/AdminMaterials.jsx'
 import AdminProducts from './pages/admin/AdminProducts.jsx'
 import AdminCodes from './pages/admin/AdminCodes.jsx'
@@ -159,6 +160,7 @@ export default function App() {
         >
           <Route index element={<AdminDashboard />} />
           <Route path="admins" element={<AdminAdmins />} />
+          <Route path="users" element={<AdminUsers />} />
           <Route path="materials" element={<AdminMaterials />} />
           <Route path="materials/:moduleId" element={<AdminMaterials />} />
           <Route path="products" element={<AdminProducts />} />

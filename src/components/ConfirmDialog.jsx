@@ -8,7 +8,7 @@ export default function ConfirmDialog({ title, children, confirmLabel, busyLabel
       <div
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-[400px] rounded-2xl border border-app-border bg-app-panel p-6 shadow-[0_20px_60px_rgba(0,0,0,.5)]"
+        className="relative w-full max-w-[400px] rounded-2xl border border-app-border bg-app-surface p-6 shadow-[0_20px_60px_rgba(0,0,0,.5)]"
       >
         <div className="mb-2 font-poppins text-lg font-extrabold">{title}</div>
         <div className="mb-5 text-[13px] leading-relaxed text-app-inkSoft">{children}</div>
