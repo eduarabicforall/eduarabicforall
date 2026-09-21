@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Private / account / transactional areas — not for search results
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /auth
+Disallow: /profile
+Disallow: /my-reviews
+Disallow: /notifications
+Disallow: /activate
+Disallow: /audio/
+Disallow: /grammar
+Disallow: /ai-ustaz
+Disallow: /checkout
+
+Sitemap: https://eduarabicforall.com/sitemap.xml

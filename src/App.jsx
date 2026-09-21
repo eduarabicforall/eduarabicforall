@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { ViewTransitionGate } from './components/TransitionNavLink.jsx'
+import { RouteMeta } from './lib/seo.js'
+import NotFound from './pages/NotFound.jsx'
 import Landing from './pages/Landing.jsx'
 import TermsAndConditions from './pages/TermsAndConditions.jsx'
 import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
@@ -39,6 +41,7 @@ export default function App() {
   return (
     <>
       <ViewTransitionGate />
+      <RouteMeta />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/terms" element={<TermsAndConditions />} />
@@ -158,6 +161,7 @@ export default function App() {
           <Route path="ai" element={<AdminAiConsole />} />
           <Route path="profile" element={<AdminProfile />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )

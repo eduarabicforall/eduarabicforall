@@ -6,6 +6,7 @@ import Icon from '../components/Icon.jsx'
 import Star from '../components/Star.jsx'
 import PlaceholderBlock from '../components/PlaceholderBlock.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { DEFAULT_IMAGE, SITE_NAME, SITE_URL, useJsonLd, usePageMeta } from '../lib/seo.js'
 import { supabase } from '../lib/supabase.js'
 
 function Stars({ value, size = 14 }) {
@@ -68,6 +69,53 @@ export default function Product() {
     else if (window.history.state?.idx > 0) navigate(-1)
     else navigate('/')
   }
+
+  // SEO: the tab title / shared-link tags and Product structured data come from
+  // the loaded product (must be called before the early return below).
+  const seoUrl = product ? `${SITE_URL}/product/${product.id}` : ''
+  const seoImages = product ? [product.image_url, ...(product.image_urls || [])].filter(Boolean) : []
+  const seoDescription = product
+    ? (product.description || `${product.name} — a physical Arabic module with audio lessons and a dedicated AI Ustaz.`).slice(0, 155)
+    : ''
+  usePageMeta(
+    product
+      ? {
+          title: `${product.name} | ${SITE_NAME}`,
+          description: seoDescription,
+          path: `/product/${product.id}`,
+          image: seoImages[0] || DEFAULT_IMAGE,
+        }
+      : null,
+  )
+  const ratingCount = reviews?.length || 0
+  useJsonLd(
+    product
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: product.name,
+          description: seoDescription,
+          image: seoImages.length ? seoImages : [DEFAULT_IMAGE],
+          sku: product.id,
+          brand: { '@type': 'Brand', name: SITE_NAME },
+          offers: {
+            '@type': 'Offer',
+            url: seoUrl,
+            priceCurrency: 'MYR',
+            price: Number(product.price).toFixed(2),
+            availability: 'https://schema.org/InStock',
+            itemCondition: 'https://schema.org/NewCondition',
+          },
+          ...(ratingCount > 0 && {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: (reviews.reduce((sum, r) => sum + r.rating, 0) / ratingCount).toFixed(1),
+              reviewCount: ratingCount,
+            },
+          }),
+        }
+      : null,
+  )
 
   if (!product) {
     return (

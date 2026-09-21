@@ -3,7 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EduArabic for All</title>
+
+    <!-- Primary SEO. These static tags are what crawlers and social-link previews read
+         (they don't run JavaScript); src/lib/seo.js updates them per route once the app loads. -->
+    <title>EduArabic for All | Learn Arabic with Modules &amp; AI Ustaz</title>
+    <meta
+      name="description"
+      content="Physical Arabic modules with audio lessons and a dedicated AI Ustaz for every module. Listen, speak and repeat — a new-age way to learn Arabic, made in Malaysia."
+    />
+    <link rel="canonical" href="https://eduarabicforall.com/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#0C1D3D" />
+
+    <!-- Icons -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:site_name" content="EduArabic for All" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_MY" />
+    <meta property="og:url" content="https://eduarabicforall.com/" />
+    <meta property="og:title" content="EduArabic for All | Learn Arabic with Modules &amp; AI Ustaz" />
+    <meta
+      property="og:description"
+      content="Physical Arabic modules with audio lessons and a dedicated AI Ustaz for every module. Listen, speak and repeat."
+    />
+    <meta property="og:image" content="https://eduarabicforall.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="EduArabic for All — Listen, Speak & Repeat" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EduArabic for All | Learn Arabic with Modules &amp; AI Ustaz" />
+    <meta
+      name="twitter:description"
+      content="Physical Arabic modules with audio lessons and a dedicated AI Ustaz for every module."
+    />
+    <meta name="twitter:image" content="https://eduarabicforall.com/og-image.jpg" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://eduarabicforall.com/#organization",
+            "name": "EduArabic for All",
+            "url": "https://eduarabicforall.com/",
+            "logo": "https://eduarabicforall.com/icon-512.png",
+            "description": "Physical Arabic learning modules with digital audio lessons and a dedicated AI Ustaz for every module.",
+            "areaServed": "MY"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://eduarabicforall.com/#website",
+            "url": "https://eduarabicforall.com/",
+            "name": "EduArabic for All",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://eduarabicforall.com/#organization" }
+          }
+        ]
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,6 +78,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>EduArabic for All — Learn Arabic with physical modules and AI Ustaz</h1>
+      <p>
+        Physical Arabic modules with audio lessons and a dedicated AI Ustaz for every module. Please enable
+        JavaScript to use the site.
+      </p>
+      <nav>
+        <a href="/shop">Shop modules</a> · <a href="/about">About us</a> · <a href="/contact">Contact us</a> ·
+        <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="/refund">Refund policy</a>
+      </nav>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
