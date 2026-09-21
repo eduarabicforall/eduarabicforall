@@ -57,7 +57,8 @@ Deno.serve(async (req: Request) => {
 
   // 3. caller has activated this module (or is an admin)
   const { data: profile } = await admin.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (profile?.role !== "admin") {
+  const isAdmin = profile?.role === "admin";
+  if (!isAdmin) {
     const { data: owned } = await admin
       .from("user_modules")
       .select("module_id")
@@ -99,26 +100,39 @@ Deno.serve(async (req: Request) => {
   ].join("\n");
   const systemPrompt = `${guardrails}\n\nModule-specific instructions from the teacher:\n${config.system_prompt ?? ""}`;
 
+  // Google AI Studio keys ("AIza…") use the Generative Language API; the newer
+  // Google Cloud / Vertex AI Express keys ("AQ.…") use the Vertex endpoint.
+  const isVertexKey = String(apiKey).startsWith("AQ.");
+  const endpoint = isVertexKey
+    ? `https://aiplatform.googleapis.com/v1/publishers/google/models/${config.model}:generateContent?key=${apiKey}`
+    : `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${apiKey}`;
+
   let reply: string | undefined;
+  let upstream: { status: number; message: string } | undefined;
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${config.model}:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: "user", parts: [{ text: message }] }],
-        }),
-      },
-    );
-    const data = await res.json();
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: "user", parts: [{ text: message }] }],
+      }),
+    });
+    const data = await res.json().catch(() => null);
     reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  } catch {
+    if (!reply) {
+      const raw = data?.error?.message ??
+        (data?.promptFeedback?.blockReason ? `blocked: ${data.promptFeedback.blockReason}` : "empty reply");
+      upstream = { status: res.status, message: String(raw).split(String(apiKey)).join("[key]").slice(0, 300) };
+      console.error("ai-ustaz-chat upstream failure", upstream.status, upstream.message);
+    }
+  } catch (err) {
+    console.error("ai-ustaz-chat upstream unreachable", String(err));
     return json({ error: "upstream_unavailable" }, 502);
   }
   // No usable reply (blocked, empty, upstream error) — don't spend the learner's quota.
-  if (!reply) return json({ error: "no_reply" }, 502);
+  // Admins also get the upstream reason so setup problems (wrong key, wrong model) are visible.
+  if (!reply) return json({ error: "no_reply", ...(isAdmin && upstream ? { detail: upstream } : {}) }, 502);
 
   await admin.from("ai_usage_log").upsert({
     user_id: user.id,

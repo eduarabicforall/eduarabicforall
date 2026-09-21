@@ -3,7 +3,7 @@ import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
 import Icon from '../components/Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { functionErrorCode } from '../lib/functionError.js'
+import { functionErrorBody } from '../lib/functionError.js'
 import { supabase } from '../lib/supabase.js'
 
 // What the Ustaz tells the learner when the ai-ustaz-chat function refuses or
@@ -134,12 +134,16 @@ export default function AiUstaz() {
       addMessage({ from: 'them', text: data.reply })
       setUsedByModule((prev) => ({ ...prev, [targetId]: data.used ?? (prev[targetId] || 0) + 1 }))
     } catch (err) {
-      const code = await functionErrorCode(err)
+      const body = await functionErrorBody(err)
+      const code = body?.error || 'unknown'
       if (code === 'quota_exceeded') {
         setUsedByModule((prev) => ({ ...prev, [targetId]: target.limit }))
         return
       }
-      addMessage({ from: 'them', text: ERROR_MESSAGES[code] || FALLBACK_ERROR, isError: true })
+      // Only admins receive `detail` from the server — it says why Gemini refused
+      // (invalid key, unknown model, …) so setup problems are visible.
+      const debug = body?.detail ? ` [admin: ${body.detail.status} — ${body.detail.message}]` : ''
+      addMessage({ from: 'them', text: (ERROR_MESSAGES[code] || FALLBACK_ERROR) + debug, isError: true })
     } finally {
       setTyping(false)
     }

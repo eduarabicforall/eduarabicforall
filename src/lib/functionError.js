@@ -1,12 +1,16 @@
 // supabase.functions.invoke() reports a non-2xx reply as an error whose
-// `context` is the raw Response — the function's own { error: "code" } JSON
-// has to be read from it. Returns that code (e.g. "quota_exceeded"), or
-// "unknown" if there isn't one.
-export async function functionErrorCode(error) {
+// `context` is the raw Response — the function's own JSON body has to be read
+// from it. functionErrorBody returns that body (or null); functionErrorCode
+// returns just its { error: "code" }, or "unknown" if there isn't one.
+export async function functionErrorBody(error) {
   try {
-    const body = await error?.context?.json?.()
-    return body?.error || 'unknown'
+    return (await error?.context?.json?.()) ?? null
   } catch {
-    return 'unknown'
+    return null
   }
+}
+
+export async function functionErrorCode(error) {
+  const body = await functionErrorBody(error)
+  return body?.error || 'unknown'
 }
