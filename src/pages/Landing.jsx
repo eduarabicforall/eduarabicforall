@@ -420,7 +420,7 @@ export default function Landing() {
       {/* AI Ustaz / My Vocab — a dark feature panel that rotates between the two app mockups */}
       <section id="ai" className="px-[4vw] pb-[70px] sm:px-[5vw]">
         <div
-          className="gs-reveal relative mx-auto max-w-[1100px] overflow-hidden rounded-[32px] px-6 py-12 text-center sm:rounded-[40px] md:px-14 md:py-16"
+          className="gs-reveal relative mx-auto max-w-[1100px] overflow-hidden rounded-[32px] px-6 py-10 text-center sm:rounded-[40px] md:px-14 md:py-10"
           style={{
             background:
               'radial-gradient(60% 50% at 50% 0%, rgba(61,125,216,.28) 0%, transparent 70%), radial-gradient(50% 40% at 50% 100%, rgba(61,125,216,.22) 0%, transparent 70%), linear-gradient(160deg, #070A14 0%, #0C1D3D 55%, #0A1730 100%)',
@@ -436,21 +436,21 @@ export default function Landing() {
                   i === featureSlide ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-2 opacity-0'
                 }`}
               >
-                <div className="mb-5 inline-flex items-center gap-2.5 rounded-pill border border-white/15 bg-white/[.08] px-4 py-2 text-[12px] font-bold uppercase tracking-[.14em] text-white/90">
+                <div className="mb-4 inline-flex items-center gap-2.5 rounded-pill border border-white/15 bg-white/[.08] px-4 py-2 text-[12px] font-bold uppercase tracking-[.14em] text-white/90">
                   <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-goldBright" /> {slide.badge}
                 </div>
-                <h2 className="mx-auto mb-4 max-w-[640px] font-poppins text-[28px] font-extrabold leading-[1.15] text-white sm:text-[36px] md:text-[42px]">
+                <h2 className="mx-auto mb-3 max-w-[860px] font-poppins text-[26px] font-extrabold leading-[1.15] text-white sm:text-[32px] md:text-[36px]">
                   {slide.title}{' '}
                   <span className="bg-gradient-to-r from-[#FFE27A] via-[#FFC93C] to-[#FFA928] bg-clip-text text-transparent">
                     {slide.highlight}
                   </span>
                 </h2>
-                <p className="mx-auto max-w-[560px] text-[15px] leading-[1.7] text-white/75 sm:text-base">{slide.body}</p>
+                <p className="mx-auto max-w-[680px] text-[15px] leading-[1.7] text-white/75 sm:text-base">{slide.body}</p>
               </div>
             ))}
           </div>
 
-          <div className="mx-auto -my-2 mt-6 grid w-full max-w-[420px] sm:max-w-[520px] md:max-w-[560px]">
+          <div className="mx-auto -my-6 grid w-full max-w-[340px] sm:max-w-[380px] md:max-w-[340px]">
             {FEATURE_SLIDES.map((slide, i) => (
               <img
                 key={slide.image}
@@ -484,7 +484,7 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="mt-10">
+          <div className="mt-5">
             <TransitionLink
               to="/auth?view=signup"
               className="inline-flex items-center justify-center gap-4 rounded-pill bg-gradient-to-r from-[#FFD75E] to-[#FFB92E] py-2 pl-8 pr-2 text-[15px] font-bold text-[#2A1C04] shadow-[0_10px_30px_rgba(255,193,50,.3)]"
