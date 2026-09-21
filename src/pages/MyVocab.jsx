@@ -151,8 +151,8 @@ export default function MyVocab() {
   for (const it of items || []) counts[it.kind] += 1
 
   return (
-    <AppShell>
-      <div className="flex items-center gap-3 px-5 pb-1.5 pt-[22px]">
+    <AppShell fill>
+      <div className="flex flex-shrink-0 items-center gap-3 px-5 pb-1.5 pt-[22px]">
         <button
           type="button"
           onClick={() => navigate(-1)}
@@ -168,7 +168,7 @@ export default function MyVocab() {
         )}
       </div>
 
-      <div className="flex flex-col gap-3.5 px-5 py-4">
+      <div className="flex flex-shrink-0 flex-col gap-3.5 px-5 pb-3.5 pt-4">
         <div className="flex gap-2">
           {TABS.map((t) => (
             <button
@@ -193,6 +193,10 @@ export default function MyVocab() {
 
         {error && <div className="text-[12px] font-semibold text-danger">{error}</div>}
         {speech.notice && <div className="text-[12px] font-semibold text-gold">{speech.notice}</div>}
+      </div>
+
+      {/* Only the saved items scroll; the header, tabs and search above stay put. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-5 pb-4">
         {items === null && <div className="text-[12.5px] text-app-inkFaint">Loading…</div>}
 
         {items?.length === 0 && !error && (

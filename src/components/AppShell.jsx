@@ -154,10 +154,14 @@ function Sidebar() {
 // wide content column on desktop, and the same full-width mobile layout
 // (with BottomTabBar, rendered per-page as before) below the md breakpoint.
 //
+// `fill` locks the shell to the viewport height instead of letting the page
+// grow, so a page can keep a header/composer fixed and scroll only its middle
+// (children must use flex-1 + min-h-0 + overflow-y-auto on the scrolling part).
+//
 // `bare` skips the sidebar entirely — used for pages a signed-out visitor
 // can land on (e.g. guest checkout) where the account nav/sign-out block
 // would be misleading since there's no account yet.
-export default function AppShell({ children, bare = false }) {
+export default function AppShell({ children, bare = false, fill = false }) {
   if (bare) {
     return (
       <div className="min-h-screen bg-app-bg text-app-ink">
@@ -167,15 +171,15 @@ export default function AppShell({ children, bare = false }) {
   }
 
   return (
-    <div className="min-h-screen bg-app-bg text-app-ink md:flex">
+    <div className={`bg-app-bg text-app-ink md:flex ${fill ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'}`}>
       <div className="hidden w-[230px] flex-shrink-0 border-r border-app-border md:block">
         <div className="vt-sidebar sticky top-0 h-screen">
           <Sidebar />
         </div>
       </div>
-      <div className="min-h-screen flex-1">
+      <div className={`min-w-0 flex-1 ${fill ? 'h-full' : 'min-h-screen'}`}>
         {/* min-h-screen so the BottomTabBar's mt-auto pins it to the bottom of short pages */}
-        <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col">{children}</div>
+        <div className={`mx-auto flex w-full max-w-2xl flex-col ${fill ? 'h-full' : 'min-h-screen'}`}>{children}</div>
       </div>
     </div>
   )

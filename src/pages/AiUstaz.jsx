@@ -293,8 +293,8 @@ export default function AiUstaz() {
   }
 
   return (
-    <AppShell>
-      <div className="border-b border-app-border px-5 pb-3.5 pt-5">
+    <AppShell fill>
+      <div className="flex-shrink-0 border-b border-app-border px-5 pb-3.5 pt-5">
         <div className="mb-3.5 flex items-center gap-3">
           <button
             type="button"
@@ -339,7 +339,7 @@ export default function AiUstaz() {
         </select>
       </div>
 
-      <div ref={scrollRef} className="flex flex-1 flex-col gap-3.5 overflow-y-auto px-5 py-4.5 py-[18px]">
+      <div ref={scrollRef} className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-5 py-4.5 py-[18px]">
         {messages.map((msg, i) => (
           <div key={i} className={`max-w-[82%] ${msg.from === 'me' ? 'self-end' : 'self-start'}`}>
             <div
@@ -379,7 +379,7 @@ export default function AiUstaz() {
 
       {vocabError && <div className="px-5 pb-2 text-center text-[12px] font-semibold text-danger">{vocabError}</div>}
 
-      <form onSubmit={send} className="flex items-center gap-2.5 border-t border-app-border px-4 pb-5 pt-3.5">
+      <form onSubmit={send} className="flex flex-shrink-0 items-center gap-2.5 border-t border-app-border px-4 pb-5 pt-3.5">
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
