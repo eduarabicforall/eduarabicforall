@@ -106,6 +106,13 @@ export function ModuleTreeProvider({ children }) {
     return data
   }
 
+  async function renameModule(moduleDbId, name) {
+    const { data, error } = await supabase.from('modules').update({ name: name.trim() }).eq('id', moduleDbId).select('id')
+    if (error) throw error
+    if (!data?.length) throw new Error('Module was not renamed — check your permissions.')
+    await refresh()
+  }
+
   // `.select()` so a delete blocked by RLS (0 rows, no error) is reported
   // instead of looking like it worked.
   async function removeModule(moduleDbId) {
@@ -179,6 +186,7 @@ export function ModuleTreeProvider({ children }) {
         loading,
         refresh,
         addModule,
+        renameModule,
         removeModule,
         addUnit,
         addAudio,

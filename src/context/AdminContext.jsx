@@ -486,6 +486,30 @@ export function AdminProvider({ children }) {
       if (patch.active !== undefined) dbPatch.is_active = patch.active
       const { error } = await supabase.from('products').update(dbPatch).eq('id', productId)
       if (error) throw error
+      // A product's module carries the product's name in Manage Materials. Keep
+      // them in step — unless the module is shared with another product, in which
+      // case renaming it for one would mislabel the other.
+      const product = products.find((p) => p.id === productId)
+      // Only when the product still points at the same module — relinking it to a
+      // different module must never rename that other module.
+      const moduleDbId = product?.moduleId
+      const relinked = dbPatch.module_id !== undefined && dbPatch.module_id !== moduleDbId
+      const newName = typeof patch.name === 'string' ? patch.name.trim() : ''
+      if (
+        moduleDbId &&
+        !relinked &&
+        newName &&
+        !products.some((p) => p.id !== productId && p.moduleId === moduleDbId)
+      ) {
+        const current = moduleTree.find((m) => m.dbId === moduleDbId)
+        if (current && current.name !== newName) {
+          try {
+            await moduleTreeStore.renameModule(moduleDbId, newName)
+          } catch (renameErr) {
+            console.error('Could not rename the linked module', renameErr)
+          }
+        }
+      }
       await refreshProducts()
     } catch (err) {
       showToast(err.message || 'Could not update product.')
