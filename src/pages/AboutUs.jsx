@@ -28,7 +28,7 @@ export default function AboutUs() {
     <div className="min-h-screen bg-light-bg text-light-ink">
       <Navbar />
       <main className="mx-auto max-w-[900px] px-[6vw] py-16">
-        <h1 className="mb-3 font-sora text-[32px] font-extrabold">About EduArabic for All</h1>
+        <h1 className="mb-3 font-poppins text-[32px] font-extrabold">About EduArabic for All</h1>
         <p className="mb-10 max-w-[600px] text-[14.5px] leading-relaxed text-light-inkSoft">
           EduArabic for All pairs a physical Arabic-learning module with a companion app — audio lessons, a free
           Grammar module, and a dedicated AI Ustaz for every module you activate. Developed with the Faculty of
@@ -47,7 +47,7 @@ export default function AboutUs() {
           ))}
         </div>
 
-        <h2 className="mb-2 font-sora text-xl font-extrabold">Recognised at international innovation competitions</h2>
+        <h2 className="mb-2 font-poppins text-xl font-extrabold">Recognised at international innovation competitions</h2>
         <p className="mb-6 max-w-[560px] text-[13.5px] leading-relaxed text-light-inkSoft">
           EduArabic for All has been submitted to and recognised at several innovation and teaching-enhancement
           competitions in Malaysia.
@@ -67,7 +67,7 @@ export default function AboutUs() {
         </div>
 
         <div className="rounded-2xl border border-primary/[.18] bg-primary/[.06] p-6 text-center sm:p-8">
-          <div className="mb-1.5 font-sora text-lg font-extrabold">Have a question, or want to partner with us?</div>
+          <div className="mb-1.5 font-poppins text-lg font-extrabold">Have a question, or want to partner with us?</div>
           <p className="mb-5 text-[13.5px] text-light-inkSoft">
             We'd love to hear from resellers, educators, and institutions interested in EduArabic for All.
           </p>

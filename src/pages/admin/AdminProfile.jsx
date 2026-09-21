@@ -14,7 +14,7 @@ export default function AdminProfile() {
 
   return (
     <div>
-      <h1 className="mb-6 font-sora text-2xl font-extrabold">Profile settings</h1>
+      <h1 className="mb-6 font-poppins text-2xl font-extrabold">Profile settings</h1>
 
       <div className="flex max-w-[480px] flex-col gap-4 rounded-2xl border border-app-border bg-app-panel p-6">
         <div className="mb-1.5 flex items-center gap-3.5">

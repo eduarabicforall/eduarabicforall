@@ -58,7 +58,7 @@ export default function Activate() {
         >
           <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
         </button>
-        <div className="font-sora text-base font-extrabold">Activate module</div>
+        <div className="font-poppins text-base font-extrabold">Activate module</div>
       </div>
 
       <div className="px-6 py-6.5 px-6 py-[26px]">
@@ -67,7 +67,7 @@ export default function Activate() {
             <div className="mb-4.5 mb-[18px] flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/[.14]">
               <Icon name="key-01" size={26} className="text-primary" />
             </div>
-            <div className="mb-1.5 font-sora text-[19px] font-extrabold">Enter your activation code</div>
+            <div className="mb-1.5 font-poppins text-[19px] font-extrabold">Enter your activation code</div>
             <div className="mb-6.5 mb-[26px] text-[13px] leading-relaxed text-app-inkSoft">
               Find the unique code printed inside your physical module.
             </div>
@@ -75,7 +75,7 @@ export default function Activate() {
               value={code}
               onChange={(e) => setCode(formatCode(e.target.value))}
               placeholder="XXXX-XXXX"
-              className="w-full rounded-xl border border-app-border bg-app-panel2 px-2 py-4 text-center font-sora text-lg font-bold uppercase tracking-[.15em] text-app-ink placeholder:text-app-inkFaint placeholder:tracking-[.15em]"
+              className="w-full rounded-xl border border-app-border bg-app-panel2 px-2 py-4 text-center font-poppins text-lg font-bold uppercase tracking-[.15em] text-app-ink placeholder:text-app-inkFaint placeholder:tracking-[.15em]"
             />
             <button
               type="submit"
@@ -92,7 +92,7 @@ export default function Activate() {
             <div className="mb-4.5 mb-[18px] flex h-14 w-14 items-center justify-center rounded-2xl bg-danger/[.14]">
               <Icon name="alert-circle" size={26} className="text-danger" />
             </div>
-            <div className="mb-1.5 font-sora text-[19px] font-extrabold">Invalid code</div>
+            <div className="mb-1.5 font-poppins text-[19px] font-extrabold">Invalid code</div>
             <div className="mb-6.5 mb-[26px] text-[13px] leading-relaxed text-app-inkSoft">{errorMessage}</div>
             <button
               type="button"
@@ -109,7 +109,7 @@ export default function Activate() {
             <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/[.18]">
               <Icon name="checkmark-circle-02" size={26} className="text-primary" />
             </div>
-            <div className="mb-5 font-sora text-[19px] font-extrabold">Module activated!</div>
+            <div className="mb-5 font-poppins text-[19px] font-extrabold">Module activated!</div>
             <div className="mb-6 flex w-full items-center gap-3.5 rounded-2xl border border-app-border bg-app-panel p-4 text-left">
               <PlaceholderBlock variant="dark" label="" className="h-[52px] w-[52px] flex-shrink-0 rounded-[13px]" />
               <div>

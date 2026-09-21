@@ -151,7 +151,7 @@ export default function Landing() {
           <div className="gs-hero-item mb-[22px] inline-flex items-center gap-2 rounded-pill border border-light-ink/10 bg-light-ink/[.045] px-3.5 py-[7px] text-[13px] font-semibold text-light-inkSoft">
             <Icon name="qr-code" size={15} className="animate-pulse text-primary" /> Physical modules, digital learning
           </div>
-          <h1 className="gs-hero-item mb-5 font-sora text-[52px] font-extrabold leading-[1.06] tracking-tight">
+          <h1 className="gs-hero-item mb-5 font-poppins text-[52px] font-extrabold leading-[1.06] tracking-tight">
             Listen, Speak &amp;{' '}
             <span className="bg-gradient-to-r from-primary to-violet bg-clip-text text-transparent">Repeat!</span>
           </h1>
@@ -212,7 +212,7 @@ export default function Landing() {
 
       {/* How it works */}
       <section id="how" className="mx-auto max-w-[1160px] px-[6vw] py-[70px]">
-        <h2 className="mb-2.5 text-center font-sora text-[32px] font-extrabold">
+        <h2 className="mb-2.5 text-center font-poppins text-[32px] font-extrabold">
           Four steps to{' '}
           <span className="bg-gradient-to-r from-primary to-violet bg-clip-text text-transparent">fluent!</span>
         </h2>
@@ -225,7 +225,7 @@ export default function Landing() {
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[11px] bg-primary/[.15]">
                 <Icon name={step.icon} size={19} className="text-primary" />
               </div>
-              <div className="mb-1.5 font-sora text-[15px] font-bold">{step.title}</div>
+              <div className="mb-1.5 font-poppins text-[15px] font-bold">{step.title}</div>
               <div className="text-[13px] leading-[1.55] text-light-inkSoft">{step.body}</div>
             </div>
           ))}
@@ -258,7 +258,7 @@ export default function Landing() {
           <div className="mb-[18px] inline-flex items-center gap-2 rounded-pill border border-violet/25 bg-violet/[.12] px-3.5 py-1.5 text-xs font-bold text-violet">
             AI USTAZ
           </div>
-          <h2 className="mb-3.5 font-sora text-[30px] font-extrabold leading-[1.15]">
+          <h2 className="mb-3.5 font-poppins text-[30px] font-extrabold leading-[1.15]">
             A different Ustaz for every module
           </h2>
           <p className="text-[15px] leading-[1.65] text-light-inkSoft">
@@ -270,7 +270,7 @@ export default function Landing() {
 
       {/* Modules */}
       <section id="modules" className="mx-auto max-w-[1160px] px-[6vw] pb-[70px]">
-        <h2 className="mb-2.5 text-center font-sora text-[32px] font-extrabold">Our physical modules</h2>
+        <h2 className="mb-2.5 text-center font-poppins text-[32px] font-extrabold">Our physical modules</h2>
         <p className="mb-11 text-center text-[15px] text-light-inkSoft">
           Each one ships with its own audio library and AI Ustaz.
         </p>
@@ -288,7 +288,7 @@ export default function Landing() {
               <div className="p-4">
                 <div className="mb-1 text-sm font-bold">{mod.name}</div>
                 <div className="mb-2.5 truncate text-xs text-light-inkFaint">{mod.description}</div>
-                <div className="font-sora text-base font-extrabold text-primary">RM{mod.price}</div>
+                <div className="font-poppins text-base font-extrabold text-primary">RM{mod.price}</div>
                 <div className="mt-3.5 flex gap-2">
                   <button
                     type="button"
@@ -311,7 +311,7 @@ export default function Landing() {
         </div>
 
         <div className="mt-10">
-          <h3 className="mb-6 text-center font-sora text-xl font-extrabold">App features</h3>
+          <h3 className="mb-6 text-center font-poppins text-xl font-extrabold">App features</h3>
           <div className="gs-stagger grid grid-cols-2 gap-4 md:grid-cols-4">
             {APP_FEATURES.map((feat) => (
               <div key={feat.title} className="rounded-2xl border border-light-ink/[.07] bg-light-ink/[.03] p-5">
@@ -326,7 +326,7 @@ export default function Landing() {
 
       {/* Reviews */}
       <section id="reviews" className="mx-auto max-w-[1160px] px-[6vw] pb-20">
-        <h2 className="mb-10 text-center font-sora text-[32px] font-extrabold">Students say</h2>
+        <h2 className="mb-10 text-center font-poppins text-[32px] font-extrabold">Students say</h2>
         <div className="gs-stagger scrollbar-none -mx-[6vw] flex snap-x snap-mandatory gap-[18px] overflow-x-auto px-[6vw] pb-2 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:pb-0">
           {REVIEWS.map((review) => (
             <div
@@ -342,7 +342,7 @@ export default function Landing() {
 
       {/* FAQ */}
       <section id="faq" className="mx-auto max-w-[800px] px-[6vw] pb-20">
-        <h2 className="mb-10 text-center font-sora text-[32px] font-extrabold">Frequently asked questions</h2>
+        <h2 className="mb-10 text-center font-poppins text-[32px] font-extrabold">Frequently asked questions</h2>
         <div className="gs-stagger flex flex-col gap-2.5">
           {FAQS.map((faq, i) => (
             <FaqItem

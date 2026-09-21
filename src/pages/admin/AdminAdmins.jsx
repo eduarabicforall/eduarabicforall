@@ -13,7 +13,7 @@ export default function AdminAdmins() {
 
   return (
     <div>
-      <h1 className="mb-1.5 font-sora text-2xl font-extrabold">Manage admins</h1>
+      <h1 className="mb-1.5 font-poppins text-2xl font-extrabold">Manage admins</h1>
       <p className="mb-6 text-[12.5px] text-app-inkFaint">
         Adding an email here only grants admin access the next time that person signs up — it does not retroactively
         promote someone who already has an account.

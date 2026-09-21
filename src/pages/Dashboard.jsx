@@ -68,14 +68,14 @@ export default function Dashboard() {
           <button
             type="button"
             onClick={() => navigate('/profile')}
-            className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-soft font-sora text-[17px] font-extrabold text-[#0B2A4A]"
+            className="flex h-[46px] w-[46px] flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-soft font-poppins text-[17px] font-extrabold text-[#0B2A4A]"
           >
             {initials(name)}
           </button>
 
           <div>
             <div className="mb-0.5 text-[10.5px] font-semibold text-app-inkFaint">{today}</div>
-            <div className="font-sora text-[19px] font-extrabold">{name}</div>
+            <div className="font-poppins text-[19px] font-extrabold">{name}</div>
           </div>
         </div>
         <div className="flex items-center gap-2">

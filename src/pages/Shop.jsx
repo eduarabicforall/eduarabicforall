@@ -27,6 +27,7 @@ export default function Shop() {
       .from('products')
       .select('id, name, description, price, image_url, created_at')
       .eq('is_active', true)
+      .eq('on_sale', true) // only products with "Sell in app" switched on
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (error) {
@@ -62,7 +63,7 @@ export default function Shop() {
           <div className="flex h-9 w-9 items-center justify-center rounded-[11px] bg-primary/[.15]">
             <Icon name="shopping-bag-02" size={18} className="text-primary" />
           </div>
-          <div className="font-sora text-xl font-extrabold">Shop</div>
+          <div className="font-poppins text-xl font-extrabold">Shop</div>
         </div>
         <div className="text-[12.5px] text-app-inkSoft">Physical modules, delivered to your door.</div>
       </div>
@@ -82,7 +83,7 @@ export default function Shop() {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 px-5 pt-4">
+      <div className="grid grid-cols-2 content-start items-start gap-3 px-5 pb-6 pt-4">
         {products === null && <div className="col-span-2 text-[12.5px] text-app-inkFaint">Loading…</div>}
         {products?.length === 0 && (
           <div className="col-span-2 rounded-2xl border border-dashed border-app-border bg-app-panel/60 p-4 text-[12.5px] text-app-inkSoft">
@@ -105,7 +106,7 @@ export default function Shop() {
               <div className="p-3">
                 <div className="mb-1 line-clamp-1 text-[13px] font-bold">{p.name}</div>
                 <div className="mb-2 line-clamp-2 text-[11px] leading-snug text-app-inkFaint">{p.description}</div>
-                <div className="font-sora text-sm font-extrabold text-primary">RM{p.price}</div>
+                <div className="font-poppins text-sm font-extrabold text-primary">RM{p.price}</div>
               </div>
             </button>
             <button

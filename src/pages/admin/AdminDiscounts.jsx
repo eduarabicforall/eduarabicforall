@@ -59,7 +59,7 @@ export default function AdminDiscounts() {
   return (
     <div>
       <div className="mb-1 text-xs font-bold tracking-wide text-app-inkFaint">MANAGE DISCOUNT CODES</div>
-      <h1 className="mb-1.5 font-sora text-2xl font-extrabold">Discount codes</h1>
+      <h1 className="mb-1.5 font-poppins text-2xl font-extrabold">Discount codes</h1>
       <p className="mb-6 text-[12.5px] text-app-inkFaint">
         Codes apply a percentage off a single item's price at checkout. Deactivating a code stops new orders from
         using it — it doesn't affect orders already placed.

@@ -164,7 +164,8 @@ export default function AppShell({ children, bare = false }) {
         </div>
       </div>
       <div className="min-h-screen flex-1">
-        <div className="mx-auto flex w-full max-w-2xl flex-col">{children}</div>
+        {/* min-h-screen so the BottomTabBar's mt-auto pins it to the bottom of short pages */}
+        <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col">{children}</div>
       </div>
     </div>
   )

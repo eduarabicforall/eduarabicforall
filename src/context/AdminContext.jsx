@@ -284,6 +284,36 @@ export function AdminProvider({ children }) {
     }
   }
 
+  // Deleting a product also removes its module (Manage Materials entry) —
+  // unless another product still points at the same module, in which case
+  // the module stays. The product goes first because it references the module.
+  async function deleteProduct(productId) {
+    const product = products.find((p) => p.id === productId)
+    try {
+      const { data, error } = await supabase.from('products').delete().eq('id', productId).select('id')
+      if (error) throw error
+      if (!data?.length) throw new Error('Product was not deleted — check your permissions.')
+    } catch (err) {
+      showToast(err.message || 'Could not delete product.')
+      return false
+    }
+
+    let message = 'Product deleted.'
+    const moduleDbId = product?.moduleId
+    const sharedWithOthers = moduleDbId && products.some((p) => p.id !== productId && p.moduleId === moduleDbId)
+    if (moduleDbId && !sharedWithOthers) {
+      try {
+        await moduleTreeStore.removeModule(moduleDbId)
+        message = 'Product and its module deleted.'
+      } catch (err) {
+        message = `Product deleted, but its module could not be removed: ${err.message}`
+      }
+    }
+    await Promise.all([refreshProducts(), refreshCodes(), refreshAiConfigs()])
+    showToast(message)
+    return true
+  }
+
   async function addAudio(unitId, track) {
     try {
       await moduleTreeStore.addAudio(unitId, track)
@@ -540,6 +570,7 @@ export function AdminProvider({ children }) {
       moduleTree,
       moduleTreeLoading: moduleTreeStore.loading,
       removeModule,
+      deleteProduct,
       addUnit,
       addAudio,
       updateUnitTitle,

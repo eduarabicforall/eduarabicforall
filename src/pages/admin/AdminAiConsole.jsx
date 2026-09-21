@@ -22,7 +22,7 @@ export default function AdminAiConsole() {
 
   return (
     <div>
-      <h1 className="mb-6 font-sora text-2xl font-extrabold">AI console</h1>
+      <h1 className="mb-6 font-poppins text-2xl font-extrabold">AI console</h1>
 
       <div className="mb-7 max-w-[640px] rounded-2xl border border-violet/20 bg-violet/[.06] p-5.5 p-[22px]">
         <div className="mb-3 flex items-center gap-2">

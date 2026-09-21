@@ -30,8 +30,9 @@ export default {
         danger: '#f06868',
       },
       fontFamily: {
-        sora: ['Sora', 'sans-serif'],
-        jakarta: ['"Plus Jakarta Sans"', 'sans-serif'],
+        // Poppins for all Latin text; Amiri is listed as a fallback so any
+        // Arabic outside an explicit font-amiri element still renders in it.
+        poppins: ['Poppins', 'Amiri', 'sans-serif'],
         amiri: ['Amiri', 'serif'],
       },
       borderRadius: {

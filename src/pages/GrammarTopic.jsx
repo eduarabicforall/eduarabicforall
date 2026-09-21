@@ -162,7 +162,7 @@ export default function GrammarTopic() {
             >
               <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
             </button>
-            <div className="font-sora text-base font-extrabold">{topic.title_en}</div>
+            <div className="font-poppins text-base font-extrabold">{topic.title_en}</div>
           </div>
 
           <div className="px-5 pb-2 pt-3.5">
@@ -222,7 +222,7 @@ export default function GrammarTopic() {
             >
               <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
             </button>
-            <div className="font-sora text-base font-extrabold">{QUIZ_TYPE_META[activeType].title}</div>
+            <div className="font-poppins text-base font-extrabold">{QUIZ_TYPE_META[activeType].title}</div>
           </div>
 
           <div className="px-5 py-2">
@@ -386,7 +386,7 @@ export default function GrammarTopic() {
           <div className="mb-4.5 mb-[18px] flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/[.18]">
             <Icon name="checkmark-circle-02" size={26} className="text-primary" />
           </div>
-          <div className="mb-2 font-sora text-[19px] font-extrabold">Quiz complete!</div>
+          <div className="mb-2 font-poppins text-[19px] font-extrabold">Quiz complete!</div>
           <div className="mb-6 text-[13px] leading-relaxed text-app-inkSoft">
             You got {finalScore?.correct} out of {finalScore?.total} correct.
           </div>

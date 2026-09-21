@@ -133,7 +133,7 @@ export default function AiUstaz() {
           >
             <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
           </button>
-          <div className="font-sora text-base font-extrabold">AI Ustaz</div>
+          <div className="font-poppins text-base font-extrabold">AI Ustaz</div>
         </div>
         <div className="mx-5 mt-2 rounded-2xl border border-app-border bg-app-panel px-4 py-6 text-center">
           <Icon name="sparkles" size={22} className="mx-auto mb-2.5 text-violet" />
@@ -167,7 +167,7 @@ export default function AiUstaz() {
           <div className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-[10px] bg-violet/[.15]">
             <Icon name="sparkles" size={17} className="text-violet" />
           </div>
-          <div className="font-sora text-[15px] font-extrabold">{currentModule.persona}</div>
+          <div className="font-poppins text-[15px] font-extrabold">{currentModule.persona}</div>
         </div>
 
         <div className="mb-3.5 flex items-center gap-2">

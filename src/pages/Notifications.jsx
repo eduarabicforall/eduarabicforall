@@ -17,7 +17,7 @@ export default function Notifications() {
         >
           <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
         </button>
-        <div className="font-sora text-base font-extrabold">Notifications</div>
+        <div className="font-poppins text-base font-extrabold">Notifications</div>
       </div>
 
       <div className="px-5 py-10 text-center">

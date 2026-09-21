@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import ConfirmDialog from '../../components/ConfirmDialog.jsx'
 import Icon from '../../components/Icon.jsx'
 import { useAdmin } from '../../context/AdminContext.jsx'
 import AdminGrammarMaterial from './AdminGrammarMaterial.jsx'
@@ -302,6 +303,8 @@ export default function AdminMaterials() {
   const admin = useAdmin()
   const { moduleTree, addUnit, removeModule } = admin
   const navigate = useNavigate()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   if (admin.moduleTreeLoading) {
     return <div className="text-sm text-app-inkFaint">Loading materials…</div>
@@ -317,13 +320,18 @@ export default function AdminMaterials() {
     return <div className="text-sm text-app-inkFaint">No modules found.</div>
   }
 
+  const trackCount = material.units.reduce((n, u) => n + u.tracks.length, 0)
+
+  // In-app dialog rather than window.confirm — native dialogs are blocked in
+  // some embedded browsers, which made the button look dead.
   async function handleDeleteModule() {
-    const trackCount = material.units.reduce((n, u) => n + u.tracks.length, 0)
-    const ok = window.confirm(
-      `Delete "${material.name}" permanently?\n\nThis removes its ${material.units.length} units and ${trackCount} audio tracks. This cannot be undone.`,
-    )
-    if (!ok) return
-    if (await removeModule(material.dbId)) navigate('/admin/materials', { replace: true })
+    setDeleting(true)
+    const ok = await removeModule(material.dbId)
+    setDeleting(false)
+    if (ok) {
+      setConfirmingDelete(false)
+      navigate('/admin/materials', { replace: true })
+    }
   }
 
   return (
@@ -331,21 +339,21 @@ export default function AdminMaterials() {
       <div className="mb-1.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="mb-1 text-xs font-bold tracking-wide text-app-inkFaint">MANAGE MATERIALS</div>
-          <h1 className="flex items-center gap-2.5 font-sora text-2xl font-extrabold">{material.name}</h1>
+          <h1 className="flex items-center gap-2.5 font-poppins text-2xl font-extrabold">{material.name}</h1>
           <div className="mt-1 text-[12.5px] text-app-inkFaint">{material.units.length} units</div>
         </div>
         <div className="flex items-center gap-2.5 self-start">
           <button
             type="button"
-            onClick={handleDeleteModule}
-            className="flex items-center gap-1.5 rounded-[11px] border border-danger/40 px-4 py-2.5 text-[13.5px] font-bold text-danger"
+            onClick={() => setConfirmingDelete(true)}
+            className="flex flex-shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[11px] border border-danger/40 px-4 py-2.5 text-[13.5px] font-bold text-danger"
           >
             <Icon name="delete-02" size={15} /> Delete module
           </button>
           <button
             type="button"
             onClick={() => addUnit(material.dbId)}
-            className="rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
+            className="flex-shrink-0 whitespace-nowrap rounded-[11px] bg-primary px-4.5 px-[18px] py-2.5 text-[13.5px] font-bold text-[#0B2A4A]"
           >
             + Add unit
           </button>
@@ -357,6 +365,20 @@ export default function AdminMaterials() {
           <AudioUnit key={u.id} unit={u} admin={admin} />
         ))}
       </div>
+
+      {confirmingDelete && (
+        <ConfirmDialog
+          title={`Delete "${material.name}"?`}
+          confirmLabel="Delete module"
+          busyLabel="Deleting…"
+          busy={deleting}
+          onConfirm={handleDeleteModule}
+          onCancel={() => setConfirmingDelete(false)}
+        >
+          This permanently removes the module, its {material.units.length} units and {trackCount} audio tracks. This
+          cannot be undone.
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

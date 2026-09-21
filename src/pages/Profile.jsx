@@ -77,12 +77,12 @@ export default function Profile() {
         >
           <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
         </button>
-        <div className="font-sora text-base font-extrabold">Profile settings</div>
+        <div className="font-poppins text-base font-extrabold">Profile settings</div>
       </div>
 
       <div className="flex flex-col gap-4 px-5 py-4">
         <div className="flex items-center gap-3.5 rounded-2xl border border-app-border bg-app-panel p-4">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-soft font-sora text-base font-extrabold text-[#0B2A4A]">
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-soft font-poppins text-base font-extrabold text-[#0B2A4A]">
             {initials(user?.fullName)}
           </div>
           <div className="min-w-0 flex-1">

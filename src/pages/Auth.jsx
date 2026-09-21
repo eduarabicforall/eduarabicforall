@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabase.js'
 
 const inputClass =
-  'mt-1.5 block w-full rounded-xl border border-app-border bg-app-panel2 px-3.5 py-3 font-jakarta text-sm text-app-ink placeholder:text-app-inkFaint'
+  'mt-1.5 block w-full rounded-xl border border-app-border bg-app-panel2 px-3.5 py-3 font-poppins text-sm text-app-ink placeholder:text-app-inkFaint'
 
 function GoogleLogo({ size = 16 }) {
   return (
@@ -132,7 +132,7 @@ export default function Auth() {
 
         {view === 'signin' && (
           <form onSubmit={handleSignIn} className="flex flex-col gap-4.5 gap-y-[18px]">
-            <h1 className="text-center font-sora text-[28px] font-extrabold">Sign in</h1>
+            <h1 className="text-center font-poppins text-[28px] font-extrabold">Sign in</h1>
             <button
               type="button"
               title="Coming soon"
@@ -202,7 +202,7 @@ export default function Auth() {
 
         {view === 'signup' && !signupSent && (
           <form onSubmit={handleSignUp} className="flex flex-col gap-[18px]">
-            <h1 className="text-center font-sora text-[28px] font-extrabold">Create account</h1>
+            <h1 className="text-center font-poppins text-[28px] font-extrabold">Create account</h1>
             <button
               type="button"
               title="Coming soon"
@@ -295,7 +295,7 @@ export default function Auth() {
         {view === 'forgot' && (
           <div className="flex flex-col gap-[18px]">
             <div>
-              <h1 className="mb-1.5 font-sora text-[28px] font-extrabold">Reset password</h1>
+              <h1 className="mb-1.5 font-poppins text-[28px] font-extrabold">Reset password</h1>
               <p className="text-sm text-app-inkSoft">We'll email you a link to reset it.</p>
             </div>
 

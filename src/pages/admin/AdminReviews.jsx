@@ -60,7 +60,7 @@ export default function AdminReviews() {
   return (
     <div>
       <div className="mb-1 text-xs font-bold tracking-wide text-app-inkFaint">MODERATE REVIEWS</div>
-      <h1 className="mb-1.5 font-sora text-2xl font-extrabold">Product reviews</h1>
+      <h1 className="mb-1.5 font-poppins text-2xl font-extrabold">Product reviews</h1>
       <p className="mb-6 text-[12.5px] text-app-inkFaint">
         Reviews go live immediately when a customer submits one. Hide a review to remove it from the product page
         without deleting it — the customer can still see and edit their own hidden review.

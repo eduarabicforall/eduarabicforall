@@ -353,7 +353,7 @@ export default function AdminGrammarMaterial() {
       <div className="mb-1.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="mb-1 text-xs font-bold tracking-wide text-app-inkFaint">MANAGE MATERIALS</div>
-          <h1 className="flex items-center gap-2.5 font-sora text-2xl font-extrabold">
+          <h1 className="flex items-center gap-2.5 font-poppins text-2xl font-extrabold">
             Grammar module
             <span className="rounded-pill bg-gold/[.16] px-2.5 py-1 text-[11px] font-extrabold text-gold">FREE</span>
           </h1>

@@ -12,7 +12,7 @@ export default function ContactUs() {
     <div className="min-h-screen bg-light-bg text-light-ink">
       <Navbar />
       <main className="mx-auto max-w-[900px] px-[6vw] py-16">
-        <h1 className="mb-2 font-sora text-[32px] font-extrabold">Contact Us</h1>
+        <h1 className="mb-2 font-poppins text-[32px] font-extrabold">Contact Us</h1>
         <p className="mb-10 max-w-[520px] text-[14.5px] leading-relaxed text-light-inkSoft">
           Have a question about a module, an activation code, or anything else? Reach out — we're happy to help.
         </p>

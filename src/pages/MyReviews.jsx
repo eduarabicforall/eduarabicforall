@@ -176,7 +176,7 @@ export default function MyReviews() {
         >
           <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
         </button>
-        <div className="font-sora text-base font-extrabold">My reviews</div>
+        <div className="font-poppins text-base font-extrabold">My reviews</div>
       </div>
 
       <div className="flex flex-col gap-3.5 px-5 py-4">

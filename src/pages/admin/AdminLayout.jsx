@@ -133,7 +133,7 @@ export default function AdminLayout() {
       <div className="flex items-center justify-between border-b border-app-border px-4 py-3.5 md:hidden">
         <div className="flex items-center gap-2.5">
           <img src="/logo.png" alt="EduArabic for All" className="h-5 w-auto" />
-          <span className="font-sora text-sm font-extrabold">{activeLabel}</span>
+          <span className="font-poppins text-sm font-extrabold">{activeLabel}</span>
         </div>
         <button
           type="button"

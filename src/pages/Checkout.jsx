@@ -227,7 +227,7 @@ export default function Checkout() {
         >
           <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
         </button>
-        <div className="font-sora text-base font-extrabold">Checkout</div>
+        <div className="font-poppins text-base font-extrabold">Checkout</div>
       </div>
 
       <form onSubmit={user ? placeOrderAsMember : placeOrderAsGuest} className="px-5 pb-6 pt-3.5">
@@ -437,7 +437,7 @@ export default function Checkout() {
           <span>Shipping</span>
           <span>RM{SHIPPING.toFixed(2)}</span>
         </div>
-        <div className="mb-5 flex justify-between border-t border-app-border pt-3 font-sora text-[15px] font-extrabold">
+        <div className="mb-5 flex justify-between border-t border-app-border pt-3 font-poppins text-[15px] font-extrabold">
           <span>Total</span>
           <span className="text-primary">RM{total}</span>
         </div>

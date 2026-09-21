@@ -97,7 +97,7 @@ export default function Product() {
         >
           <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
         </button>
-        <div className="font-sora text-base font-extrabold">Product</div>
+        <div className="font-poppins text-base font-extrabold">Product</div>
       </div>
 
       <div className="px-5 pb-5 pt-3.5">
@@ -126,7 +126,7 @@ export default function Product() {
             ))}
           </div>
         )}
-        <div className="mb-1 font-sora text-[19px] font-extrabold">{product.name}</div>
+        <div className="mb-1 font-poppins text-[19px] font-extrabold">{product.name}</div>
 
         {reviewCount > 0 && (
           <button
@@ -142,7 +142,7 @@ export default function Product() {
           </button>
         )}
 
-        <div className="mb-4 font-sora text-[22px] font-extrabold text-primary">RM{product.price}</div>
+        <div className="mb-4 font-poppins text-[22px] font-extrabold text-primary">RM{product.price}</div>
         <p className="mb-4 text-[13.5px] leading-relaxed text-app-inkSoft">
           {product.description ||
             'Includes the printed module and a unique activation code that unlocks the matching Audio Library and AI Ustaz once scanned or entered in the app.'}
@@ -161,7 +161,7 @@ export default function Product() {
 
         <div id="reviews" className="mt-8 border-t border-app-border pt-6">
           <div className="mb-4 flex items-center justify-between">
-            <div className="font-sora text-base font-extrabold">Reviews</div>
+            <div className="font-poppins text-base font-extrabold">Reviews</div>
             {reviewCount > 0 && (
               <div className="flex items-center gap-2">
                 <Stars value={avgRating} size={15} />

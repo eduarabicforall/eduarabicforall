@@ -16,7 +16,7 @@ export default function AdminCodes() {
   return (
     <div>
       <div className="mb-1.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="font-sora text-2xl font-extrabold">Activation codes</h1>
+        <h1 className="font-poppins text-2xl font-extrabold">Activation codes</h1>
         <button
           type="button"
           onClick={exportCodesCsv}
@@ -48,7 +48,7 @@ export default function AdminCodes() {
               {rows.map(({ module, code }) => (
                 <tr key={module.dbId} className="border-t border-app-border">
                   <td className="px-3.5 py-3.5 text-[13px] font-semibold">{module.name}</td>
-                  <td className="px-3.5 py-3.5 font-sora text-[13px] font-bold tracking-wide">
+                  <td className="px-3.5 py-3.5 font-poppins text-[13px] font-bold tracking-wide">
                     {code ? code.code : <span className="font-sans font-normal text-app-inkFaint">No code yet</span>}
                   </td>
                   <td className="px-3.5 py-3.5 text-[13px] text-app-inkSoft">{code?.activatedCount ?? '—'}</td>

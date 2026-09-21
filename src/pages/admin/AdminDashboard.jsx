@@ -7,6 +7,7 @@ const formatRm = (n) => `RM${n.toLocaleString('en-MY', { minimumFractionDigits: 
 export default function AdminDashboard() {
   const { moduleTree, codes, orders, codesLoading, ordersLoading } = useAdmin()
   const [totalUsers, setTotalUsers] = useState(null)
+  const [aiMessages, setAiMessages] = useState(null)
 
   useEffect(() => {
     let active = true
@@ -15,6 +16,15 @@ export default function AdminDashboard() {
       .select('id', { count: 'exact', head: true })
       .then(({ count, error }) => {
         if (active) setTotalUsers(error ? undefined : count)
+      })
+    // ai_usage_log holds one row per user/module/day with a message_count.
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    supabase
+      .from('ai_usage_log')
+      .select('message_count')
+      .gte('date', since)
+      .then(({ data, error }) => {
+        if (active) setAiMessages(error ? undefined : data.reduce((sum, r) => sum + (r.message_count || 0), 0))
       })
     return () => {
       active = false
@@ -52,7 +62,10 @@ export default function AdminDashboard() {
       value: totalUsers === null ? '…' : totalUsers === undefined ? '—' : totalUsers.toLocaleString('en-MY'),
     },
     { label: 'Most active module', value: loadingStats ? '…' : topModule },
-    { label: 'AI Ustaz messages (30d)', value: '—', hint: 'Not tracked yet' },
+    {
+      label: 'AI Ustaz messages (30d)',
+      value: aiMessages === null ? '…' : aiMessages === undefined ? '—' : aiMessages.toLocaleString('en-MY'),
+    },
     {
       label: 'Sales (paid orders)',
       value: loadingStats ? '…' : formatRm(sales),
@@ -64,13 +77,13 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="mb-1 text-xs font-semibold text-app-inkFaint">{today}</div>
-      <h1 className="mb-6 font-sora text-2xl font-extrabold">Dashboard</h1>
+      <h1 className="mb-6 font-poppins text-2xl font-extrabold">Dashboard</h1>
 
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {STAT_CARDS.map((card) => (
           <div key={card.label} className="rounded-2xl border border-app-border bg-app-panel p-5">
             <div className="mb-2 text-xs font-semibold text-app-inkFaint">{card.label}</div>
-            <div className={`font-sora text-[26px] font-extrabold ${card.accent ? 'text-primary' : ''}`}>
+            <div className={`font-poppins text-[26px] font-extrabold ${card.accent ? 'text-primary' : ''}`}>
               {card.value}
             </div>
             {card.hint && <div className="mt-1 text-[11px] text-app-inkFaint">{card.hint}</div>}

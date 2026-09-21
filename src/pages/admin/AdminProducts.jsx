@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_FILTERS } from '../../data/adminMock.js'
 import { useAdmin } from '../../context/AdminContext.jsx'
+import ConfirmDialog from '../../components/ConfirmDialog.jsx'
 import R2MockUpload from '../../components/R2MockUpload.jsx'
 
 // PRD §6 issue #6: admin product form now includes an image URL + description,
@@ -11,10 +12,12 @@ import R2MockUpload from '../../components/R2MockUpload.jsx'
 const emptyDraft = { name: '', moduleId: '', price: '', stock: '', description: '', imageUrl: '', imageUrls: [] }
 
 export default function AdminProducts() {
-  const { products, productsLoading, addProduct, updateProduct, showToast, moduleTree } = useAdmin()
+  const { products, productsLoading, addProduct, updateProduct, deleteProduct, showToast, moduleTree } = useAdmin()
   const [filter, setFilter] = useState('all')
   const [editingId, setEditingId] = useState(null)
   const [draft, setDraft] = useState(emptyDraft)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const filtered = products.filter((p) => filter === 'all' || (filter === 'active' ? p.active : !p.active))
 
@@ -45,12 +48,27 @@ export default function AdminProducts() {
     showToast('Product saved.')
   }
 
+  const editingProduct = products.find((p) => p.id === editingId)
+  const moduleShared =
+    editingProduct?.moduleId && products.some((p) => p.id !== editingId && p.moduleId === editingProduct.moduleId)
+
+  async function handleDeleteProduct() {
+    setDeleting(true)
+    const ok = await deleteProduct(editingId)
+    setDeleting(false)
+    if (ok) {
+      setConfirmingDelete(false)
+      setEditingId(null)
+      setDraft(emptyDraft)
+    }
+  }
+
   return (
     <div>
       <div className="mb-1.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="mb-1 text-xs font-bold tracking-wide text-app-inkFaint">MANAGE PRODUCTS</div>
-          <h1 className="font-sora text-2xl font-extrabold">
+          <h1 className="font-poppins text-2xl font-extrabold">
             {PRODUCT_FILTERS.find((f) => f.id === filter)?.label}
           </h1>
         </div>
@@ -278,8 +296,29 @@ export default function AdminProducts() {
             >
               Cancel
             </button>
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(true)}
+              className="ml-auto rounded-[9px] border border-danger/40 px-4 py-2.5 text-xs font-semibold text-danger"
+            >
+              Delete product
+            </button>
           </div>
         </div>
+      )}
+      {confirmingDelete && editingProduct && (
+        <ConfirmDialog
+          title={`Delete "${editingProduct.name}"?`}
+          confirmLabel="Delete product"
+          busyLabel="Deleting…"
+          busy={deleting}
+          onConfirm={handleDeleteProduct}
+          onCancel={() => setConfirmingDelete(false)}
+        >
+          {editingProduct.moduleId && !moduleShared
+            ? `This permanently removes the product and its module "${editingProduct.module}" from Manage Materials, including its units and audio tracks. This cannot be undone.`
+            : 'This permanently removes the product. Its module stays, because another product still uses it. This cannot be undone.'}
+        </ConfirmDialog>
       )}
     </div>
   )

@@ -55,7 +55,7 @@ export default function Grammar() {
             <div className="flex h-[38px] w-[38px] items-center justify-center rounded-[11px] bg-gold/[.18]">
               <Icon name="mortarboard-01" size={19} className="text-gold" />
             </div>
-            <div className="font-sora text-[17px] font-extrabold">Grammar module</div>
+            <div className="font-poppins text-[17px] font-extrabold">Grammar module</div>
           </div>
           <div className="rounded-pill border border-gold/30 bg-gold/[.16] px-2.5 py-1 text-[11px] font-extrabold text-gold">
             FREE

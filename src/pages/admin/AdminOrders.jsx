@@ -14,7 +14,7 @@ export default function AdminOrders() {
   return (
     <div>
       <div className="mb-1 text-xs font-bold tracking-wide text-app-inkFaint">ORDERS</div>
-      <h1 className="mb-6 font-sora text-2xl font-extrabold">{ORDER_FILTERS.find((f) => f.id === filter)?.label}</h1>
+      <h1 className="mb-6 font-poppins text-2xl font-extrabold">{ORDER_FILTERS.find((f) => f.id === filter)?.label}</h1>
 
       {ordersLoading ? (
         <div className="text-sm text-app-inkFaint">Loading…</div>
@@ -38,7 +38,7 @@ export default function AdminOrders() {
             {filtered.map((o) => (
               <Fragment key={o.id}>
                 <tr className="border-t border-app-border">
-                  <td className="px-3.5 py-3.5 font-sora text-[13px] font-bold" title={o.id}>
+                  <td className="px-3.5 py-3.5 font-poppins text-[13px] font-bold" title={o.id}>
                     #{o.id.slice(0, 8)}
                   </td>
                   <td className="px-3.5 py-3.5 text-[13px] text-app-inkSoft">{o.customer}</td>

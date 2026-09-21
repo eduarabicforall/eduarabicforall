@@ -93,7 +93,7 @@ export default function AudioLibrary() {
         <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
       </button>
       <div>
-        <div className="font-sora text-base font-extrabold">Audio Library</div>
+        <div className="font-poppins text-base font-extrabold">Audio Library</div>
         <div className="text-[11.5px] text-app-inkFaint">{material.name}</div>
       </div>
     </div>
