@@ -100,9 +100,8 @@ export default function Landing() {
 
     const mm = gsap.matchMedia()
     mm.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.set('.gs-hero-item, .gs-hero-img', { opacity: 0, y: 24 })
+      gsap.set('.gs-hero-item', { opacity: 0, y: 24 })
       gsap.to('.gs-hero-item', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', stagger: 0.12, delay: 0.1 })
-      gsap.to('.gs-hero-img', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.2 })
 
       gsap.utils.toArray('.gs-stagger').forEach((el) => {
         gsap.from(el.children, {
@@ -146,8 +145,8 @@ export default function Landing() {
       <Navbar />
 
       {/* Hero */}
-      <section className="mx-auto grid max-w-[1160px] items-center gap-14 px-[6vw] pb-[60px] pt-10 md:grid-cols-[1.1fr_.9fr] md:pt-[90px]">
-        <div className="text-center md:text-left">
+      <section className="mx-auto max-w-[1160px] px-[6vw] pb-[60px] pt-10 md:pt-[90px]">
+        <div className="text-center">
           <div className="gs-hero-item mb-[22px] inline-flex items-center gap-2 rounded-pill border border-light-ink/10 bg-light-ink/[.045] px-3.5 py-[7px] text-[13px] font-semibold text-light-inkSoft">
             <Icon name="qr-code" size={15} className="animate-pulse text-primary" /> Physical modules, digital learning
           </div>
@@ -155,10 +154,10 @@ export default function Landing() {
             Listen, Speak &amp;{' '}
             <span className="bg-gradient-to-r from-primary to-violet bg-clip-text text-transparent">Repeat!</span>
           </h1>
-          <p className="gs-hero-item mx-auto mb-8 max-w-[480px] text-[17px] leading-relaxed text-light-inkSoft md:mx-0">
+          <p className="gs-hero-item mx-auto mb-8 max-w-[480px] text-[17px] leading-relaxed text-light-inkSoft">
             A new-age way to learn Arabic. With interactive modules powered by AI.
           </p>
-          <div className="gs-hero-item flex flex-col items-center gap-3.5 sm:flex-row sm:flex-wrap sm:justify-center md:justify-start">
+          <div className="gs-hero-item flex flex-col items-center gap-3.5 sm:flex-row sm:flex-wrap sm:justify-center">
             <Link
               to="/auth?view=signup"
               className="gs-float relative inline-block w-full max-w-[340px] overflow-hidden rounded-[13px] bg-primary px-[26px] py-[15px] text-center text-[15px] font-bold text-[#0B2A4A] shadow-[0_8px_24px_rgba(61,125,216,.35)] sm:w-auto sm:max-w-none"
@@ -179,37 +178,6 @@ export default function Landing() {
               <Icon name="shopping-bag-02" size={16} /> Browse modules
             </a>
           </div>
-          <div className="gs-hero-item mt-10 flex justify-center gap-7 md:justify-start">
-            <div className="flex flex-col items-center md:items-start">
-              <Icon name="mortarboard-01" size={20} className="text-gold" />
-              <div className="mt-2 text-[13px] text-light-inkFaint">Endorsed by Arabic Specialists</div>
-            </div>
-            <div className="flex flex-col items-center md:items-start">
-              <Icon name="sparkles" size={20} className="text-violet" />
-              <div className="mt-2 text-[13px] text-light-inkFaint">AI Integrated</div>
-            </div>
-            <div className="flex flex-col items-center md:items-start">
-              <Icon name="headphones" size={20} className="text-primary" />
-              <div className="mt-2 text-[13px] text-light-inkFaint">Audio Support</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="gs-hero-img relative">
-          <PlaceholderBlock
-            label="product photo — hand holding physical module & phone showing app"
-            className="rounded-[24px] border border-light-ink/10"
-            style={{ aspectRatio: '4/5' }}
-          />
-          <div className="absolute -bottom-[18px] -left-[18px] flex items-center gap-2.5 rounded-2xl border border-light-ink/10 bg-[#F3F1EC] px-[18px] py-3.5 shadow-[0_20px_40px_rgba(0,0,0,.4)]">
-            <div className="flex h-[34px] w-[34px] items-center justify-center rounded-[10px] bg-violet/[.15]">
-              <Icon name="message-01" size={17} className="text-violet" />
-            </div>
-            <div>
-              <div className="text-[13px] font-bold">Ai Ustaz Module</div>
-              <div className="text-[11px] text-light-inkFaint">Your Arabic studies companion</div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -224,20 +192,11 @@ export default function Landing() {
         >
           {AWARDS.map((award) => {
             const meta = AWARD_META[award.status]
-            const isJudging = award.status === 'judging'
             return (
               <div
                 key={award.name}
                 className="relative w-[62vw] flex-shrink-0 rounded-2xl border border-light-ink/[.08] bg-light-ink/[.03] px-4 pb-4 pt-6 sm:w-[220px]"
               >
-                <div
-                  className={`absolute -right-2 -top-3 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-light-bg shadow-md ${
-                    isJudging ? 'animate-pulse' : 'animate-medal-glow'
-                  }`}
-                  style={{ backgroundColor: meta.color, color: meta.color }}
-                >
-                  <Icon name={meta.icon} size={15} className="text-white" />
-                </div>
                 <div className="flex h-[52px] items-center justify-center">
                   <img src={award.img} alt={award.name} className="max-h-full max-w-full object-contain" />
                 </div>

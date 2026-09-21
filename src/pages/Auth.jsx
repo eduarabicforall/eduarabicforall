@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import gsap from 'gsap'
 import Icon from '../components/Icon.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
@@ -49,7 +49,7 @@ export default function Auth() {
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const { signIn, signUp } = useAuth()
+  const { user, signIn, signUp } = useAuth()
   const navigate = useNavigate()
   const cardRef = useRef(null)
   const isFirstViewRender = useRef(true)
@@ -118,6 +118,10 @@ export default function Auth() {
       setSubmitting(false)
     }
   }
+
+  // Already signed in — including the moment right after signIn() resolves,
+  // when the profile is still loading and ProtectedRoute bounces us back here.
+  if (user) return <Navigate to="/dashboard" replace />
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-app-bg p-10 text-app-ink">
