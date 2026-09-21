@@ -76,6 +76,7 @@ export default function Landing() {
       .from('products')
       .select('id, name, description, price, image_url')
       .eq('is_active', true)
+      .eq('on_sale', true) // "Sell in app" toggle — switched off means hidden from the landing page
       .order('created_at')
       .then(({ data, error }) => {
         if (error) {
