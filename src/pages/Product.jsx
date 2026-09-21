@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
@@ -30,6 +30,7 @@ export default function Product() {
   const [product, setProduct] = useState(null)
   const [reviews, setReviews] = useState(null)
   const [activeImage, setActiveImage] = useState(0)
+  const galleryRef = useRef(null)
 
   useEffect(() => {
     supabase
@@ -125,6 +126,20 @@ export default function Product() {
     )
   }
 
+  // The photos sit in a scroll-snap row, so they swipe natively on touch; the
+  // arrows and thumbnails scroll the same row, and scrolling updates the active thumbnail.
+  function goToImage(i) {
+    const el = galleryRef.current
+    if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+    setActiveImage(i)
+  }
+
+  function onGalleryScroll(e) {
+    const el = e.currentTarget
+    const i = Math.round(el.scrollLeft / el.clientWidth)
+    if (i !== activeImage) setActiveImage(i)
+  }
+
   const gallery = [product.image_url, ...(product.image_urls || [])].filter(Boolean)
   const reviewCount = reviews?.length || 0
   const avgRating = reviewCount
@@ -150,12 +165,49 @@ export default function Product() {
       </div>
 
       <div className="px-5 pb-5 pt-3.5">
-        {gallery.length > 0 ? (
-          <img
-            src={gallery[activeImage] || gallery[0]}
-            alt=""
-            className={`aspect-square w-full rounded-2xl object-cover ${gallery.length > 1 ? 'mb-2.5' : 'mb-4.5 mb-[18px]'}`}
-          />
+        {gallery.length > 1 ? (
+          <div className="relative mb-2.5">
+            <div
+              ref={galleryRef}
+              onScroll={onGalleryScroll}
+              className="scrollbar-none flex snap-x snap-mandatory overflow-x-auto rounded-2xl"
+            >
+              {gallery.map((url, i) => (
+                <img
+                  key={url + i}
+                  src={url}
+                  alt={`${product.name} — photo ${i + 1} of ${gallery.length}`}
+                  draggable={false}
+                  className="aspect-[18/25] max-h-[75vh] w-full flex-shrink-0 snap-center bg-app-panel2 object-contain"
+                />
+              ))}
+            </div>
+            {activeImage > 0 && (
+              <button
+                type="button"
+                onClick={() => goToImage(activeImage - 1)}
+                aria-label="Previous photo"
+                className="absolute left-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur"
+              >
+                <Icon name="arrow-left-01" size={16} />
+              </button>
+            )}
+            {activeImage < gallery.length - 1 && (
+              <button
+                type="button"
+                onClick={() => goToImage(activeImage + 1)}
+                aria-label="Next photo"
+                className="absolute right-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur"
+              >
+                <Icon name="arrow-right-01" size={16} />
+              </button>
+            )}
+            <div className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
+              {activeImage + 1} / {gallery.length}
+            </div>
+          </div>
+        ) : gallery.length === 1 ? (
+          <img src={gallery[0]} alt={product.name} className="mb-4.5 mb-[18px] aspect-square w-full rounded-2xl bg-app-panel2 object-contain" />
         ) : (
           <PlaceholderBlock variant="dark" label="product photo" className="mb-4.5 mb-[18px] aspect-square rounded-2xl" />
         )}
@@ -165,7 +217,7 @@ export default function Product() {
               <button
                 key={url + i}
                 type="button"
-                onClick={() => setActiveImage(i)}
+                onClick={() => goToImage(i)}
                 className={`h-14 w-14 flex-shrink-0 overflow-hidden rounded-[10px] border-2 ${
                   i === activeImage ? 'border-primary' : 'border-transparent'
                 }`}
