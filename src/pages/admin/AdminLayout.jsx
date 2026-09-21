@@ -42,17 +42,15 @@ const subLinkClass = ({ isActive }) =>
   }`
 
 function SidebarContent({ user, onNavigate }) {
-  const { moduleTree, products } = useAdmin()
+  const { moduleTree } = useAdmin()
   // Grammar has no row in `modules` at all (it's routed by the fixed
   // "grammar" slug, not a DB module) so it's pinned here rather than coming
-  // from moduleTree. Every other module only shows once it has a matching
-  // *active* product — a module for a disabled/draft product would otherwise
-  // clutter this list before it's actually ready to sell.
+  // from moduleTree. Every other module is listed — including the one created
+  // for a draft (inactive) product — so materials can be prepared before the
+  // product is switched on.
   const materialsSubItems = [
     { to: '/admin/materials/grammar', label: 'Grammar module' },
-    ...moduleTree
-      .filter((m) => products.some((p) => p.moduleId === m.dbId && p.active))
-      .map((m) => ({ to: `/admin/materials/${m.id}`, label: m.name })),
+    ...moduleTree.map((m) => ({ to: `/admin/materials/${m.id}`, label: m.name })),
   ]
 
   return (
