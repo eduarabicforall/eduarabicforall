@@ -237,7 +237,7 @@ function VideoUrlField({ topic, setTopicVideo }) {
 function TopicCard({ topic, setTopicVideo, addQuizQuestion, removeQuizQuestion, updateGrammarTopicTitle, removeGrammarTopic }) {
   const [editingTitle, setEditingTitle] = useState(false)
   const [titleDraft, setTitleDraft] = useState(topic.titleEn)
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   function saveTitle() {
     if (titleDraft.trim()) updateGrammarTopicTitle(topic.id, titleDraft.trim())
