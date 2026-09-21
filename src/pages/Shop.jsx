@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AppShell from '../components/AppShell.jsx'
 import BottomTabBar from '../components/BottomTabBar.jsx'
 import Icon from '../components/Icon.jsx'
 import PlaceholderBlock from '../components/PlaceholderBlock.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabase.js'
 
 const TABS = [
@@ -17,6 +18,7 @@ const NEW_RELEASE_DAYS = 30
 
 export default function Shop() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [products, setProducts] = useState(null)
   const [tab, setTab] = useState('all')
 
@@ -40,7 +42,18 @@ export default function Shop() {
   const visibleProducts = products?.filter((p) => tab === 'all' || isNewRelease(p))
 
   return (
-    <AppShell>
+    <AppShell bare={!user}>
+      {/* Signed-out visitors get the bare layout (no account sidebar / tab bar) */}
+      {!user && (
+        <div className="flex items-center justify-between px-5 pt-5.5 pt-[22px]">
+          <Link to="/">
+            <img src="/logo.png" alt="EduArabic for All" className="h-7 w-auto" />
+          </Link>
+          <Link to="/auth" className="text-[13px] font-semibold text-app-inkSoft">
+            Sign in
+          </Link>
+        </div>
+      )}
       <div
         className="px-5 pb-4.5 pb-[18px] pt-6.5 pt-[26px]"
         style={{ background: 'linear-gradient(180deg, rgba(61,125,216,.10), transparent)' }}
@@ -106,7 +119,7 @@ export default function Shop() {
         ))}
       </div>
 
-      <BottomTabBar />
+      {user && <BottomTabBar />}
     </AppShell>
   )
 }

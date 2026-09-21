@@ -59,6 +59,15 @@ export default function Product() {
       })
   }, [productId])
 
+  // Signed-out visitors usually arrive from the landing page, so "back" returns
+  // to wherever they came from (or the landing page on a direct link) instead
+  // of forcing them into the shop.
+  function goBack() {
+    if (user) navigate('/shop')
+    else if (window.history.state?.idx > 0) navigate(-1)
+    else navigate('/')
+  }
+
   if (!product) {
     return (
       <AppShell bare={!user}>
@@ -83,7 +92,7 @@ export default function Product() {
       <div className="flex items-center gap-3 px-5 pb-1.5 pt-5.5 pt-[22px]">
         <button
           type="button"
-          onClick={() => navigate('/shop')}
+          onClick={goBack}
           className="flex h-9 w-9 items-center justify-center rounded-[11px] border border-app-border bg-app-panel2"
         >
           <Icon name="arrow-left-01" size={16} className="text-app-inkSoft" />
