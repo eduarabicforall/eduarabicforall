@@ -34,7 +34,7 @@ export default function Product() {
   useEffect(() => {
     supabase
       .from('products')
-      .select('id, name, description, price, image_url, image_urls')
+      .select('id, name, description, price, image_url, image_urls, included')
       .eq('id', productId)
       .single()
       .then(({ data, error }) => {
@@ -192,10 +192,23 @@ export default function Product() {
         )}
 
         <div className="mb-4 font-poppins text-[22px] font-extrabold text-primary">RM{product.price}</div>
-        <p className="mb-4 text-[13.5px] leading-relaxed text-app-inkSoft">
+        <p className="mb-4 whitespace-pre-line text-[13.5px] leading-relaxed text-app-inkSoft">
           {product.description ||
             'Includes the printed module and a unique activation code that unlocks the matching Audio Library and AI Ustaz once scanned or entered in the app.'}
         </p>
+        {product.included?.length > 0 && (
+          <div className="mb-5">
+            <div className="mb-2.5 font-poppins text-[14px] font-extrabold">What's included</div>
+            <ul className="flex flex-col gap-2">
+              {product.included.map((line) => (
+                <li key={line} className="flex items-start gap-2.5 text-[13.5px] font-semibold leading-snug">
+                  <Icon name="checkmark-circle-02" size={18} className="mt-px flex-shrink-0 text-primary" />
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="mb-5 flex gap-2.5 rounded-2xl border border-primary/[.18] bg-primary/[.06] px-3.5 py-3">
           <Icon name="truck" size={18} className="text-primary" />
           <div className="text-xs text-app-inkSoft">Ships within 3–5 business days across Malaysia.</div>
