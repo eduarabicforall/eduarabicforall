@@ -23,6 +23,73 @@ gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 // A module counts as new for its first 30 days on the shelf (same rule as the Shop).
 const NEW_RELEASE_DAYS = 30
 
+// Small animated illustration at the top of each "How it works" card:
+// book with a price tag → QR being scanned → activation code typing → audio wave.
+function HowVisual({ index }) {
+  const box = 'mb-5 flex h-[104px] items-center justify-center overflow-hidden rounded-[16px] bg-[#F1F6FD]'
+
+  if (index === 0) {
+    return (
+      <div className={box}>
+        <div className="relative h-[68px] w-[52px] rounded-[7px] bg-gradient-to-br from-primary to-primary-soft shadow-[0_8px_18px_rgba(61,125,216,.35)]">
+          <span className="absolute inset-y-0 left-1.5 w-0.5 bg-white/30" />
+          <span className="absolute left-3 top-4 h-1 w-6 rounded-full bg-white/70" />
+          <span className="absolute left-3 top-7 h-1 w-4 rounded-full bg-white/40" />
+          <span className="absolute -top-0.5 right-2 h-5 w-2.5 rounded-b-[3px] bg-gold" />
+          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-pill bg-white px-2.5 py-1 text-[10px] font-extrabold text-[#0B2A4A] shadow-md">
+            Book + QR
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  if (index === 1) {
+    return (
+      <div className={box}>
+        <div className="relative h-[68px] w-[68px]">
+          <Icon name="qr-code" size={46} className="absolute left-[11px] top-[11px] text-[#0B2A4A]/80" />
+          <span className="absolute left-0 top-0 h-3.5 w-3.5 rounded-tl-md border-l-[3px] border-t-[3px] border-primary" />
+          <span className="absolute right-0 top-0 h-3.5 w-3.5 rounded-tr-md border-r-[3px] border-t-[3px] border-primary" />
+          <span className="absolute bottom-0 left-0 h-3.5 w-3.5 rounded-bl-md border-b-[3px] border-l-[3px] border-primary" />
+          <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-br-md border-b-[3px] border-r-[3px] border-primary" />
+          <span className="animate-scan absolute inset-x-1 h-0.5 rounded-full bg-goldBright shadow-[0_0_10px_rgba(255,201,60,.95)]" />
+        </div>
+      </div>
+    )
+  }
+
+  if (index === 2) {
+    return (
+      <div className={box}>
+        <div className="rounded-xl border border-primary/25 bg-white px-4 py-2.5 shadow-sm">
+          <span className="animate-typing inline-block overflow-hidden whitespace-nowrap border-r-2 border-primary align-bottom font-mono text-[15px] font-bold tracking-[.18em] text-[#0B2A4A]">
+            PEMU-1234
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  const bars = [10, 18, 28, 20, 34, 24, 14, 26, 12]
+  return (
+    <div className={`${box} flex-col gap-2`}>
+      <div className="flex h-10 items-center gap-1">
+        {bars.map((h, i) => (
+          <span
+            key={i}
+            className="animate-wave w-1 rounded-full bg-gradient-to-t from-primary to-goldBright"
+            style={{ height: h, animationDelay: `${i * 0.12}s` }}
+          />
+        ))}
+      </div>
+      <span className="whitespace-nowrap rounded-pill bg-white px-2.5 py-1 text-[9.5px] font-semibold text-primary-soft shadow-sm">
+        Assalamualaikum!
+      </span>
+    </div>
+  )
+}
+
 export default function Landing() {
   const [openFaq, setOpenFaq] = useState(0)
   const [products, setProducts] = useState([])
@@ -100,6 +167,23 @@ export default function Landing() {
           scrollTrigger: { trigger: el, start: 'top 85%' },
         })
       })
+      // How-it-works connector lines draw in as the steps scroll past.
+      gsap.fromTo(
+        '.gs-how-line',
+        { scaleX: 0 },
+        {
+          scaleX: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: '.gs-how-steps', start: 'top 70%', end: 'bottom 55%', scrub: true },
+        },
+      )
+      gsap.utils.toArray('.gs-how-vline').forEach((el) => {
+        gsap.fromTo(
+          el,
+          { scaleY: 0 },
+          { scaleY: 1, ease: 'none', scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 60%', scrub: true } },
+        )
+      })
       gsap.utils.toArray('.gs-reveal').forEach((el) => {
         gsap.from(el, {
           opacity: 0,
@@ -160,12 +244,32 @@ export default function Landing() {
               A new-age way to learn Arabic. With interactive modules powered by AI.
             </p>
             <div className="gs-hero-item flex flex-col items-center gap-3.5 sm:flex-row sm:flex-wrap sm:justify-center">
-              <TransitionLink
-                to="/auth?view=signup"
-                className="relative inline-block w-full max-w-[272px] overflow-hidden rounded-pill bg-primary px-8 py-4 text-center text-[15px] font-bold text-white shadow-[0_10px_30px_rgba(61,125,216,.5)] ring-1 ring-white/20 sm:w-auto sm:max-w-none"
-              >
-                <span className="relative">Start Now! →</span>
-              </TransitionLink>
+              {/* Wrapper carries the width so the sparkles can sit outside the button's overflow-hidden edge. */}
+              <span className="relative w-full max-w-[272px] sm:w-auto sm:max-w-none">
+                <TransitionLink
+                  to="/auth?view=signup"
+                  className="animate-cta-glow relative block overflow-hidden rounded-pill bg-primary px-8 py-4 text-center text-[15px] font-bold text-white shadow-[0_10px_30px_rgba(61,125,216,.5)] ring-1 ring-white/20"
+                >
+                  <span className="relative">Start Now! →</span>
+                </TransitionLink>
+                <Icon
+                  name="sparkles"
+                  size={16}
+                  className="animate-twinkle pointer-events-none absolute -right-2 -top-3 text-goldBright"
+                />
+                <Icon
+                  name="sparkles"
+                  size={12}
+                  className="animate-twinkle pointer-events-none absolute -bottom-2 left-3 text-white"
+                  style={{ animationDelay: '.7s' }}
+                />
+                <Icon
+                  name="sparkles"
+                  size={10}
+                  className="animate-twinkle pointer-events-none absolute -left-2 top-1 text-goldBright"
+                  style={{ animationDelay: '1.3s' }}
+                />
+              </span>
               <a
                 href="#modules"
                 className="inline-flex w-full max-w-[272px] items-center justify-center gap-4 rounded-pill bg-gradient-to-r from-[#FFD75E] to-[#FFB92E] py-2 pl-8 pr-2 text-[15px] font-bold text-[#2A1C04] shadow-[0_10px_30px_rgba(255,193,50,.35)] sm:w-auto sm:max-w-none"
@@ -219,25 +323,68 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How it works — a connected timeline; each step has a small animated illustration */}
       <section id="how" className="mx-auto max-w-[1160px] px-[6vw] py-[70px]">
+        <div className="mb-8 text-center">
+          <a
+            href="#modules"
+            className="inline-flex items-center gap-2.5 rounded-pill border border-primary/15 bg-white px-4 py-2 text-[12px] font-bold uppercase tracking-[.14em] text-primary-soft shadow-sm"
+          >
+            <span className="h-2.5 w-2.5 rounded-full bg-gold ring-2 ring-gold/40" /> Our Blueprints
+          </a>
+        </div>
         <h2 className="mb-2.5 text-center font-poppins text-[32px] font-extrabold">
           Four steps to{' '}
-          <span className="bg-gradient-to-r from-primary to-violet bg-clip-text text-transparent">fluent!</span>
+          <span className="bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent">fluent!</span>
         </h2>
-        <p className="mb-12 text-center text-[15px] text-light-inkSoft">
+        <p className="mx-auto mb-14 max-w-[560px] text-center text-[15px] text-light-inkSoft">
           No app-only courses. Your module is a real book — the app is what makes it come alive.
         </p>
-        <div className="gs-stagger grid grid-cols-2 gap-5 md:grid-cols-4">
-          {HOW_IT_WORKS.map((step) => (
-            <div key={step.title} className="rounded-[18px] border border-primary/15 bg-white shadow-[0_6px_20px_rgba(61,125,216,.06)] p-[26px_22px]">
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[11px] bg-primary/[.15]">
-                <Icon name={step.icon} size={19} className="text-primary" />
-              </div>
-              <div className="mb-1.5 font-poppins text-[15px] font-bold">{step.title}</div>
-              <div className="text-[13px] leading-[1.55] text-light-inkSoft">{step.body}</div>
-            </div>
-          ))}
+
+        <div className="gs-how-steps relative">
+          {/* desktop connector: dashed track with a blue→gold line that draws in as you scroll */}
+          <div aria-hidden="true" className="pointer-events-none absolute left-[12.5%] right-[12.5%] top-7 hidden md:block">
+            <div className="absolute inset-x-0 top-0 border-t-2 border-dashed border-primary/25" />
+            <div className="gs-how-line relative h-0.5 origin-left rounded bg-gradient-to-r from-primary to-goldBright" />
+          </div>
+
+          <div className="gs-stagger grid gap-6 md:grid-cols-4 md:gap-5">
+            {HOW_IT_WORKS.map((step, i) => {
+              const last = i === HOW_IT_WORKS.length - 1
+              return (
+                <div key={step.title} className="relative pl-[68px] md:pl-0 md:pt-[84px]">
+                  <div
+                    className={`absolute left-0 top-0 z-10 flex h-14 w-14 items-center justify-center rounded-full font-poppins text-[17px] font-extrabold ring-4 ring-[#F1F6FD] md:left-1/2 md:-translate-x-1/2 ${
+                      last
+                        ? 'bg-gradient-to-br from-[#FFD75E] to-[#FFB92E] text-[#2A1C04] shadow-[0_8px_20px_rgba(255,185,46,.4)]'
+                        : 'bg-gradient-to-br from-primary to-primary-soft text-white shadow-[0_8px_20px_rgba(61,125,216,.35)]'
+                    }`}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+
+                  {/* mobile connector down to the next step */}
+                  {!last && (
+                    <>
+                      <span aria-hidden="true" className="absolute -bottom-6 left-[27px] top-14 border-l-2 border-dashed border-primary/25 md:hidden" />
+                      <span
+                        aria-hidden="true"
+                        className="gs-how-vline absolute -bottom-6 left-[26px] top-14 w-0.5 origin-top rounded bg-gradient-to-b from-primary to-goldBright md:hidden"
+                      />
+                    </>
+                  )}
+
+                  <div className="h-full rounded-[24px] border border-primary/15 bg-white p-5 shadow-[0_10px_30px_rgba(61,125,216,.08)]">
+                    <HowVisual index={i} />
+                    <div className="mb-1.5 font-poppins text-[16px] font-bold text-[#0B2A4A]">
+                      {step.title.replace(/^\d+\.\s*/, '')}
+                    </div>
+                    <div className="hidden text-[13.5px] leading-[1.6] text-light-inkSoft md:block">{step.body}</div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </section>
 

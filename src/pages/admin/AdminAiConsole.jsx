@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import Icon from '../../components/Icon.jsx'
 import PasswordInput from '../../components/PasswordInput.jsx'
-import { AI_MODULE_TABS } from '../../data/adminMock.js'
 import { useAdmin } from '../../context/AdminContext.jsx'
 
 export default function AdminAiConsole() {
-  const { aiConfigs, aiConfigsLoading, saveAiConfig, confirmSaveAiConfig, apiKeySaved, saveApiKey } = useAdmin()
-  const [aiModule, setAiModule] = useState('quran')
+  const { aiConfigs, aiConfigsLoading, moduleTree, saveAiConfig, confirmSaveAiConfig, apiKeySaved, saveApiKey } =
+    useAdmin()
+  const [selected, setSelected] = useState('')
   const [apiKeyInput, setApiKeyInput] = useState('')
   const [savingKey, setSavingKey] = useState(false)
+  // Tabs come from the real modules that have an AI config (matched by slug) —
+  // not a fixed list — so a deleted or renamed module can't leave the page stuck.
+  const tabs = moduleTree.filter((m) => aiConfigs[m.id]).map((m) => ({ id: m.id, label: m.name }))
+  const aiModule = aiConfigs[selected] ? selected : tabs[0]?.id
   const config = aiConfigs[aiModule]
 
   async function handleSaveApiKey() {
@@ -17,10 +21,6 @@ export default function AdminAiConsole() {
     const ok = await saveApiKey(apiKeyInput.trim())
     setSavingKey(false)
     if (ok) setApiKeyInput('')
-  }
-
-  if (aiConfigsLoading || !config) {
-    return <div className="text-sm text-app-inkFaint">Loading…</div>
   }
 
   return (
@@ -56,11 +56,11 @@ export default function AdminAiConsole() {
       </div>
 
       <div className="mb-5 flex flex-wrap gap-2.5">
-        {AI_MODULE_TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
-            onClick={() => setAiModule(t.id)}
+            onClick={() => setSelected(t.id)}
             className={`rounded-pill border px-4 py-2.5 text-[12.5px] font-bold ${
               aiModule === t.id ? 'border-violet bg-violet/[.15] text-violet' : 'border-app-border bg-app-panel2 text-app-inkSoft'
             }`}
@@ -70,54 +70,62 @@ export default function AdminAiConsole() {
         ))}
       </div>
 
+      {aiConfigsLoading ? (
+        <div className="text-sm text-app-inkFaint">Loading…</div>
+      ) : !config ? (
+        <div className="max-w-[640px] rounded-2xl border border-dashed border-app-border bg-app-panel/60 p-5 text-[13px] text-app-inkSoft">
+          No module has an AI configuration yet. One is created automatically for every new product/module.
+        </div>
+      ) : (
       <div className="flex max-w-[640px] flex-col gap-4 rounded-2xl border border-app-border bg-app-panel p-6">
-        <label className="text-xs font-semibold text-app-inkSoft">
-          Persona name
-          <input
-            value={config.persona}
-            onChange={(e) => saveAiConfig(aiModule, { persona: e.target.value })}
-            className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13.5px] text-app-ink"
-          />
-        </label>
-        <label className="text-xs font-semibold text-app-inkSoft">
-          System prompt
-          <textarea
-            value={config.prompt}
-            onChange={(e) => saveAiConfig(aiModule, { prompt: e.target.value })}
-            rows={5}
-            className="mt-1.5 block w-full resize-y rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
-          />
-        </label>
-        <div className="flex flex-col gap-3.5 sm:flex-row">
-          <label className="flex-1 text-xs font-semibold text-app-inkSoft">
-            Model
-            <select
-              value={config.model}
-              onChange={(e) => saveAiConfig(aiModule, { model: e.target.value })}
-              className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
-            >
-              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-              <option value="gemini-2.5-pro">gemini-2.5-pro</option>
-            </select>
-          </label>
-          <label className="flex-1 text-xs font-semibold text-app-inkSoft">
-            Daily quota / user
+          <label className="text-xs font-semibold text-app-inkSoft">
+            Persona name
             <input
-              type="number"
-              value={config.quota}
-              onChange={(e) => saveAiConfig(aiModule, { quota: parseInt(e.target.value) || 0 })}
-              className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
+              value={config.persona}
+              onChange={(e) => saveAiConfig(aiModule, { persona: e.target.value })}
+              className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13.5px] text-app-ink"
             />
           </label>
+          <label className="text-xs font-semibold text-app-inkSoft">
+            System prompt
+            <textarea
+              value={config.prompt}
+              onChange={(e) => saveAiConfig(aiModule, { prompt: e.target.value })}
+              rows={5}
+              className="mt-1.5 block w-full resize-y rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
+            />
+          </label>
+          <div className="flex flex-col gap-3.5 sm:flex-row">
+            <label className="flex-1 text-xs font-semibold text-app-inkSoft">
+              Model
+              <select
+                value={config.model}
+                onChange={(e) => saveAiConfig(aiModule, { model: e.target.value })}
+                className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
+              >
+                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+              </select>
+            </label>
+            <label className="flex-1 text-xs font-semibold text-app-inkSoft">
+              Daily quota / user
+              <input
+                type="number"
+                value={config.quota}
+                onChange={(e) => saveAiConfig(aiModule, { quota: parseInt(e.target.value) || 0 })}
+                className="mt-1.5 block w-full rounded-[10px] border border-app-border bg-app-panel2 px-3.5 py-2.5 text-[13px] text-app-ink"
+              />
+            </label>
+          </div>
+          <button
+            type="button"
+            onClick={() => confirmSaveAiConfig(aiModule)}
+            className="mt-1 self-start rounded-[11px] bg-primary px-5.5 px-[22px] py-2.5 text-[13.5px] font-bold text-white"
+          >
+            Save configuration
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => confirmSaveAiConfig(aiModule)}
-          className="mt-1 self-start rounded-[11px] bg-primary px-5.5 px-[22px] py-2.5 text-[13.5px] font-bold text-white"
-        >
-          Save configuration
-        </button>
-      </div>
+      )}
     </div>
   )
 }

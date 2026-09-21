@@ -454,7 +454,18 @@ export function AdminProvider({ children }) {
         .from('products')
         .insert({ name, module_id: newModule.id, price: 0, stock: 0, on_sale: false, is_active: false })
       if (error) throw error
-      await refreshProducts()
+      // Every module needs an AI config row — without it its Ustaz answers
+      // "module_not_configured" and it never shows up in the AI console.
+      const { error: aiError } = await supabase.from('module_ai_config').insert({
+        module_id: newModule.id,
+        persona_name: 'Ustaz',
+        system_prompt:
+          'You are a friendly Arabic tutor for this module. Help learners understand its vocabulary, grammar and dialogues, step by step.',
+        model: 'gemini-2.5-flash',
+        daily_quota: 60,
+      })
+      if (aiError) console.error('Could not create the default AI config', aiError)
+      await Promise.all([refreshProducts(), refreshAiConfigs()])
       showToast('Product created — a matching module was also added to Manage Materials.')
     } catch (err) {
       showToast(err.message || 'Could not create product.')

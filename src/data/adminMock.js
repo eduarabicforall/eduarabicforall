@@ -18,10 +18,3 @@ export const PRODUCT_FILTERS = [
   { id: 'active', label: 'Active' },
   { id: 'inactive', label: 'Tidak Aktif' },
 ]
-
-export const AI_MODULE_TABS = [
-  { id: 'quran', label: 'Al Quran' },
-  { id: 'pemula', label: 'Pemula' },
-  { id: 'kerjaya', label: 'Kerjaya' },
-  { id: 'anak', label: 'Anakku' },
-]
