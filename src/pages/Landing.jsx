@@ -420,7 +420,7 @@ export default function Landing() {
       {/* AI Ustaz / My Vocab — a dark feature panel that rotates between the two app mockups */}
       <section id="ai" className="px-[4vw] pb-[70px] sm:px-[5vw]">
         <div
-          className="gs-reveal relative mx-auto max-w-[1100px] overflow-hidden rounded-[32px] px-6 py-10 text-center sm:rounded-[40px] md:px-14 md:py-10"
+          className="gs-reveal relative mx-auto max-w-[1100px] overflow-hidden rounded-[32px] px-6 py-10 text-center sm:rounded-[40px] md:px-14 md:py-8"
           style={{
             background:
               'radial-gradient(60% 50% at 50% 0%, rgba(61,125,216,.28) 0%, transparent 70%), radial-gradient(50% 40% at 50% 100%, rgba(61,125,216,.22) 0%, transparent 70%), linear-gradient(160deg, #070A14 0%, #0C1D3D 55%, #0A1730 100%)',
@@ -450,7 +450,7 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="mx-auto -my-6 grid w-full max-w-[340px] sm:max-w-[380px] md:max-w-[340px]">
+          <div className="mx-auto mt-3 -mb-3 grid w-full max-w-[340px] sm:max-w-[380px] md:max-w-[320px]">
             {FEATURE_SLIDES.map((slide, i) => (
               <img
                 key={slide.image}
@@ -484,7 +484,7 @@ export default function Landing() {
             ))}
           </div>
 
-          <div className="mt-5">
+          <div className="mt-6">
             <TransitionLink
               to="/auth?view=signup"
               className="inline-flex items-center justify-center gap-4 rounded-pill bg-gradient-to-r from-[#FFD75E] to-[#FFB92E] py-2 pl-8 pr-2 text-[15px] font-bold text-[#2A1C04] shadow-[0_10px_30px_rgba(255,193,50,.3)]"
