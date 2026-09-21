@@ -62,6 +62,16 @@ export function AuthProvider({ children }) {
     return { needsEmailConfirmation: !data.session }
   }
 
+  // Redirects to Google, then back to /dashboard with a session. New Google
+  // users get a profile from the same signup trigger as email signups.
+  async function signInWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    })
+    if (error) throw error
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
@@ -73,7 +83,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, refreshUser }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signInWithGoogle, signOut, refreshUser }}>{children}</AuthContext.Provider>
   )
 }
 

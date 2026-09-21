@@ -50,7 +50,7 @@ export default function Auth() {
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const { user, signIn, signUp } = useAuth()
+  const { user, signIn, signUp, signInWithGoogle } = useAuth()
   const navigate = useTransitionNavigate()
   const cardRef = useRef(null)
   const isFirstViewRender = useRef(true)
@@ -105,6 +105,17 @@ export default function Auth() {
     }
   }
 
+  async function handleGoogle() {
+    setError('')
+    setSubmitting(true)
+    try {
+      await signInWithGoogle() // navigates away to Google on success
+    } catch (err) {
+      setError(friendlyError(err))
+      setSubmitting(false)
+    }
+  }
+
   async function handleSendReset(e) {
     e.preventDefault()
     setError('')
@@ -136,8 +147,9 @@ export default function Auth() {
             <h1 className="text-center font-poppins text-[28px] font-extrabold">Sign in</h1>
             <button
               type="button"
-              title="Coming soon"
-              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink"
+              onClick={handleGoogle}
+              disabled={submitting}
+              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink disabled:opacity-60"
             >
               <GoogleLogo size={16} /> Continue with Google
             </button>
@@ -206,8 +218,9 @@ export default function Auth() {
             <h1 className="text-center font-poppins text-[28px] font-extrabold">Create account</h1>
             <button
               type="button"
-              title="Coming soon"
-              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink"
+              onClick={handleGoogle}
+              disabled={submitting}
+              className="flex items-center justify-center gap-2.5 rounded-xl border border-app-border bg-app-panel2 py-[13px] text-sm font-semibold text-app-ink disabled:opacity-60"
             >
               <GoogleLogo size={16} /> Continue with Google
             </button>
