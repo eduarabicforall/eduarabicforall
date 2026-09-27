@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTransitionNavigate } from '../components/TransitionNavLink.jsx'
 import AppShell from '../components/AppShell.jsx'
@@ -39,6 +39,13 @@ export default function AudioLibrary() {
   const [activated, setActivated] = useState(null) // null = checking
   const [audioError, setAudioError] = useState('')
   const audioRef = useRef(null)
+  // The <audio> element only exists once the page has loaded past its
+  // loading / locked screens, so effects must wait for it via state.
+  const [audioEl, setAudioEl] = useState(null)
+  const setAudioNode = useCallback((node) => {
+    audioRef.current = node
+    setAudioEl(node)
+  }, [])
   const navigate = useTransitionNavigate()
   const tracks = material?.units[unitIndex]?.tracks || []
 
@@ -77,7 +84,7 @@ export default function AudioLibrary() {
 
   // Keep React in step with the shared <audio> element.
   useEffect(() => {
-    const el = audioRef.current
+    const el = audioEl
     if (!el) return
     const onPlay = () => setIsPlaying(true)
     const onPause = () => setIsPlaying(false)
@@ -121,7 +128,7 @@ export default function AudioLibrary() {
       el.removeEventListener('loadedmetadata', onMeta)
       el.removeEventListener('durationchange', onMeta)
     }
-  }, [speed])
+  }, [audioEl, speed])
 
   // Smooth progress: read the playhead every frame while playing.
   useEffect(() => {
@@ -137,7 +144,7 @@ export default function AudioLibrary() {
   }, [isPlaying])
 
   useEffect(() => {
-    const el = audioRef.current
+    const el = audioEl
     if (el) {
       el.defaultPlaybackRate = speed
       el.playbackRate = speed
@@ -147,10 +154,10 @@ export default function AudioLibrary() {
     } catch {
       // storage unavailable — the speed just won't be remembered
     }
-  }, [speed])
+  }, [audioEl, speed])
 
   // Pause if the student leaves the page.
-  useEffect(() => () => audioRef.current?.pause(), [])
+  useEffect(() => () => audioEl?.pause(), [audioEl])
 
   async function togglePlay(i, track) {
     const el = audioRef.current
@@ -250,7 +257,7 @@ export default function AudioLibrary() {
 
   return (
     <AppShell>
-      <audio ref={audioRef} className="hidden" />
+      <audio ref={setAudioNode} className="hidden" />
       <div className="px-5 pb-1.5 pt-5.5 pt-[22px]">
         {header}
 
