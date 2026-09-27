@@ -38,12 +38,20 @@ import AdminReviews from './pages/admin/AdminReviews.jsx'
 import AdminOrders from './pages/admin/AdminOrders.jsx'
 import AdminAiConsole from './pages/admin/AdminAiConsole.jsx'
 import AdminProfile from './pages/admin/AdminProfile.jsx'
+import Toast from './components/Toast.jsx'
+import { useAuth } from './context/AuthContext.jsx'
 
 export default function App() {
+  // Mounted once, above the Routes it swaps out, so a forced sign-out
+  // notice (idle timeout, or another device taking over the account) stays
+  // visible through the redirect back to /auth.
+  const { notice } = useAuth()
+
   return (
     <>
       <ViewTransitionGate />
       <RouteMeta />
+      <Toast message={notice} icon="alert-circle" />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/terms" element={<TermsAndConditions />} />
