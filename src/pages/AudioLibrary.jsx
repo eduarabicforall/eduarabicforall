@@ -32,6 +32,7 @@ export default function AudioLibrary() {
   const [unitIndex, setUnitIndex] = useState(0)
   const [playingIndex, setPlayingIndex] = useState(null) // the loaded track (may be paused)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [loading, setLoading] = useState(false) // fetching the link or buffering
   const [time, setTime] = useState({ current: 0, duration: 0 })
   const [speed, setSpeed] = useState(readSpeed)
   const loadRef = useRef(0)
@@ -70,6 +71,7 @@ export default function AudioLibrary() {
     audioRef.current?.pause()
     setPlayingIndex(null)
     setIsPlaying(false)
+    setLoading(false)
     setTime({ current: 0, duration: 0 })
   }
 
@@ -84,6 +86,19 @@ export default function AudioLibrary() {
       el.currentTime = 0
       setTime((t) => ({ ...t, current: 0 }))
     }
+    const onWaiting = () => setLoading(true)
+    const onPlaying = () => {
+      setLoading(false)
+      setIsPlaying(true)
+    }
+    const onError = () => {
+      // Fired when the signed link is rejected or the file isn't playable audio.
+      console.error('Audio element error', el.error, el.currentSrc)
+      setLoading(false)
+      setIsPlaying(false)
+      setPlayingIndex(null)
+      setAudioError("This audio couldn't be loaded. Please try again, or contact us if it keeps happening.")
+    }
     const onMeta = () => {
       el.playbackRate = speed
       if (isFinite(el.duration)) setTime((t) => ({ ...t, duration: el.duration }))
@@ -93,7 +108,13 @@ export default function AudioLibrary() {
     el.addEventListener('ended', onEnded)
     el.addEventListener('loadedmetadata', onMeta)
     el.addEventListener('durationchange', onMeta)
+    el.addEventListener('waiting', onWaiting)
+    el.addEventListener('playing', onPlaying)
+    el.addEventListener('error', onError)
     return () => {
+      el.removeEventListener('waiting', onWaiting)
+      el.removeEventListener('playing', onPlaying)
+      el.removeEventListener('error', onError)
       el.removeEventListener('play', onPlay)
       el.removeEventListener('pause', onPause)
       el.removeEventListener('ended', onEnded)
@@ -144,6 +165,7 @@ export default function AudioLibrary() {
     el.pause() // stop the previous track while the new link is fetched
     setAudioError('')
     setPlayingIndex(i)
+    setLoading(true)
     setTime({ current: 0, duration: 0 })
     try {
       // Files in the private R2 bucket need a short-lived signed link first.
@@ -153,9 +175,11 @@ export default function AudioLibrary() {
       el.playbackRate = speed
       await el.play()
     } catch (err) {
+      console.error('Audio play failed', err)
       if (token !== loadRef.current || err?.name === 'AbortError') return
       setPlayingIndex(null)
       setIsPlaying(false)
+      setLoading(false)
       setAudioError(err?.message || "Couldn't play this audio.")
     }
   }
@@ -291,7 +315,7 @@ export default function AudioLibrary() {
                   </div>
                 </div>
                 <div className="flex-shrink-0 text-[11px] tabular-nums text-app-inkFaint">
-                  {active ? `${formatDuration(time.current)} / ${formatDuration(total)}` : t.duration}
+                  {active ? (loading ? 'Loading…' : `${formatDuration(time.current)} / ${formatDuration(total)}`) : t.duration}
                 </div>
               </div>
 
