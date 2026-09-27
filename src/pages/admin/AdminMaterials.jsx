@@ -4,6 +4,7 @@ import { useTransitionNavigate } from '../../components/TransitionNavLink.jsx'
 import ConfirmDialog from '../../components/ConfirmDialog.jsx'
 import Icon from '../../components/Icon.jsx'
 import { useAdmin } from '../../context/AdminContext.jsx'
+import { resolveAudioUrl } from '../../lib/audioUrl.js'
 import AdminGrammarMaterial from './AdminGrammarMaterial.jsx'
 
 const trackInputClass =
@@ -15,15 +16,19 @@ function formatDuration(totalSeconds) {
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
-// Audio (like the Grammar lesson video) is hosted on R2 — admin pastes the
-// R2/Worker URL rather than uploading a file through this form directly.
+// Audio (like the Grammar lesson video) is hosted in a private R2 bucket — the
+// admin enters the file's path inside the bucket (or a full https URL) rather
+// than uploading through this form. Paths are turned into short-lived signed
+// links by the audio Worker (see lib/audioUrl.js).
 // Duration is never typed by hand — it's read straight off the audio file
-// itself once the URL resolves, so it can't drift from the real track length.
+// itself once the link resolves, so it can't drift from the real track length.
 // Retries once on failure (transient network hiccups happen), and exposes a
 // manual `retry()` for the admin if it still can't read the file.
 function useAutoDuration(audioUrl, initialDuration) {
   const [duration, setDuration] = useState(initialDuration || '')
   const [status, setStatus] = useState(initialDuration ? 'done' : 'idle') // idle | detecting | done | error
+  const [message, setMessage] = useState('')
+  const [playUrl, setPlayUrl] = useState('')
   const lastProbedUrl = useRef(initialDuration ? audioUrl : null)
   const [retryToken, setRetryToken] = useState(0)
 
@@ -32,15 +37,34 @@ function useAutoDuration(audioUrl, initialDuration) {
     if (!url) {
       setStatus('idle')
       setDuration('')
+      setMessage('')
+      setPlayUrl('')
       return
     }
-    if (url === lastProbedUrl.current && retryToken === 0) return
+    if (url === lastProbedUrl.current && retryToken === 0) {
+      resolveAudioUrl(url).then(setPlayUrl).catch(() => {})
+      return
+    }
 
     setStatus('detecting')
+    setMessage('')
     let cancelled = false
     let attempt = 0
 
-    function tryLoad() {
+    async function tryLoad() {
+      let src
+      try {
+        src = await resolveAudioUrl(url)
+      } catch (err) {
+        if (cancelled) return
+        setStatus('error')
+        setDuration('')
+        setMessage(err.message || "Couldn't reach the file.")
+        return
+      }
+      if (cancelled) return
+      setPlayUrl(src)
+
       const probe = new Audio()
       probe.preload = 'metadata'
 
@@ -53,6 +77,7 @@ function useAutoDuration(audioUrl, initialDuration) {
           setStatus('done')
         } else {
           setStatus('error')
+          setMessage("Couldn't read the audio length.")
         }
       }
       const onError = () => {
@@ -66,6 +91,7 @@ function useAutoDuration(audioUrl, initialDuration) {
         } else {
           setStatus('error')
           setDuration('')
+          setMessage("The file was found but couldn't be played — is it a valid audio file?")
         }
       }
       function cleanup() {
@@ -75,18 +101,20 @@ function useAutoDuration(audioUrl, initialDuration) {
 
       probe.addEventListener('loadedmetadata', onLoaded)
       probe.addEventListener('error', onError)
-      probe.src = url
+      probe.src = src
     }
 
-    tryLoad()
+    // Small pause so typing a path doesn't fire a request per keystroke.
+    const timer = setTimeout(tryLoad, 500)
 
     return () => {
       cancelled = true
+      clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioUrl, retryToken])
 
-  return { duration, status, retry: () => setRetryToken((n) => n + 1) }
+  return { duration, status, message, playUrl, retry: () => setRetryToken((n) => n + 1) }
 }
 
 function DurationBadge({ status, duration, onRetry }) {
@@ -105,7 +133,7 @@ function TrackForm({ initial, onSave, onCancel }) {
   const [titleEn, setTitleEn] = useState(initial?.titleEn || '')
   const [titleAr, setTitleAr] = useState(initial?.titleAr || '')
   const [audioUrl, setAudioUrl] = useState(initial?.audioUrl || '')
-  const { duration, status, retry } = useAutoDuration(audioUrl, initial?.duration)
+  const { duration, status, message, playUrl, retry } = useAutoDuration(audioUrl, initial?.duration)
 
   function submit(e) {
     e.preventDefault()
@@ -124,16 +152,17 @@ function TrackForm({ initial, onSave, onCancel }) {
   return (
     <form onSubmit={submit} className="mt-2.5 flex flex-col gap-2 rounded-[11px] border border-primary/[.25] bg-app-panel p-3">
       <label className="block text-xs font-semibold text-app-inkSoft">
-        Audio file URL (R2)
+        Audio file (R2 path or URL)
         <div className="mt-1.5 flex flex-wrap items-center gap-2.5">
           <input
             value={audioUrl}
             onChange={(e) => setAudioUrl(e.target.value)}
-            placeholder="https://audio.eduarabic.my/pemula/unit-1-greetings.mp3"
+            placeholder="Bahasa Arab Pemula/Unit 1/track.mp3"
             className={`min-w-[220px] flex-1 ${trackInputClass}`}
           />
-          {audioUrl.trim() && <audio controls src={audioUrl.trim()} className="h-8 max-w-[200px]" />}
+          {playUrl && <audio controls src={playUrl} className="h-8 max-w-[200px]" />}
         </div>
+        {status === 'error' && message && <div className="mt-1.5 font-semibold text-danger">{message}</div>}
       </label>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input

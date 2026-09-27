@@ -6,6 +6,7 @@ import BottomTabBar from '../components/BottomTabBar.jsx'
 import Icon from '../components/Icon.jsx'
 import { useModuleTree } from '../context/ModuleTreeContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { resolveAudioUrl } from '../lib/audioUrl.js'
 import { supabase } from '../lib/supabase.js'
 
 export default function AudioLibrary() {
@@ -17,6 +18,7 @@ export default function AudioLibrary() {
   const [unitIndex, setUnitIndex] = useState(0)
   const [playingIndex, setPlayingIndex] = useState(null)
   const [activated, setActivated] = useState(null) // null = checking
+  const [audioError, setAudioError] = useState('')
   const audioRef = useRef(null)
   const navigate = useTransitionNavigate()
   const tracks = material?.units[unitIndex]?.tracks || []
@@ -52,18 +54,25 @@ export default function AudioLibrary() {
     return () => el.removeEventListener('ended', onEnded)
   }, [])
 
-  function togglePlay(i, track) {
+  async function togglePlay(i, track) {
     const el = audioRef.current
     if (playingIndex === i) {
       el?.pause()
       setPlayingIndex(null)
       return
     }
-    if (track.audioUrl && el) {
-      el.src = track.audioUrl
-      el.play().catch(() => {})
-    }
+    if (!track.audioUrl || !el) return
+    setAudioError('')
     setPlayingIndex(i)
+    try {
+      // Files in the private R2 bucket need a short-lived signed link first.
+      el.src = await resolveAudioUrl(track.audioUrl)
+      await el.play()
+    } catch (err) {
+      if (err?.name === 'AbortError') return // another track was picked meanwhile
+      setPlayingIndex(null)
+      setAudioError(err?.message || "Couldn't play this audio.")
+    }
   }
 
   if (moduleTreeLoading) {
@@ -153,6 +162,7 @@ export default function AudioLibrary() {
       </div>
 
       <div className="px-5 pb-2 pt-4">
+        {audioError && <div className="mb-2.5 text-[12.5px] font-semibold text-danger">{audioError}</div>}
         {tracks.length === 0 && (
           <div className="rounded-2xl border border-app-border bg-app-panel px-3.5 py-5 text-center text-[13px] text-app-inkFaint">
             No dialogue tracks in this unit yet.

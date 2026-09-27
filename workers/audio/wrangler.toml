@@ -1,0 +1,15 @@
+# Gatekeeper for the private R2 bucket that holds module audio.
+# Deploy:  cd workers/audio && npx wrangler deploy
+# Secret:  npx wrangler secret put SIGNING_SECRET   (any long random string)
+name = "eduarabic-audio"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[[r2_buckets]]
+binding = "AUDIO"
+bucket_name = "eduarabicforall"
+
+# Both values are public (the same ones the browser app ships with).
+[vars]
+SUPABASE_URL = "https://unqbijfmsniedwgtyulp.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable_P4PxzC89VdTyQOPLeM3AUg_D18NMne0"
