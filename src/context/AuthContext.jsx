@@ -16,6 +16,13 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [notice, setNotice] = useState('')
   const noticeTimer = useRef(null)
+  // True for the temporary session Supabase creates when someone opens a
+  // "reset your password" email link — it authenticates them just enough to
+  // set a new password, but it isn't a real sign-in. Auth.jsx uses this to
+  // show the "set new password" screen instead of redirecting to /dashboard,
+  // and the effect below uses it to skip device-claim/idle enforcement so
+  // opening the link doesn't sign the account's other device out.
+  const [isRecovery, setIsRecovery] = useState(false)
 
   const announce = useCallback((message) => {
     setNotice(message)
@@ -63,7 +70,9 @@ export function AuthProvider({ children }) {
       })
     })
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') setIsRecovery(true)
+      if (event === 'SIGNED_OUT') setIsRecovery(false)
       loadFromSession(session)
     })
 
@@ -79,7 +88,7 @@ export function AuthProvider({ children }) {
   // the account right away, and a device that just got out-claimed is
   // signed out within one interval rather than waiting on the idle timer.
   useEffect(() => {
-    if (!user?.id) return
+    if (!user?.id || isRecovery) return
 
     const stopIdleWatch = startIdleWatch(() => forceSignOut('idle'))
 
@@ -96,7 +105,7 @@ export function AuthProvider({ children }) {
       stopIdleWatch()
       clearInterval(deviceCheckInterval)
     }
-  }, [user?.id, forceSignOut])
+  }, [user?.id, isRecovery, forceSignOut])
 
   async function signIn({ email, password }) {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -129,6 +138,14 @@ export function AuthProvider({ children }) {
     await supabase.auth.signOut()
   }
 
+  // Used to finish the "forgot password" flow: the recovery-link session is
+  // only valid for setting a new password, so the caller signs out right
+  // after this succeeds and asks the user to sign in again normally.
+  async function updatePassword(password) {
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw error
+  }
+
   async function refreshUser() {
     if (!user?.id) return
     const profile = await fetchProfile(user.id)
@@ -136,7 +153,9 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, notice, signIn, signUp, signInWithGoogle, signOut, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, notice, isRecovery, signIn, signUp, signInWithGoogle, signOut, updatePassword, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   )

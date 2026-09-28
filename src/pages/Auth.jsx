@@ -42,18 +42,27 @@ function friendlyError(error) {
 
 export default function Auth() {
   const [searchParams] = useSearchParams()
-  const [view, setView] = useState(searchParams.get('view') === 'signup' ? 'signup' : 'signin') // signin | signup | forgot
+  const [view, setView] = useState(searchParams.get('view') === 'signup' ? 'signup' : 'signin') // signin | signup | forgot | reset
   const [sent, setSent] = useState(false)
   const [signupSent, setSignupSent] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const { user, signIn, signUp, signInWithGoogle } = useAuth()
+  const [resetDone, setResetDone] = useState(false)
+  const { user, isRecovery, signIn, signUp, signInWithGoogle, signOut, updatePassword } = useAuth()
   const navigate = useTransitionNavigate()
   const cardRef = useRef(null)
   const isFirstViewRender = useRef(true)
+
+  // Opening a "reset your password" email link logs the browser into a
+  // temporary recovery session and lands here — switch straight to the
+  // set-new-password screen regardless of whatever view was showing before.
+  useEffect(() => {
+    if (isRecovery) setView('reset')
+  }, [isRecovery])
 
   // Entrance animation when arriving here (e.g. from the Landing page's
   // Sign in / Sign up buttons), and a quick cross-fade whenever the view
@@ -121,7 +130,9 @@ export default function Auth() {
     setError('')
     setSubmitting(true)
     try {
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email)
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      })
       if (resetError) throw resetError
       setSent(true)
     } catch (err) {
@@ -131,9 +142,36 @@ export default function Auth() {
     }
   }
 
-  // Already signed in — including the moment right after signIn() resolves,
-  // when the profile is still loading and ProtectedRoute bounces us back here.
-  if (user) return <Navigate to="/dashboard" replace />
+  async function handleSetNewPassword(e) {
+    e.preventDefault()
+    setError('')
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+    setSubmitting(true)
+    try {
+      await updatePassword(password)
+      // The recovery session is only meant for this one action — sign out so
+      // they land back on a normal sign-in with their new password.
+      await signOut()
+      setResetDone(true)
+    } catch (err) {
+      setError(friendlyError(err))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // Already signed in with a normal session — including the moment right
+  // after signIn() resolves, when the profile is still loading and
+  // ProtectedRoute bounces us back here. A recovery session is deliberately
+  // excluded so it lands on the set-new-password screen below instead.
+  if (user && !isRecovery) return <Navigate to="/dashboard" replace />
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-app-bg p-10 text-app-ink">
@@ -359,6 +397,68 @@ export default function Auth() {
                 ← Back to sign in
               </button>
             </p>
+          </div>
+        )}
+
+        {view === 'reset' && !resetDone && (
+          <form onSubmit={handleSetNewPassword} className="flex flex-col gap-[18px]">
+            <div>
+              <h1 className="mb-1.5 font-poppins text-[28px] font-extrabold">Set new password</h1>
+              <p className="text-sm text-app-inkSoft">Choose a new password for your account.</p>
+            </div>
+            <label className="text-[13px] font-semibold text-app-inkSoft">
+              New password
+              <PasswordInput
+                required
+                minLength={8}
+                autoFocus
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="At least 8 characters"
+                className={inputClass}
+              />
+            </label>
+            <label className="text-[13px] font-semibold text-app-inkSoft">
+              Confirm new password
+              <PasswordInput
+                required
+                minLength={8}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Type it again"
+                className={inputClass}
+              />
+            </label>
+            {error && <div className="text-[13px] font-semibold text-danger">{error}</div>}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-1 rounded-xl bg-primary py-3.5 text-[15px] font-bold text-white disabled:opacity-60"
+            >
+              {submitting ? 'Saving…' : 'Save new password'}
+            </button>
+          </form>
+        )}
+
+        {view === 'reset' && resetDone && (
+          <div className="flex flex-col items-center gap-3.5 rounded-2xl border border-primary/[.22] bg-primary/[.08] px-5 py-7 text-center">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/[.18]">
+              <Icon name="checkmark-circle-02" size={22} className="text-primary" />
+            </div>
+            <div className="text-[15px] font-bold">Password updated</div>
+            <div className="text-[13px] leading-relaxed text-app-inkSoft">Please sign in with your new password.</div>
+            <button
+              type="button"
+              onClick={() => {
+                setResetDone(false)
+                setPassword('')
+                setConfirmPassword('')
+                setView('signin')
+              }}
+              className="mt-1 font-bold text-primary"
+            >
+              ← Back to sign in
+            </button>
           </div>
         )}
       </div>
